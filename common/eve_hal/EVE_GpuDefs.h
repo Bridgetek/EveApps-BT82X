@@ -262,7 +262,7 @@
 
 /** @name LVDSRX System Register */
 ///@{
-#define REG_LVDSRX_SETUP         
+#define REG_LVDSRX_SETUP         (REG_LVDSRX + 0x0000)
 #define REG_LVDSRX_CTRL          (REG_LVDSRX + 0x0004)
 #define REG_LVDSRX_STAT          (REG_LVDSRX + 0x0008)
 ///@}
@@ -530,9 +530,6 @@
 #define REGION(y, h, dest)            ((52UL << 24) | (((y)&63UL) << 18) | (((h)&63UL) << 12) | (((dest)&4095UL) << 0))
 #define RETURN()                      ((36UL << 24))
 ///@}
-
-#define INT_PALDAT()                  ((48UL << 24))
-#define SYS_PSEUDO_BASE(p)            ((53UL << 24) | (((p)&2047UL) << 0))
 
 /***************
 ** Parameters **
