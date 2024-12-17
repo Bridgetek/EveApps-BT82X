@@ -63,20 +63,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void SAMAPP_Demo_Graphs();
-
-void SAMAPP_Bedside_Monitor()
-{
-	SAMAPP_Demo_Graphs();
-}
-
 /// The demo area //////////////////////////////////////////////////////////////////////////////////////
-
-typedef struct
-{
-	int x, y, w, h, x_end, y_end, x_mid, y_mid;
-} app_box;
-
 #define INIT_APP_BOX(x_val, y_val, w_val, h_val) \
 	{                                            \
 		(x_val),                                 \
@@ -125,28 +112,12 @@ typedef struct
 		EVE_DRAW_AT(box.x_end - border, box.y_end - border);                                                      \
 	}
 
-app_box lcd_size = {0, 0, 1920, 1200, 1920, 1200};
-app_box app_window = INIT_APP_BOX((1920 - 1280) / 2, (1200 - 800) / 2, 1280, 800);
 #define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * 1, (y) * 1))
-#define VERTEX2F16(x, y) VERTEX2F(x / 16, y / 16)
 
-void Gpu_Radiobutton(int16_t x, int16_t y, uint32_t bgcolor, uint32_t fgcolor, uint8_t psize, uint8_t tag, uint8_t option)
+typedef struct
 {
-	uint8_t check_size = psize / 2;
-	EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
-	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB((bgcolor >> 16 & 0xff), (bgcolor >> 8 & 0xff), (bgcolor & 0xff)));
-	EVE_Cmd_wr32(s_pHalContext, TAG(tag));
-	EVE_Cmd_wr32(s_pHalContext, POINT_SIZE(psize * 16));
-	EVE_Cmd_wr32(s_pHalContext, BEGIN(POINTS));
-	EVE_DRAW_AT(x, y);
-	if (tag == option)
-	{
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB((fgcolor >> 16 & 0xff), (fgcolor >> 8 & 0xff), (fgcolor & 0xff)));
-		EVE_Cmd_wr32(s_pHalContext, POINT_SIZE(check_size * 16));
-		EVE_DRAW_AT(x, y);
-	}
-	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
-}
+	int x, y, w, h, x_end, y_end, x_mid, y_mid;
+} app_box;
 
 uint8_t Gesture_GetTag(EVE_HalContext *phost)
 {
@@ -201,170 +172,7 @@ int getFPS()
 	return fps;
 }
 
-// Integer to string conversion without reversing
-void int_to_string(int value, char *buffer)
-{
-	char *ptr = buffer;
-
-	// Handle negative numbers
-	if (value < 0)
-	{
-		*ptr++ = '-'; // Add negative sign
-		value = -value;
-	}
-
-	// Find the number of digits
-	int temp = value;
-	int num_digits = 1;
-	while (temp >= 10)
-	{
-		num_digits++;
-		temp /= 10;
-	}
-
-	// Write digits starting from the left
-	ptr[num_digits] = '\0'; // Null-terminate the string
-	for (int i = num_digits - 1; i >= 0; i--)
-	{
-		ptr[i] = (value % 10) + '0'; // Place digits
-		value /= 10;
-	}
-}
-
-int my_sprintf(char *output, const char *format, int value)
-{
-	// Initialize pointers for output and format
-	char *out_ptr = output;
-	const char *fmt_ptr = format;
-
-	while (*fmt_ptr)
-	{
-		if (*fmt_ptr == '%' && *(fmt_ptr + 1) == 'd')
-		{
-			// Found %d, convert the integer to string
-			char num_buffer[12];
-			int_to_string(value, num_buffer);
-
-			// Append the integer string to the output
-			strcpy(out_ptr, num_buffer);
-			out_ptr += strlen(num_buffer);
-
-			// Skip the %d in the format
-			fmt_ptr += 2;
-		}
-		else
-		{
-			// Copy other characters as-is
-			*out_ptr++ = *fmt_ptr++;
-		}
-	}
-
-	// Null-terminate the output string
-	*out_ptr = '\0';
-
-	// Return the length of the output string
-	return strlen(output);
-}
-
-/// helper functions //////////////////////////////////////////////////////////////////////////////////////
-/// Sample data generator //////////////////////////////////////////////////////////////////////////////////////
-#define CYCLE_DURATION 100 // One heartbeat in 100 SAMPLE_INTERVAL
-#define SAMPLE_INTERVAL 1  // Adjustable sampling rate in ms
-#define BASELINE 200	   // Baseline (y-offset)
-#define AMPLITUDE 100	   // Maximum amplitude of the waveform
-#define HEARTBEAT_PER_1000_MS 1
-#define SAMPLE_PER_SECOND (HEARTBEAT_PER_1000_MS * CYCLE_DURATION)
-
-// Function to simulate an integer-based sine wave (approximation)
-int approx_sine_wave(int t, int period)
-{
-	t = t % period;
-	int segment = period / 4;
-
-	if (t < segment)
-	{
-		return (4 * AMPLITUDE * t) / period; // Rising
-	}
-	else if (t < 2 * segment)
-	{
-		return (2 * AMPLITUDE) - (4 * AMPLITUDE * t) / period; // Falling
-	}
-	else if (t < 3 * segment)
-	{
-		return -(4 * AMPLITUDE * (t - 2 * segment)) / period; // Falling
-	}
-	else
-	{
-		return -(2 * AMPLITUDE) + (4 * AMPLITUDE * t) / period; // Rising
-	}
-}
-
-// Function to generate a random number within a range
-int random_in_range(int min, int max)
-{
-	return min + (rand() % (max - min + 1));
-}
-
-// Function to generate one ECG value (keeps track of time internally)
-int generate_ecg_sample()
-{
-	static int time = 0; // Keeps track of the current time step
-	int cycle_time = time % CYCLE_DURATION;
-	int value;
-
-	// Introduce small random variations
-	int rand_amplitude = AMPLITUDE + random_in_range(-10, 10);
-	int rand_baseline = BASELINE + random_in_range(-5, 5);
-
-	// P-Wave (small upward bump)
-	if (cycle_time >= 0 && cycle_time < 10)
-	{
-		value = rand_baseline + (rand_amplitude / 4) * cycle_time / 10;
-	}
-	// PR Segment (flat line)
-	else if (cycle_time >= 10 && cycle_time < 12)
-	{
-		value = rand_baseline;
-	}
-	// Q-Wave (small downward dip)
-	else if (cycle_time >= 12 && cycle_time < 15)
-	{
-		value = rand_baseline - (rand_amplitude / 5) * (cycle_time - 12) / 3;
-	}
-	// R-Wave (sharp upward spike)
-	else if (cycle_time >= 15 && cycle_time < 18)
-	{
-		value = rand_baseline + (rand_amplitude * 3 / 2) * (18 - cycle_time) / 3;
-	}
-	// S-Wave (sharp downward spike)
-	else if (cycle_time >= 18 && cycle_time < 21)
-	{
-		value = rand_baseline - (rand_amplitude / 2) * (cycle_time - 18) / 3;
-	}
-	// ST Segment (flat line)
-	else if (cycle_time >= 21 && cycle_time < 40)
-	{
-		value = rand_baseline;
-	}
-	// T-Wave (broad upward bump)
-	else if (cycle_time >= 40 && cycle_time < 60)
-	{
-		value = rand_baseline + approx_sine_wave(cycle_time - 40, 20, rand_amplitude / 2);
-	}
-	// Baseline (flat line)
-	else
-	{
-		value = rand_baseline;
-	}
-
-	time += SAMPLE_INTERVAL; // Advance time by the sample interval
-	return value;
-}
-
-#define TOTAL_SAMPLES 1000
-int ecg_data[TOTAL_SAMPLES];
-
-void draw_app_window()
+void draw_app_window(app_box app_window)
 {
 	int border = 5;
 	int bx = app_window.x;
@@ -372,6 +180,11 @@ void draw_app_window()
 	int bw = app_window.w + border;
 	int bh = app_window.h + border;
 	char border_color[3] = {134, 134, 134};
+
+	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+	EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));
+	EVE_DRAW_AT(0, 0);
+	EVE_DRAW_AT(s_pHalContext->Width, s_pHalContext->Height);
 
 	// Camera border
 	// start draw a small rectangle with alpha value 255
@@ -536,19 +349,31 @@ char *dd_mm_yyyy(int start_dd, int start_mm, int start_yyyy)
 int rand(int range)
 {
 	if (range <= 0)
-		return 0; // Nếu range không hợp lệ, trả về 0
+		return 0; 
 
-	unsigned long millis = EVE_millis() + 17; // Lấy giá trị mili-giây
-	return millis % range;					  // Lấy phần dư của mili-giây chia cho range
+	unsigned long millis = EVE_millis() + 17; 
+	return millis % range;					  
 }
 
 // ************************************ application ************************************
+#define BIT_PER_CHAR 8
+#define USE_BITMAP_L1 0
+#define USE_BITMAP_PALETTED 1
+
+#define USEBITMAP USE_BITMAP_L1
+
+#if  USEBITMAP == USE_BITMAP_L1
+#define GRAPH_BIT_PER_PIXEL 1
+#else
+#define GRAPH_BIT_PER_PIXEL (BIT_PER_CHAR)
+#endif
+
 #define GRAPH_W 160
 #define GRAPH_H 1000
-#define GRAPH_SIZE GRAPH_W *GRAPH_H
+#define GRAPH_SIZE (GRAPH_W *GRAPH_H)
+#define GRAPH_BYTE (GRAPH_SIZE * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR)
 
 // coloring
-
 uint8_t color_table[] = {
 	// blue, green, red, alpha
 	// blue, green, red, alpha
@@ -621,29 +446,40 @@ enum ColorIndex
 	ARGB_DEEP_PURPLE
 };
 
+// graph palleted buffer
+char buffer_paletted1_x2[GRAPH_BYTE * 2] = {{0}}; 
+char buffer_paletted2_x2[GRAPH_BYTE * 2] = {{0}};
+char buffer_paletted3_x2[GRAPH_BYTE * 2] = {{0}};
+
+// graph background color
+#if USEBITMAP == USE_BITMAP_PALETTED
 #define PALETTED_BG (ARGB_BLACK * 4)
-#define PALETTED_COLOR (ARGB_WHITE * 4)
+#elif USEBITMAP == USE_BITMAP_L1
+#define PALETTED_BG 0
+#endif
 
-/// SAMAPP_Demo_Graphs //////////////////////////////////////////////////////////////////////////////////////
-
-char buffer_paletted1_x2[GRAPH_SIZE * 2] = {{0}};
-char buffer_paletted2_x2[GRAPH_SIZE * 2] = {{0}};
-char buffer_paletted3_x2[GRAPH_SIZE * 2] = {{0}};
+void set_color(char* a, int n, char color) {
+#if USEBITMAP == USE_BITMAP_L1
+	int byte_index = n / 8;    // byte nth
+	int bit_index = 7 - n % 8;    // bit nth 
+	a[byte_index] |= (1 << bit_index);
+#else
+	a[n] = color;
+#endif
+}
 void draw_pixel(char *buffer, int x, int y, int color_offset)
 {
 	if (y > GRAPH_H * 2)
 		return;
 	if (x < 0)
-		printf("Drawing pixel at (%d, %d)\n", x, y);
-	int line_width = 1;
-	for (int i = 0; i < line_width; i++)
+		printf("Error: Drawing pixel at (%d, %d)\n", x, y);
+
+
+	if (x < 0 || x>= GRAPH_W)
 	{
-		if (x + i < 0 || x + i >= GRAPH_W)
-		{
-			break;
-		}
-		buffer[x + i + y * GRAPH_W] = color_offset;
+		return;
 	}
+	set_color(buffer, x + y * GRAPH_W, color_offset);
 }
 void bresenham_line(char *buffer, int x1, int y1, int x2, int y2, int color_offset)
 {
@@ -651,7 +487,6 @@ void bresenham_line(char *buffer, int x1, int y1, int x2, int y2, int color_offs
 	int sy = (y2 > y1) ? 1 : -1;
 	int dx = abs(x2 - x1);
 	int dy = abs(y2 - y1);
-
 	while (dx-- > -1)
 	{
 		draw_pixel(buffer, x1, y1, color_offset);
@@ -664,9 +499,10 @@ int read_time_simulate(int sample_rate, int time_start_ms)
 	int duration_ms = now_ms - time_start_ms;
 
 	int num_samples = duration_ms * sample_rate / 1000;
-	// return 1;
+	//return 1;
 	return num_samples;
 }
+
 // put a realtime data into ramg
 // return the paletted bitmap adderss
 int heartbeat(int ramg_paletted, char *buffer_paletted, int color_offset)
@@ -691,6 +527,7 @@ int heartbeat(int ramg_paletted, char *buffer_paletted, int color_offset)
 	static int lastx = 2;
 	static int lasty = GRAPH_H;
 	static int line_next = GRAPH_H; // start from buffer 2nd
+	static int paletted_addr_start = 0;
 
 	static uint32_t time_start_ms = 0;
 	if (time_start_ms == 0)
@@ -700,6 +537,9 @@ int heartbeat(int ramg_paletted, char *buffer_paletted, int color_offset)
 	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
 	if (num_samples > 0)
 		time_start_ms = EVE_millis();
+	else {
+		return paletted_addr_start;
+	}
 
 	int copy_start = line_next * GRAPH_W;
 	int copy_bytes = 0;
@@ -708,9 +548,10 @@ int heartbeat(int ramg_paletted, char *buffer_paletted, int color_offset)
 	{
 		int paletted_x = ecg_data[(sample_offset + line_next) % sample_num] * multipler / dividor;
 
-		for (int ii = 0; ii < GRAPH_W; ii++)
+		for (int ii = 0; ii < GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR; ii++)
 		{
-			buffer_paletted[line_next * GRAPH_W + ii] = PALETTED_BG;
+			int bytenth = line_next * GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR + ii;
+			buffer_paletted[bytenth] = PALETTED_BG;
 		}
 		bresenham_line(buffer_paletted, paletted_x, line_next, lastx, lasty, color_offset);
 		lastx = paletted_x;
@@ -721,21 +562,27 @@ int heartbeat(int ramg_paletted, char *buffer_paletted, int color_offset)
 
 		if (line_next == GRAPH_H * 2) // if buffer 2nd full
 		{
-			memcpy(buffer_paletted, &buffer_paletted[GRAPH_SIZE], GRAPH_SIZE); // copy buffer 2nd to buffer 1st
+			memcpy(buffer_paletted, &buffer_paletted[GRAPH_BYTE], GRAPH_BYTE); // copy buffer 2nd to buffer 1st
 			line_next = GRAPH_H;											   // continue writing to buffer 2nd, while displaying buffer 1st
-			copy_start = line_next * GRAPH_W;
-			copy_bytes = 0;
+			//copy_start = line_next * GRAPH_W;
+			//copy_bytes = 0;
 			sample_offset = (line_next - 1) % sample_num;
+			break;
 		}
 	}
+
+	copy_start = copy_start * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
+	copy_bytes = copy_bytes * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
 
 	// copy to buffer 2nd
 	EVE_Hal_wrMem(s_pHalContext, ramg_paletted + copy_start, &buffer_paletted[copy_start], copy_bytes);
 
 	// duplicate to buffer 1st for next cycle
-	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + copy_start - GRAPH_SIZE - GRAPH_W - copy_bytes, ramg_paletted + copy_start, copy_bytes);
+	int duplicate_to = copy_start - GRAPH_BYTE - copy_bytes;
+	int duplicate_from = copy_start;
+	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + duplicate_to, ramg_paletted + duplicate_from, copy_bytes);
 
-	int paletted_addr_start = copy_start - GRAPH_SIZE;
+	paletted_addr_start = copy_start - GRAPH_BYTE + copy_bytes;
 	return paletted_addr_start;
 }
 int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
@@ -755,7 +602,7 @@ int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
 	};
 	int dividor = 2;
 	int multipler = 1;
-	int data_duration = 4; // unit: second
+	int data_duration = 1; // unit: second
 	const int sample_num = sizeof(pleth_data) / sizeof(int);
 	const int sample_per_second = sample_num / data_duration;
 	static int sample_offset = 0;
@@ -763,6 +610,7 @@ int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
 	static int lastx = 2;
 	static int lasty = GRAPH_H;
 	static int line_next = GRAPH_H; // start from buffer 2nd
+	static int paletted_addr_start = 0;
 
 	static uint32_t time_start_ms = 0;
 	if (time_start_ms == 0)
@@ -772,6 +620,9 @@ int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
 	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
 	if (num_samples > 0)
 		time_start_ms = EVE_millis();
+	else {
+		return paletted_addr_start;
+	}
 
 	int copy_start = line_next * GRAPH_W;
 	int copy_bytes = 0;
@@ -780,9 +631,10 @@ int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
 	{
 		int paletted_x = pleth_data[(sample_offset + line_next) % sample_num] * multipler / dividor;
 
-		for (int ii = 0; ii < GRAPH_W; ii++)
+		for (int ii = 0; ii < GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR; ii++)
 		{
-			buffer_paletted[line_next * GRAPH_W + ii] = PALETTED_BG;
+			int bytenth = line_next * GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR + ii;
+			buffer_paletted[bytenth] = PALETTED_BG;
 		}
 		bresenham_line(buffer_paletted, paletted_x, line_next, lastx, lasty, color_offset);
 		lastx = paletted_x;
@@ -793,21 +645,27 @@ int pleth(int ramg_paletted, char *buffer_paletted, int color_offset)
 
 		if (line_next == GRAPH_H * 2) // if buffer 2nd full
 		{
-			memcpy(buffer_paletted, &buffer_paletted[GRAPH_SIZE], GRAPH_SIZE); // copy buffer 2nd to buffer 1st
+			memcpy(buffer_paletted, &buffer_paletted[GRAPH_BYTE], GRAPH_BYTE); // copy buffer 2nd to buffer 1st
 			line_next = GRAPH_H;											   // continue writing to buffer 2nd, while displaying buffer 1st
-			copy_start = line_next * GRAPH_W;
-			copy_bytes = 0;
+			//copy_start = line_next * GRAPH_W;
+			//copy_bytes = 0;
 			sample_offset = (line_next - 1) % sample_num;
+			break;
 		}
 	}
+
+	copy_start = copy_start * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
+	copy_bytes = copy_bytes * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
 
 	// copy to buffer 2nd
 	EVE_Hal_wrMem(s_pHalContext, ramg_paletted + copy_start, &buffer_paletted[copy_start], copy_bytes);
 
 	// duplicate to buffer 1st for next cycle
-	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + copy_start - GRAPH_SIZE - GRAPH_W - copy_bytes, ramg_paletted + copy_start, copy_bytes);
+	int duplicate_to = copy_start - GRAPH_BYTE - copy_bytes;
+	int duplicate_from = copy_start;
+	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + duplicate_to, ramg_paletted + duplicate_from, copy_bytes);
 
-	int paletted_addr_start = copy_start - GRAPH_SIZE;
+	paletted_addr_start = copy_start - GRAPH_BYTE + copy_bytes;
 	return paletted_addr_start;
 }
 int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
@@ -822,7 +680,7 @@ int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
 							0, 0, 0, 0, 0, 5, 10, 15, 15};
 	int dividor = 2;
 	int multipler = 1;
-	int data_duration = 2; // unit: second
+	int data_duration = 1; // unit: second
 	const int sample_num = sizeof(co2_data) / sizeof(int);
 	const int sample_per_second = sample_num / data_duration;
 	static int sample_offset = 0;
@@ -830,6 +688,7 @@ int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
 	static int lastx = 2;
 	static int lasty = GRAPH_H;
 	static int line_next = GRAPH_H; // start from buffer 2nd
+	static int paletted_addr_start = 0;
 
 	static uint32_t time_start_ms = 0;
 	if (time_start_ms == 0)
@@ -839,6 +698,9 @@ int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
 	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
 	if (num_samples > 0)
 		time_start_ms = EVE_millis();
+	else {
+		return paletted_addr_start;
+	}
 
 	int copy_start = line_next * GRAPH_W;
 	int copy_bytes = 0;
@@ -847,9 +709,10 @@ int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
 	{
 		int paletted_x = co2_data[(sample_offset + line_next) % sample_num] * multipler / dividor;
 
-		for (int ii = 0; ii < GRAPH_W; ii++)
+		for (int ii = 0; ii < GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR; ii++)
 		{
-			buffer_paletted[line_next * GRAPH_W + ii] = PALETTED_BG;
+			int bytenth = line_next * GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR + ii;
+			buffer_paletted[bytenth] = PALETTED_BG;
 		}
 		bresenham_line(buffer_paletted, paletted_x, line_next, lastx, lasty, color_offset);
 		lastx = paletted_x;
@@ -860,43 +723,122 @@ int co2(int ramg_paletted, char *buffer_paletted, int color_offset)
 
 		if (line_next == GRAPH_H * 2) // if buffer 2nd full
 		{
-			memcpy(buffer_paletted, &buffer_paletted[GRAPH_SIZE], GRAPH_SIZE); // copy buffer 2nd to buffer 1st
+			memcpy(buffer_paletted, &buffer_paletted[GRAPH_BYTE], GRAPH_BYTE); // copy buffer 2nd to buffer 1st
 			line_next = GRAPH_H;											   // continue writing to buffer 2nd, while displaying buffer 1st
-			copy_start = line_next * GRAPH_W;
-			copy_bytes = 0;
+			//copy_start = line_next * GRAPH_W;
+			//copy_bytes = 0;
 			sample_offset = (line_next - 1) % sample_num;
+			break;
 		}
 	}
+
+	copy_start = copy_start * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
+	copy_bytes = copy_bytes * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR;
 
 	// copy to buffer 2nd
 	EVE_Hal_wrMem(s_pHalContext, ramg_paletted + copy_start, &buffer_paletted[copy_start], copy_bytes);
 
 	// duplicate to buffer 1st for next cycle
-	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + copy_start - GRAPH_SIZE - GRAPH_W - copy_bytes, ramg_paletted + copy_start, copy_bytes);
+	int duplicate_to = copy_start - GRAPH_BYTE - copy_bytes;
+	int duplicate_from = copy_start;
+	EVE_CoCmd_memCpy(s_pHalContext, ramg_paletted + duplicate_to, ramg_paletted + duplicate_from, copy_bytes);
 
-	int paletted_addr_start = copy_start - GRAPH_SIZE;
+	paletted_addr_start = copy_start - GRAPH_BYTE + copy_bytes;
 	return paletted_addr_start;
 }
 
-void SAMAPP_Demo_Graphs()
+void graph_L1(int bitmap_addr, int color_source, int x, int y) {
+	int bformat = L1;
+	int lw = max(GRAPH_H, GRAPH_W);
+	int lh = max(GRAPH_H, GRAPH_W);
+#define MAX_ANGLE 360
+#define MAX_CIRCLE_UNIT 65536
+	int rotation_angle = -90;
+
+	EVE_CoCmd_setBitmap(s_pHalContext, bitmap_addr, bformat, GRAPH_W, GRAPH_H);
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
+	EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
+	EVE_CoCmd_loadIdentity(s_pHalContext);
+	EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
+	EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
+	EVE_CoCmd_setMatrix(s_pHalContext);
+	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
+	EVE_DRAW_AT(x, y);
+	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
+}
+
+void graph_paletted8(int bitmap_addr, int color_source, int x, int y) {
+	int bformat = PALETTED8;
+#ifdef BT82X_ENABLE
+	bformat = PALETTEDARGB8;
+#endif
+	int lw = max(GRAPH_H, GRAPH_W);
+	int lh = max(GRAPH_H, GRAPH_W);
+#define MAX_ANGLE 360
+#define MAX_CIRCLE_UNIT 65536
+	int rotation_angle = -90;
+
+	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+	EVE_CoCmd_setBitmap(s_pHalContext, bitmap_addr , bformat, GRAPH_W, GRAPH_H);
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(color_source));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
+	EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
+	EVE_CoCmd_loadIdentity(s_pHalContext);
+	EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
+	EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
+	EVE_CoCmd_setMatrix(s_pHalContext);
+	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
+	EVE_DRAW_AT(x, y);
+	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
+}
+
+void SAMAPP_Bedside_Monitor()
 {
 	int color_table_addr = 0;
-	int paletted_size = GRAPH_SIZE * 2 * 4;
-	int paletted_adr = 100 * 1024;
+	int paletted_size = GRAPH_BYTE * 3; // buffer 0 to duplicate data from buffer 1, buffer 1 to append new data
+
+	int paletted_adr = color_table_addr + sizeof(color_table);
 	int paletted_adr2 = paletted_adr + paletted_size;
 	int paletted_adr3 = paletted_adr2 + paletted_size;
+
+	
+	app_box lcd_size = {0, 0, 1920, 1200, 1920, 1200};
+	app_box app_window = INIT_APP_BOX((1920 - 1280) / 2, (1200 - 800) / 2, 1280, 800);
+	int graph_start = app_window.x + 35;
+
+	app_box box_menu_top = INIT_APP_BOX(app_window.x, app_window.y, GRAPH_H, app_window.h * 8 / 100);
+	app_box box_graph_ecg = INIT_APP_BOX(graph_start, box_menu_top.y_end, box_menu_top.w, app_window.h * 28 / 100);
+	app_box box_graph_pleth = INIT_APP_BOX(graph_start, box_graph_ecg.y_end, box_menu_top.w, box_graph_ecg.h);
+	app_box box_graph_co2 = INIT_APP_BOX(graph_start, box_graph_pleth.y_end, box_menu_top.w, box_graph_ecg.h);
+	app_box box_menu_bottom = INIT_APP_BOX(app_window.x, box_graph_co2.y_end, box_menu_top.w, box_menu_top.h);
+
+	int x = box_menu_top.x_end;
+	int w = app_window.w - box_menu_top.w;
+	int h = (app_window.h - box_menu_top.h - box_menu_bottom.h) / 4;
+	int y = box_menu_top.y_end;
+	int border = 2;
+
+	app_box box_right1 = INIT_APP_BOX(x, y + h * 0, w, h);
+	app_box box_right2 = INIT_APP_BOX(x, y + h * 1, w, h);
+	app_box box_right3 = INIT_APP_BOX(x, y + h * 2, w, h);
+	app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
 
 	// prepare a paletted buffer
 	EVE_Hal_wrMem(s_pHalContext, color_table_addr, color_table, sizeof(color_table));
 
+	// init graph palleted buffer 1
 	memset(buffer_paletted1_x2, 0, sizeof(buffer_paletted1_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr, buffer_paletted1_x2, GRAPH_SIZE);
+	EVE_Hal_wrMem(s_pHalContext, paletted_adr, buffer_paletted1_x2, sizeof(buffer_paletted1_x2));
 
+	// init graph palleted buffer 2
 	memset(buffer_paletted2_x2, 0, sizeof(buffer_paletted2_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr2, buffer_paletted2_x2, GRAPH_SIZE);
+	EVE_Hal_wrMem(s_pHalContext, paletted_adr2, buffer_paletted2_x2, sizeof(buffer_paletted2_x2));
 
+	// init graph palleted buffer 3
 	memset(buffer_paletted3_x2, 0, sizeof(buffer_paletted3_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr3, buffer_paletted3_x2, GRAPH_SIZE);
+	EVE_Hal_wrMem(s_pHalContext, paletted_adr3, buffer_paletted3_x2, sizeof(buffer_paletted3_x2));
 
 	int time_start_ms = 0;
 	int val_hr = 66;
@@ -913,214 +855,153 @@ void SAMAPP_Demo_Graphs()
 
 		Display_Start(s_pHalContext);
 		EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(0));
+		draw_app_window(app_window);
 
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));
-		EVE_DRAW_AT(0, 0);
-		EVE_DRAW_AT(s_pHalContext->Width, s_pHalContext->Height);
-		draw_app_window();
-
-		int graph_start = app_window.x + 35;
-		// top menu
-		app_box box_menu_top = INIT_APP_BOX(app_window.x, app_window.y, GRAPH_H, app_window.h * 8 / 100);
-		app_box box_graph1 = INIT_APP_BOX(graph_start, box_menu_top.y_end, box_menu_top.w, app_window.h * 28 / 100);
-		app_box box_graph2 = INIT_APP_BOX(graph_start, box_graph1.y_end, box_menu_top.w, box_graph1.h);
-		app_box box_graph3 = INIT_APP_BOX(graph_start, box_graph2.y_end, box_menu_top.w, box_graph1.h);
-		app_box box_menu_bottom = INIT_APP_BOX(app_window.x, box_graph3.y_end, box_menu_top.w, box_menu_top.h);
-
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(43, 132, 135));
-		DRAW_BOX(box_menu_top);
-		DRAW_BOX(box_menu_bottom);
-
-		{ // graph title drawing
-			int border = 3, magin = 36;
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-			DRAW_RECT(box_graph1.x, box_graph1.y + magin, 10, box_graph1.h - magin);
-			DRAW_RECT(box_graph2.x, box_graph2.y + magin, 10, box_graph2.h - magin);
-			DRAW_RECT(box_graph3.x, box_graph3.y + magin, 10, box_graph3.h - magin);
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-			DRAW_RECT(box_graph1.x + border, box_graph1.y + magin + border, 10, box_graph1.h - magin - border * 2);
-			DRAW_RECT(box_graph1.x + 10, box_graph1.y + magin, 10, box_graph1.h - magin);
-
-			DRAW_RECT(box_graph2.x + border, box_graph2.y + magin + border, 10, box_graph2.h - magin - border * 2);
-			DRAW_RECT(box_graph2.x + 10, box_graph2.y + magin, 10, box_graph2.h - magin);
-
-			DRAW_RECT(box_graph3.x + border, box_graph3.y + magin + border, 10, box_graph3.h - magin - border * 2);
-			DRAW_RECT(box_graph3.x + 10, box_graph3.y + magin, 10, box_graph3.h - magin);
-		}
-
-		int lw = max(GRAPH_H, GRAPH_W);
-		int lh = max(GRAPH_H, GRAPH_W);
-#define MAX_ANGLE 360
-#define MAX_CIRCLE_UNIT 65536
-		int rotation_angle = -90;
-
-		int bformat = PALETTED8;
-#ifdef BT82X_ENABLE
-		bformat = PALETTEDARGB8;
+#if  USEBITMAP == USE_BITMAP_L1
+#define GRAPH graph_L1
+#else
+#define GRAPH graph_paletted8
 #endif
 
+		// Graph ecg
+#if  USEBITMAP == USE_BITMAP_L1
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 0)); // green
+#endif
+		GRAPH(paletted_adr + buffer_offset, color_table_addr, graph_start + 10, box_graph_ecg.y + 50);
+
+		// Graph pleth
+#if  USEBITMAP == USE_BITMAP_L1
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 255)); // cyan
+#endif
+		GRAPH(paletted_adr2 + buffer_offset2, color_table_addr, graph_start + 10, box_graph_pleth.y + 50);
+
+		// Graph co2
+#if  USEBITMAP == USE_BITMAP_L1
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 0)); // yellow
+#endif
+		GRAPH(paletted_adr3 + buffer_offset3, color_table_addr, graph_start + 10, box_graph_co2.y + 50);
+
+		// Top menu box
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(43, 132, 135));
+		DRAW_BOX(box_menu_top);
+		// Bottom menu box
+		DRAW_BOX(box_menu_bottom);
+
+		int graph_border = 3, graph_magin = 36;
+		int brace_y = box_graph_ecg.y / 10, brace_w = 5, brace_h = box_graph_ecg.h - brace_y * 2;
+
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-		{ // graph
-			EVE_CoCmd_setBitmap(s_pHalContext, paletted_adr + buffer_offset, bformat, GRAPH_W, GRAPH_H);
-			EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(color_table_addr));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
-			EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
-			EVE_CoCmd_loadIdentity(s_pHalContext);
-			EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
-			EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
-			EVE_CoCmd_setMatrix(s_pHalContext);
-			EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-			EVE_DRAW_AT(graph_start + 10, box_graph1.y + 50);
-			EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
-		}
+		// Graph ECG braces outside
+		DRAW_RECT(box_graph_ecg.x, box_graph_ecg.y + brace_y, brace_w, brace_h);
+		// Graph pleth braces outside
+		DRAW_RECT(box_graph_pleth.x, box_graph_pleth.y + brace_y, brace_w, brace_h);
+		// Graph co2 braces outside
+		DRAW_RECT(box_graph_co2.x, box_graph_co2.y + brace_y, brace_w, brace_h);
 
-		if (1)
-		{ // graph
-			EVE_CoCmd_setBitmap(s_pHalContext, paletted_adr2 + buffer_offset2, bformat, GRAPH_W, GRAPH_H);
-			EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(color_table_addr));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
-			EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
-			EVE_CoCmd_loadIdentity(s_pHalContext);
-			EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
-			EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
-			EVE_CoCmd_setMatrix(s_pHalContext);
-			EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-			EVE_DRAW_AT(graph_start + 10, box_graph2.y + 50);
-			EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
-		}
-
-		if (1)
-		{ // graph
-			EVE_CoCmd_setBitmap(s_pHalContext, paletted_adr3 + buffer_offset3, bformat, GRAPH_W, GRAPH_H);
-			EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(color_table_addr));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
-			EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
-			EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
-			EVE_CoCmd_loadIdentity(s_pHalContext);
-			EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
-			EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
-			EVE_CoCmd_setMatrix(s_pHalContext);
-			EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-			EVE_DRAW_AT(graph_start + 10, box_graph3.y + 50);
-			EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
-		}
-
-		char fps_str[30];
-		my_sprintf(fps_str, "fps = %d", getFPS());
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_CoCmd_text(s_pHalContext, app_window.x + 10, app_window.y_end - 40, 30, 0, fps_str);
+		// Graph ecg braces inside
+		DRAW_RECT(box_graph_ecg.x + graph_border, box_graph_ecg.y + brace_y + border, brace_w , brace_h - border * 2);
+		// Graph pleth braces inside
+		DRAW_RECT(box_graph_pleth.x + graph_border, box_graph_pleth.y + brace_y + border, brace_w , brace_h - border * 2);
+		// Graph co2 braces inside
+		DRAW_RECT(box_graph_co2.x + graph_border, box_graph_co2.y + brace_y + border, brace_w , brace_h - border * 2);
 
-		// right menu
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(249, 254, 143));
+		// right menu top
+		DRAW_RECT(box_menu_top.x_end, box_menu_top.y, 1280 - box_menu_top.w, box_menu_top.h);
+		// right menu bottom
+		DRAW_RECT(box_menu_bottom.x_end, box_menu_bottom.y, 1280 - box_menu_bottom.w, box_menu_bottom.h);
+
+		// right menu HR
+		DRAW_BOX_BORDER(box_right1, 0x000000, border, 0xffffff);
+		// right menu spO2
+		DRAW_BOX_BORDER(box_right2, 0x000000, border, 0xffffff);
+		// right menu etCO2
+		DRAW_BOX_BORDER(box_right3, 0x000000, border, 0xffffff);
+		// right menu NIBP
+		DRAW_BOX_BORDER(box_right4, 0x000000, border, 0xffffff);
+
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		EVE_CoCmd_fgColor(s_pHalContext, 0xF3B475);
+		// Record button
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 1, box_menu_bottom.y + 7, 180, 50, 30, 0, "RECORD");
+		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		// Stop button
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 2 + 50, box_menu_bottom.y + 7, 180, 50, 30, 0, "STOP");
+		// NIBP button
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 3 + 99, box_menu_bottom.y + 7, 180, 50, 30, 0, "NIBP");
+		// EXIT button
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 3 + 510, box_menu_bottom.y + 7, 180, 50, 30, 0, "EXIT");
+
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		// Frame per second measurement
+		EVE_CoCmd_text(s_pHalContext, app_window.x + 10, app_window.y_end - 40, 30, OPT_FORMAT, "fps = %d", getFPS());
+
+		// register big font 32 33 34
+		EVE_CoCmd_romFont(s_pHalContext, 32, 32);
+		EVE_CoCmd_romFont(s_pHalContext, 33, 33);
+		EVE_CoCmd_romFont(s_pHalContext, 34, 34);
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+
+		int x = box_menu_top.x;
+		int y = box_menu_top.y_mid;
+		EVE_CoCmd_text(s_pHalContext, x + 5, y, 32, OPT_CENTERY, "BED");
+		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "no 5");
+		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm(9, 1));
+		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy(11, 12, 2024));
+
+		// Graph title text information
+		EVE_CoCmd_text(s_pHalContext, box_graph_ecg.x + 15, box_graph_ecg.y + 30, 30, 0, "ECG");
+		EVE_CoCmd_text(s_pHalContext, box_graph_pleth.x + 15, box_graph_pleth.y + 30, 30, 0, "PLETH");
+		EVE_CoCmd_text(s_pHalContext, box_graph_co2.x + 15, box_graph_co2.y + 30, 30, 0, "CO2");
+
+		// create random data change
+		int time_end_ms = EVE_millis();
+		int duration = time_end_ms - time_start_ms;
+		if (duration > (200 + rand(100) - 50))
 		{
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(249, 254, 143));
-			DRAW_RECT(box_menu_top.x_end, box_menu_top.y, 1280 - box_menu_top.w, box_menu_top.h);
-			DRAW_RECT(box_menu_bottom.x_end, box_menu_bottom.y, 1280 - box_menu_bottom.w, box_menu_bottom.h);
+			if (rand(10) % 9 == 0)
+				val_hr = 66 + rand(8) - 5;
+			if (rand(10) % 5 == 0)
+				val_spo2 = 96 + rand(12) - 5;
+			if (rand(10) % 5 == 0)
+				val_co2 = 22 + rand(4) - 2;
+			if (rand(10) % 2 == 0)
+				val_sys = 156 + rand(8) - 4;
+			if (rand(10) % 3 == 0)
+				val_dias = 93 + rand(8) - 4;
 
-			int x = box_menu_top.x_end;
-			int w = 1280 - box_menu_top.w;
-			int h = (800 - box_menu_top.h - box_menu_bottom.h) / 4;
-			int y = box_menu_top.y_end;
-			int border = 2;
-
-			app_box box_right1 = INIT_APP_BOX(x, y + h * 0, w, h);
-			app_box box_right2 = INIT_APP_BOX(x, y + h * 1, w, h);
-			app_box box_right3 = INIT_APP_BOX(x, y + h * 2, w, h);
-			app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
-
-			DRAW_BOX_BORDER(box_right1, 0x000000, border, 0xffffff);
-			DRAW_BOX_BORDER(box_right2, 0x000000, border, 0xffffff);
-			DRAW_BOX_BORDER(box_right3, 0x000000, border, 0xffffff);
-			DRAW_BOX_BORDER(box_right4, 0x000000, border, 0xffffff);
+			time_start_ms = time_end_ms;
 		}
 
-		{ // bottom control
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-			EVE_CoCmd_fgColor(s_pHalContext, 0xF3B475);
-			EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 1, box_menu_bottom.y + 7, 180, 50, 30, 0, "RECORD");
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 0));
+		// Heart rate
+		EVE_CoCmd_text(s_pHalContext, box_right1.x + 5, box_right1.y + 5, 29, 0, "HR");
+		EVE_CoCmd_number(s_pHalContext, box_right1.x_mid, box_right1.y_mid, 34, OPT_CENTER, val_hr);
+		EVE_CoCmd_text(s_pHalContext, box_right1.x_mid + 90, box_right1.y_mid, 29, OPT_CENTER, "bpm");
 
-			EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-			EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 2 + 50, box_menu_bottom.y + 7, 180, 50, 30, 0, "STOP");
-			EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 3 + 99, box_menu_bottom.y + 7, 180, 50, 30, 0, "NIBP");
-			EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 3 + 510, box_menu_bottom.y + 7, 180, 50, 30, 0, "EXIT");
-		}
+		// SPO2
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 255));
+		EVE_CoCmd_text(s_pHalContext, box_right2.x + 5, box_right2.y + 5, 29, 0, "spO2");
+		EVE_CoCmd_number(s_pHalContext, box_right2.x_mid, box_right2.y_mid, 34, OPT_CENTER, val_spo2);
+		EVE_CoCmd_text(s_pHalContext, box_right2.x_mid + 90, box_right2.y_mid, 29, OPT_CENTER, "%");
 
-		{ // texture top
-			EVE_CoCmd_romFont(s_pHalContext, 32, 32);
-			EVE_CoCmd_romFont(s_pHalContext, 33, 33);
-			EVE_CoCmd_romFont(s_pHalContext, 34, 34);
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 0));
+		// ETCO2
+		EVE_CoCmd_text(s_pHalContext, box_right3.x + 5, box_right3.y + 5, 29, 0, "etCO2");
+		EVE_CoCmd_number(s_pHalContext, box_right3.x_mid, box_right3.y_mid, 34, OPT_CENTER, val_co2);
+		EVE_CoCmd_text(s_pHalContext, box_right3.x_mid + 90, box_right3.y_mid, 29, OPT_CENTER, "mmHg");
 
-			int x = box_menu_top.x;
-			int y = box_menu_top.y_mid;
-			EVE_CoCmd_text(s_pHalContext, x + 5, y, 32, OPT_CENTERY, "BED");
-			EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "no 5");
-			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm(9, 1));
-			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy(11, 12, 2024));
-		}
-		{ // txture bottom
-			EVE_CoCmd_text(s_pHalContext, box_graph1.x + 15, box_graph1.y + 30, 30, 0, "ECG");
-			EVE_CoCmd_text(s_pHalContext, box_graph2.x + 15, box_graph2.y + 30, 30, 0, "PLETH");
-			EVE_CoCmd_text(s_pHalContext, box_graph3.x + 15, box_graph3.y + 30, 30, 0, "CO2");
-		}
-		{ // texture right
-			int x = box_menu_top.x_end;
-			int w = 1280 - box_menu_top.w;
-			int h = (800 - box_menu_top.h - box_menu_bottom.h) / 4;
-			int y = box_menu_top.y_end;
-			int border = 2;
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		// NIBP
+		EVE_CoCmd_text(s_pHalContext, box_right4.x + 5, box_right4.y + 5, 29, 0, "NIBP");
+		EVE_CoCmd_number(s_pHalContext, box_right4.x + 2, box_right4.y + 50, 33, 0, val_sys);
+		EVE_CoCmd_text(s_pHalContext, box_right4.x_mid + 20, box_right4.y_mid + 10, 28, OPT_CENTERX, "mmHg");
+		EVE_CoCmd_number(s_pHalContext, box_right4.x_mid + 50, box_right4.y + 50, 33, 0, val_dias);
+		EVE_CoCmd_text(s_pHalContext, box_right4.x + 35, box_right4.y_end - 40, 29, 0, "sys");
+		EVE_CoCmd_text(s_pHalContext, box_right4.x_end - 70, box_right4.y_end - 40, 29, 0, "dias");
 
-			app_box box_right1 = INIT_APP_BOX(x, y + h * 0, w, h);
-			app_box box_right2 = INIT_APP_BOX(x, y + h * 1, w, h);
-			app_box box_right3 = INIT_APP_BOX(x, y + h * 2, w, h);
-			app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
-
-			int time_end_ms = EVE_millis();
-			int duration = time_end_ms - time_start_ms;
-			if (duration > (200 + rand(100) - 50))
-			{
-				if (rand(10) % 9 == 0)
-					val_hr = 66 + rand(8) - 5;
-				if (rand(10) % 5 == 0)
-					val_spo2 = 96 + rand(12) - 5;
-				if (rand(10) % 5 == 0)
-					val_co2 = 22 + rand(4) - 2;
-				if (rand(10) % 2 == 0)
-					val_sys = 156 + rand(8) - 4;
-				if (rand(10) % 3 == 0)
-					val_dias = 93 + rand(8) - 4;
-
-				time_start_ms = time_end_ms;
-			}
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 0));
-			EVE_CoCmd_text(s_pHalContext, box_right1.x + 5, box_right1.y + 5, 29, 0, "HR");
-			EVE_CoCmd_number(s_pHalContext, box_right1.x_mid, box_right1.y_mid, 34, OPT_CENTER, val_hr);
-			EVE_CoCmd_text(s_pHalContext, box_right1.x_mid + 90, box_right1.y_mid, 29, OPT_CENTER, "bpm");
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 255));
-			EVE_CoCmd_text(s_pHalContext, box_right2.x + 5, box_right2.y + 5, 29, 0, "spO2");
-			EVE_CoCmd_number(s_pHalContext, box_right2.x_mid, box_right2.y_mid, 34, OPT_CENTER, val_spo2);
-			EVE_CoCmd_text(s_pHalContext, box_right2.x_mid + 90, box_right2.y_mid, 29, OPT_CENTER, "%");
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 0));
-			EVE_CoCmd_text(s_pHalContext, box_right3.x + 5, box_right3.y + 5, 29, 0, "etCO2");
-			EVE_CoCmd_number(s_pHalContext, box_right3.x_mid, box_right3.y_mid, 34, OPT_CENTER, val_co2);
-			EVE_CoCmd_text(s_pHalContext, box_right3.x_mid + 90, box_right3.y_mid, 29, OPT_CENTER, "mmHg");
-
-			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-			EVE_CoCmd_text(s_pHalContext, box_right4.x + 5, box_right4.y + 5, 29, 0, "NIBP");
-			EVE_CoCmd_number(s_pHalContext, box_right4.x + 2, box_right4.y + 50, 33, 0, val_sys);
-			EVE_CoCmd_text(s_pHalContext, box_right4.x_mid + 20, box_right4.y_mid + 10, 28, OPT_CENTERX, "mmHg");
-			EVE_CoCmd_number(s_pHalContext, box_right4.x_mid + 50, box_right4.y + 50, 33, 0, val_dias);
-			EVE_CoCmd_text(s_pHalContext, box_right4.x + 35, box_right4.y_end - 40, 29, 0, "sys");
-			EVE_CoCmd_text(s_pHalContext, box_right4.x_end - 70, box_right4.y_end - 40, 29, 0, "dias");
-		}
 		Display_End(s_pHalContext);
 	}
 	return 0;
