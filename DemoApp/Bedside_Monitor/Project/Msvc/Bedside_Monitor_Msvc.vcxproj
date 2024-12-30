@@ -30,8 +30,14 @@
     <ClCompile Include="..\..\..\..\common\application\FileTransfer.c" />
     <ClCompile Include="..\..\..\..\common\application\Common.c" />
     <ClCompile Include="..\..\..\..\common\application\Maths.c" />
-    <ClCompile Include="..\..\Src\Demo_Bedside_Monitor_With_LINESTRIP.c" />
-    <ClCompile Include="..\..\Src\Demo_Bedside_Monitor_With_PALETTED.c" />
+    <ClCompile Include="..\..\Src\Bedside_Monitor.c" />
+    <ClCompile Include="..\..\Src\Data_Simulate.c" />
+    <ClCompile Include="..\..\Src\Graph_Bargraph.c" />
+    <ClCompile Include="..\..\Src\Graph_L1.c" />
+    <ClCompile Include="..\..\Src\Graph_L1_rotate.c" />
+    <ClCompile Include="..\..\Src\Graph_Linestrip.c" />
+    <ClCompile Include="..\..\Src\Graph_Paletted8_rotate.c" />
+    <ClCompile Include="..\..\Src\Helpers.c" />
   </ItemGroup>
   <ItemGroup>
     <!--# header file list-->
@@ -65,6 +71,7 @@
     <ClInclude Include="..\..\..\..\common\application\FileTransfer.h" />
     <ClInclude Include="..\..\..\..\common\application\Maths.h" />
     <ClInclude Include="..\..\Hdr\Bedside_Monitor.h" />
+    <ClInclude Include="..\..\Hdr\Helpers.h" />
   </ItemGroup>
   <!--# end header file list-->
   <ItemGroup>

@@ -80,10 +80,28 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMUC.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\Demo_Bedside_Monitor_With_LINESTRIP.c">
+    <ClCompile Include="..\..\Src\Bedside_Monitor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\Demo_Bedside_Monitor_With_PALETTED.c">
+    <ClCompile Include="..\..\Src\Data_Simulate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Graph_Bargraph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Graph_L1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Graph_L1_rotate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Graph_Linestrip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Graph_Paletted8_rotate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Helpers.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -178,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalDefs.h">
       <Filter>Common\eve_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Hdr\Helpers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

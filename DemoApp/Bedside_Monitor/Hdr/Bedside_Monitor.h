@@ -12,7 +12,14 @@
 
 #define GET_CALIBRATION                     1
 
-#define ALIGN_TWO_POWER_N(Value, alignval)  (((Value) + (alignval - 1)) & (~(alignval - 1)))
-#define random(x)                           (rand() % (x))
+#define GRAPH_W 160
+#define GRAPH_H 1000
+#define GRAPH_SIZE (GRAPH_W * GRAPH_H)
+
+#define CHAR_BIT 8
+#define BITS_IN_TYPE(type) (sizeof(type) * CHAR_BIT)
+#define BIT_PER_CHAR (BITS_IN_TYPE(char))
+
+#define MSG printf
 
 #endif /* APP_H_ */
