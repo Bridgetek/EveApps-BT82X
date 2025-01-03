@@ -10,8 +10,8 @@ int new_data_heartbeat(int** data, int* data_size);
 int new_data_pleth(int** data, int* data_size);
 int new_data_co2(int** data, int* data_size);
 
-#define GRAPH_BYTE_PER_LINE   8 // bargraph 8 bit per line, value 0-255
-#define GRAPH_BYTE_BER_BUFFER (GRAPH_H * GRAPH_BYTE_PER_LINE / BIT_PER_CHAR)
+#define GRAPH_BIT_PER_LINE   8 // bargraph 8 bit per line, value 0-255
+#define GRAPH_BYTE_BER_BUFFER (GRAPH_H * GRAPH_BIT_PER_LINE / BIT_PER_CHAR)
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_BER_BUFFER * GRAPH_BUFFER_NUM) 
 
@@ -115,6 +115,15 @@ void graph_append_and_display(app_graph_t* graph, int* data, int data_count) {
 		graph_transfer_queue(graph, data, to_write);
 		
 		if (graph->bitmap_wp  >= graph->buffer2) { // loopback
+// Macro to convert an argument into a string
+#define TO_STRING2(x) #x
+#define TO_STRING(x) TO_STRING2(x)
+// Macro to evaluate the macro result and then convert to a string
+#define TO_STRING_EVAL(x) TO_STRING(x)
+#define FN "bargraph_1000x256_8000_bytes.raw"
+			//uint8_t evemem[10000];
+			//EVE_Hal_rdMem(s_pHalContext, evemem, graph->bitmap_rp, GRAPH_BYTE_BER_BUFFER);
+			//save_buffer_to_file(FN, evemem, GRAPH_BYTE_BER_BUFFER);
 			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, to_write);
 			graph->bitmap_wplb += to_write;
 		}
@@ -139,9 +148,11 @@ void graph_append_and_display(app_graph_t* graph, int* data, int data_count) {
 	int a = graph->rgba & 0xFF;          // Extract Alpha (least significant byte)
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(r, g, b));
 
-	int linewidth = 6;
+	int linewidth = 1;
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
 	EVE_DRAW_AT(graph->x, graph->y-linewidth);
+	EVE_DRAW_AT(graph->x-1, graph->y-linewidth);
+	EVE_DRAW_AT(graph->x+1, graph->y-linewidth);
 
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
 	EVE_DRAW_AT(graph->x, graph->y);
