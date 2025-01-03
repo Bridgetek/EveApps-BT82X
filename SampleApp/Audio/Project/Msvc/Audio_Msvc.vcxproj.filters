@@ -56,7 +56,7 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\Sound.c">
+    <ClCompile Include="..\..\Src\Audio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\common\application\FileTransfer.c">
@@ -155,7 +155,7 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Hdr\Sound.h">
+    <ClInclude Include="..\..\Hdr\Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\Common.h">

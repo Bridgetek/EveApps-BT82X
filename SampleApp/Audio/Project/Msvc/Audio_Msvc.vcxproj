@@ -30,7 +30,7 @@
     <ClCompile Include="..\..\..\..\common\application\FileTransfer.c" />
     <ClCompile Include="..\..\..\..\common\application\Common.c" />
     <ClCompile Include="..\..\..\..\common\application\Maths.c" />
-    <ClCompile Include="..\..\Src\Sound.c" />
+    <ClCompile Include="..\..\Src\Audio.c" />
   </ItemGroup>
   <ItemGroup>
     <!--# header file list-->
@@ -63,7 +63,7 @@
     <ClInclude Include="..\..\..\..\common\application\Common.h" />
     <ClInclude Include="..\..\..\..\common\application\FileTransfer.h" />
     <ClInclude Include="..\..\..\..\common\application\Maths.h" />
-    <ClInclude Include="..\..\Hdr\Sound.h" />
+    <ClInclude Include="..\..\Hdr\Audio.h" />
   </ItemGroup>
   <!--# end header file list-->
   <ItemGroup>
@@ -78,8 +78,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C0872233-F79B-4BCE-A4F3-AC5785CCE488}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Sound</RootNamespace>
-    <ProjectName>SAMAPP_Sound_MSVC</ProjectName>
+    <RootNamespace>Audio</RootNamespace>
+    <ProjectName>SAMAPP_Audio_MSVC</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

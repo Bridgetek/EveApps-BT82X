@@ -82,13 +82,6 @@ void Gpu_Init(EVE_HalContext* phost) {
     EVE_Hal_open(phost, &params);
 
     EVE_Util_bootupConfig(phost);
-
-#ifdef DISPLAY_RESOLUTION_WXGA
-    EVE_Hal_wr8(phost, REG_CPURESET, 2);
-    EVE_Hal_wr16(phost, REG_TOUCH_CONFIG, 0x05D0);	//for Goodix touch panel
-    EVE_Hal_wr8(phost, REG_CPURESET, 0);
-    EVE_sleep(300);
-#endif
 }
 
 void Gpu_Release(EVE_HalContext* phost) {

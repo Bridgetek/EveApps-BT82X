@@ -14,7 +14,7 @@
 ================================================================================
 
 1. INTRODUCTION
-    This project contains example code for sound functionality of EVE.
+    This project contains example code for audio functionality of EVE.
 
 2. FOLDER Structure
     ├───Project                  

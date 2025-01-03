@@ -10,25 +10,23 @@ All the applications rely on a set of common files located under the "common" fo
 
 Users are expected to be familiar with the programming guide and data sheet for the Eve Series chips.
 
-It should be noted that certain applications are specifically developed for particular host platforms (refer to "Support platforms").
-
 
 
 ## Folder introduction
 ```
 📂 EveApps
     ├───common                  
-    │   ├───application      | Application's common functions and fatfs library
+    │   ├───application      | Application's common functions
     │   ├───eve_flash        | Blob binary for flash programming
     │   └───eve_hal          | Hardware abstraction layer to bridge different platforms
     │    
     ├───SampleApp
     │    ├───Animation       | Sample usage of animation 
+    |    ├───Audio           | Sample usage of audio functionality    
     │    ├───Bitmap          | Sample usage of bitmap 
     │    ├───Flash           | Sample usage of flash 
     │    ├───Font            | Sample usage of font 
     │    ├───Primitives      | Sample usage of drawing primitives
-    |    ├───Sound           | Sample usage of sound functionality    
     │    ├───Touch           | Sample usage of touch functionality
     │    ├───Utility         | Sample usage of helper utilities
     │    ├───Video           | Sample usage of video playback
