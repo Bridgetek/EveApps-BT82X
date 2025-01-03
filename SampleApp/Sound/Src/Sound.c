@@ -118,7 +118,7 @@ void helperHighLightBtn(int32_t tagvalsnd, const char* pTagArray, int32_t wbutto
     EVE_CoDl_colorA(s_pHalContext, 255);
 }
 
-void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, const char *StringArray, const char *pString)
+void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char *StringArray, char *pString)
 {
     int32_t numbtnrow = 7;
     int32_t numbtncol = 8;
@@ -135,7 +135,7 @@ void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, cons
             EVE_CoDl_end(s_pHalContext);
 
 #if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
-            strcpy(StringArray, pString);
+            strcpy_s(StringArray, 8, pString);
 #endif
             EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
             EVE_CoCmd_text(s_pHalContext, (int16_t)((wbutton / 2) + j * wbutton),
@@ -166,8 +166,8 @@ void SAMAPP_Sound_builtin()
     uint32_t freqtrack = 0;
     uint32_t currfreq = 0;
     uint32_t prevcurrfreq;
-    const PROGMEM char* pString;
-    const PROGMEM char* pTagArray;
+    PROGMEM char* pString;
+    PROGMEM char* pTagArray;
     char StringArray[8] = { 0 };
 
     Draw_Text(s_pHalContext, "Example for: Play built-in sound\n\n\nPlease touch on screen");
@@ -235,7 +235,7 @@ void SAMAPP_Sound_builtin()
 
         /* Draw vertical slider bar for frequency control */
         StringArray[0] = '\0';
-        strcat(StringArray, "Pt ");
+        strcat_s(StringArray, sizeof(StringArray), "Pt ");
         Gpu_Hal_Dec2Ascii(StringArray, (int32_t) (currfreq + 21));
         EVE_CoDl_tagMask(s_pHalContext, 0);
         EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width - 25), 10, 29, OPT_CENTER,
@@ -267,8 +267,6 @@ void SAMAPP_Sound_fromEABConvertedRaw()
     const uint8_t* pBuff = NULL;
     const uint8_t* music_playing = 0;
     uint32_t wrptr = 0;
-    uint32_t rdptr;
-    uint32_t freebuffspace;
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: Play music");
@@ -315,7 +313,7 @@ void SAMAPP_Sound_playWavFromCMDB()
     uint32_t transfered = 0;
     EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
 
-    EVE_CoCmd_nop(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
     //The file is done, mute the sound.
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
@@ -343,7 +341,7 @@ void SAMAPP_Sound_playWavFromMediaFifo()
     uint32_t transfered = 0;
     EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
 
-    EVE_CoCmd_nop(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
     //The file is done, mute the sound.
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
@@ -372,7 +370,7 @@ void SAMAPP_Sound_playWavFromSD()
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
     EVE_CoCmd_playWav(s_pHalContext, OPT_FS);
 
-    EVE_CoCmd_nop(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
     //The file is done, mute the sound.
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
@@ -398,7 +396,7 @@ void SAMAPP_Sound_playWavFromFlash()
     EVE_CoCmd_flashSource(s_pHalContext, 4096);
     EVE_CoCmd_playWav(s_pHalContext, OPT_FLASH);
 
-    EVE_CoCmd_nop(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
 }

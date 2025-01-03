@@ -564,7 +564,7 @@ void SAMAPP_Widget_keysInteractive()
     char DispText[SAMAPP_COPRO_WIDGET_KEYS_INTERACTIVE_TEXTSIZE];
     char CurrChar = '|';
     uint32_t CurrTag = 0;
-    uint8_t PrevTag = 0;
+    uint32_t PrevTag = 0;
     uint8_t Pendown = 1;
     int32_t CurrTextIdx = 0;
 
@@ -573,7 +573,7 @@ void SAMAPP_Widget_keysInteractive()
         /* Check the user input and then add the characters into array */
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &CurrTag);
 
-        CurrChar = CurrTag;
+        CurrChar = (char)CurrTag;
         if (0 == CurrTag)
         {
             CurrChar = '|';
@@ -606,15 +606,15 @@ void SAMAPP_Widget_keysInteractive()
         EVE_CoCmd_fgColor(s_pHalContext, 0x404080);
         EVE_CoCmd_gradColor(s_pHalContext, 0x00ff00);
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "qwertyuiop");
+            (OPT_CENTER | (uint16_t)CurrTag), "qwertyuiop");
         EVE_CoCmd_gradColor(s_pHalContext, 0x00ffff);
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "asdfghjkl");
+            (OPT_CENTER | (uint16_t)CurrTag), "asdfghjkl");
         EVE_CoCmd_gradColor(s_pHalContext, 0xffff00);
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "zxcvbnm"); //hilight button z
+            (OPT_CENTER | (uint16_t)CurrTag), "zxcvbnm"); //hilight button z
         yOffset += ButtonH + yBtnDst;
         EVE_CoDl_tag(s_pHalContext, ' ');
         if (' ' == CurrTag)
@@ -629,17 +629,17 @@ void SAMAPP_Widget_keysInteractive()
         }
         yOffset = ButtonW * 2 + 10;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "789");
+            (0 | (uint16_t)CurrTag), "789");
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "456");
+            (0 | (uint16_t)CurrTag), "456");
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "123");
+            (0 | (uint16_t)CurrTag), "123");
         yOffset += ButtonH + yBtnDst;
         EVE_CoDl_colorA(s_pHalContext, 255);
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "0."); //hilight button 0
+            (0 | (uint16_t)CurrTag), "0."); //hilight button 0
         Display_End(s_pHalContext);
         EVE_sleep(10);
         PrevTag = CurrTag;

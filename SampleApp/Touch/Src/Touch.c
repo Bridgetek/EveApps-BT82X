@@ -1081,34 +1081,34 @@ void SAMAPP_Touch_touchInfo()
         EVE_CoDl_tagMask(s_pHalContext, 0);
         /* Draw informative text at width/2,20 location */
         StringArray[0] = '\0';
-        strcat(StringArray, "Touch Raw XY (");
+        strcat_s(StringArray, sizeof(StringArray), "Touch Raw XY (");
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_RAW_XY, &ReadWord);
         yvalue = (uint16_t) (ReadWord & 0xffff);
         xvalue = (uint16_t) ((ReadWord >> 16) & 0xffff);
         Gpu_Hal_Dec2Ascii(StringArray, (uint32_t) xvalue);
-        strcat(StringArray, ",");
+        strcat_s(StringArray, sizeof(StringArray), ",");
         Gpu_Hal_Dec2Ascii(StringArray, (uint32_t) yvalue);
-        strcat(StringArray, ")");
+        strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 30, 30, OPT_CENTER,
             StringArray);
 
         StringArray[0] = '\0';
-        strcat(StringArray, "Touch Screen XY (");
+        strcat_s(StringArray, sizeof(StringArray), "Touch Screen XY (");
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_SCREEN_XY, &ReadWord);
         yvalue = (int16_t) (ReadWord & 0xffff);
         xvalue = (int16_t) ((ReadWord >> 16) & 0xffff);
         Gpu_Hal_Dec2Ascii(StringArray, (int32_t) xvalue);
-        strcat(StringArray, ",");
+        strcat_s(StringArray, sizeof(StringArray), ",");
         Gpu_Hal_Dec2Ascii(StringArray, (int32_t) yvalue);
-        strcat(StringArray, ")");
+        strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 60, 30, OPT_CENTER,
             StringArray);
 
         StringArray[0] = '\0';
-        strcat(StringArray, "Touch TAG (");
+        strcat_s(StringArray, sizeof(StringArray), "Touch TAG (");
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &ReadWord);
         Gpu_Hal_Dec2Ascii(StringArray, ReadWord);
-        strcat(StringArray, ")");
+        strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 90, 30, OPT_CENTER,
             StringArray);
         tagval = ReadWord;

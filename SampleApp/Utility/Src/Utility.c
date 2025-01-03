@@ -533,7 +533,7 @@ void SAMAPP_Utility_CmdInflateFromFifo()
     /*Load data to mediafifo */
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", &transfered);
 
     Display_Start(s_pHalContext);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);

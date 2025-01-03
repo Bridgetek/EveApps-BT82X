@@ -8,10 +8,6 @@
 #  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
-# 3. Build for EMULATOR example: Use Deveoper Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_BT8XXEMU -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
-#  nmake SampleApp
-#
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13 FATAL_ERROR)
 
@@ -56,7 +52,6 @@ set(LIST_GRAPHICS DEFAULT
 set(LIST_PLATFORM DEFAULT
                   EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
-                  EVE_PLATFORM_BT8XXEMU
   )
 set(LIST_DISPLAY  DEFAULT
                   EVE_DISPLAY_WUXGA
@@ -106,15 +101,6 @@ function(validate_input option_name array)
   MESSAGE(STATUS "Other ${option_name}'s are: ${list_str} \n")
 endfunction()
 
-function(validate_env_rp2040 env env_name)
-    MESSAGE(STATUS "${env_name} is ${env}")
-    
-    if ("${env}" STREQUAL "")
-        MESSAGE(FATAL_ERROR "${env_name} is not set, stop compile!")
-    endif()
-    MESSAGE(STATUS "${env_name} is ${env}")
-endfunction()
-
 validate_input("EVE_APPS_GRAPHICS" LIST_GRAPHICS)
 validate_input("EVE_APPS_PLATFORM" LIST_PLATFORM)
 validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
@@ -122,17 +108,14 @@ validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
 # Find host platform name ######################################################
 STRING(REGEX MATCH "(EVE_PLATFORM_FT4222|EVE_PLATFORM_MPSSE|EVE_PLATFORM_BT8XXEMU)" IS_PLATFORM_WINDOW   ${EVE_APPS_PLATFORM})
 STRING(REGEX MATCH "EVE_PLATFORM_FT4222"       IS_PLATFORM_FT4222   ${EVE_APPS_PLATFORM})
-STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM})
-STRING(REGEX MATCH "EVE_PLATFORM_BT8XXEMU"     IS_PLATFORM_EMULATOR ${EVE_APPS_PLATFORM})  
+STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM}) 
 SET(IS_PLATFORM_WINDOW   "${IS_PLATFORM_WINDOW}"   CACHE STRING "Platform Target WINDOW  ")
 SET(IS_PLATFORM_FT4222   "${IS_PLATFORM_FT4222}"   CACHE STRING "Platform Target FT4222  ")
 SET(IS_PLATFORM_MPSSE    "${IS_PLATFORM_MPSSE}"    CACHE STRING "Platform Target MPSSE   ")
-SET(IS_PLATFORM_EMULATOR "${IS_PLATFORM_EMULATOR}" CACHE STRING "Platform Target EMULATOR")
 
 mark_as_advanced(IS_PLATFORM_WINDOW  )
 mark_as_advanced(IS_PLATFORM_FT4222  )
 mark_as_advanced(IS_PLATFORM_MPSSE   )
-mark_as_advanced(IS_PLATFORM_EMULATOR)
 
 # Set up the basic build environment ###########################################
 IF (CMAKE_BUILD_TYPE STREQUAL "")
@@ -156,11 +139,9 @@ IF(IS_PLATFORM_WINDOW)
   
   IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
     MESSAGE(STATUS "Using 64-bit Windows dependencies")
-    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x64)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x64)
   ELSE()
     MESSAGE(STATUS "Using 32-bit Windows dependencies")
-    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x86)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x86)
   ENDIF()
 

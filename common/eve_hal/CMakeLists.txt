@@ -21,7 +21,6 @@ IF (WIN32)
     libMPSSE
     LibFT4222
     ftd2xx
-    bt8xxemu
   )
 ELSEIF(UNIX)
   TARGET_LINK_LIBRARIES(eve_hal
@@ -46,14 +45,6 @@ IF (WIN32)
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
       ${CMAKE_CURRENT_SOURCE_DIR}/Bin/MSVC/x64/ftd2xx.dll
       ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/ftd2xx.dll)
-    ADD_CUSTOM_COMMAND(TARGET eve_hal POST_BUILD 
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Simulation/x64/bt8xxemu.dll
-      ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/bt8xxemu.dll)
-    ADD_CUSTOM_COMMAND(TARGET eve_hal POST_BUILD 
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Simulation/x64/mx25lemu.dll
-      ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/mx25lemu.dll)
   ELSE()
     ADD_CUSTOM_COMMAND(TARGET eve_hal POST_BUILD 
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -67,13 +58,5 @@ IF (WIN32)
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
       ${CMAKE_CURRENT_SOURCE_DIR}/Bin/MSVC/x86/ftd2xx.dll
       ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/ftd2xx.dll)
-    ADD_CUSTOM_COMMAND(TARGET eve_hal POST_BUILD 
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Simulation/x86/bt8xxemu.dll
-      ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/bt8xxemu.dll)
-    ADD_CUSTOM_COMMAND(TARGET eve_hal POST_BUILD 
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-     ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Simulation/x86/mx25lemu.dll
-      ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/mx25lemu.dll)
   ENDIF()
 ENDIF()

@@ -37,13 +37,12 @@ It should be noted that certain applications are specifically developed for part
 
 Note:
 - For Eve registers and commands/instructions definition, user can find it at the file common/eve_hal/EVE_GpuDef.h and common/eve_hal/Eve_CoCmd.h.
-- For Eve Emulator, it is for windows platform only and located at common/eve_hal/Bin/Simulation and common/eve_hal/Hdr
 - For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.  
 
 ## Build instructions
 
-### Emulator, FT4222 and MPSSE
-Way 1: Open EveApps_Emulator.sln or EveApps_MSVC.sln, press F5 to build and run
+### FT4222 and MPSSE
+Way 1: Open SampleApp_MSVC.sln, press F5 to build and run
 
 Way 2: Use Cmake: (Need Cmake 3.19)
 ```sh
@@ -54,7 +53,7 @@ cd build
 cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] ..
 nmake [Project name]
 
-# EVE_APPS_PLATFORM can be BT8XXEMU_PLATFORM, FT4222 or MPSSE
+# EVE_APPS_PLATFORM can be FT4222 or MPSSE
 # [EVE graphics] can be BT820
 # [Project name] is the folder name of a subfolder inside SampleApp
 ```

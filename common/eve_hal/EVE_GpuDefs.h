@@ -269,12 +269,12 @@
 
 /** @name LVDSTX system registers */
 ///@{
-#define REG_LVDS_EN              (REG_LVDSTX + 0x0000)
-#define REG_LVDS_PLLCFG          (REG_LVDSTX + 0x0004)
-#define REG_LVDS_CTRL_CH0        (REG_LVDSTX + 0x0014)
-#define REG_LVDS_CTRL_CH1        (REG_LVDSTX + 0x0018)
-#define REG_LVDS_STAT            (REG_LVDSTX + 0x001C)
-#define REG_LVDS_ERR_STAT        (REG_LVDSTX + 0x0020)
+#define REG_LVDSTX_EN              (REG_LVDSTX + 0x0000)
+#define REG_LVDSTX_PLLCFG          (REG_LVDSTX + 0x0004)
+#define REG_LVDSTX_CTRL_CH0        (REG_LVDSTX + 0x0014)
+#define REG_LVDSTX_CTRL_CH1        (REG_LVDSTX + 0x0018)
+#define REG_LVDSTX_STAT            (REG_LVDSTX + 0x001C)
+#define REG_LVDSTX_ERR_STAT        (REG_LVDSTX + 0x0020)
 ///@}
 
 /** @name System Registers */
@@ -359,7 +359,7 @@
 #define CMD_FLASHUPDATE      4294967105UL /**< 0xFFFFFF41UL */
 #define CMD_FLASHWRITE       4294967103UL /**< 0xFFFFFF3FUL */
 #define CMD_FSDIR            4294967182UL /**< 0xFFFFFF8EUL */
-#define CMD_FSOPTIONS        4294967149UL /**< 0xFFFFFF6DUL */
+#define CMD_FSOPTION         4294967149UL /**< 0xFFFFFF6DUL */
 #define CMD_FSREAD           4294967153UL /**< 0xFFFFFF71UL */
 #define CMD_FSSIZE           4294967168UL /**< 0xFFFFFF80UL */
 #define CMD_FSSOURCE         4294967167UL /**< 0xFFFFFF7FUL */
@@ -736,6 +736,45 @@
 ///@{
 #define CORNER_ZERO                0UL
 #define EDGE_ZERO                  1UL
+///@}
+
+/** @name for REG_LVDSTX_EN */
+///@{
+#define LVDS_CH1_EN                4UL
+#define LVDS_CH0_EN                2UL
+///@}
+
+/** @name for REG_I2S_CTL */
+///@{
+#define I2S_AUDIO_DISABLE          8UL
+#define I2S_TX_EN                  2UL
+#define I2S_SRST                   1UL
+///@}
+
+/** @name for REG_I2S_CFG */
+///@{
+#define I2S_FORMAT                 0UL
+#define LEFT_FORMAT                1UL
+#define RIGHT_FORMAT               2UL
+///@}
+
+/** @name for REG_I2S_EN */
+///@{
+#define I2S_ENABLE                 1UL
+#define I2S_DISABLE                0UL
+///@}
+
+/** @name for REG_SO_MODE */
+///@{
+#define ONE_PIXEL_SINGLE_LVDS      0UL
+#define TWO_PIXEL_SINGLE_LVDS      1UL
+#define TWO_PIXEL_DUAL_LVDS        2UL
+#define FOUR_PIXEL_DUAL_LVDS       3UL
+///@}
+
+/** @name for REG_LVDSTX_PLLCFG */
+///@{
+#define LVDSTX_PLLCFG(cps, lock, cks, ns, clkdiv)   ((((cps)&0x7) << 25) | (((lock)&0xFFF) << 13) | (((cks)&0x3) << 11) | (((ns)&0x7F) << 4) | ((clkdiv)&0xF))
 ///@}
 
 // clang-format on

@@ -410,8 +410,8 @@ void SAMAPP_Font_indexer()
 EVE_FontsExt2_chblk *get_FontsExt2_glyph_addr(uint32_t xf, uint32_t cp)
 {
     uint32_t *page = &((uint32_t *)(XF2_OPTR(xf)))[cp / 128];
-    uint32_t *cd = (uint32_t *)(EVE_Hal_rd32(s_pHalContext, page) + 4 * (cp % 128));
-    return((EVE_FontsExt2_chblk *)EVE_Hal_rd32(s_pHalContext, cd));
+    uint32_t *cd = (uint32_t *)(EVE_Hal_rd32(s_pHalContext, (uint32_t)page) + 4 * (cp % 128));
+    return((EVE_FontsExt2_chblk *)EVE_Hal_rd32(s_pHalContext, (uint32_t)cd));
 }
 
 /**
@@ -467,7 +467,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string1[j]);
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;
@@ -478,7 +478,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string2[j]); 
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;
@@ -489,7 +489,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string3[j]);
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;

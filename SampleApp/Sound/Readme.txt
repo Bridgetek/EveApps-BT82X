@@ -18,15 +18,13 @@
 
 2. FOLDER Structure
     ├───Project                  
-    │   ├───Msvc          | Microsoft Visual Studio C++ 2019 IDE solution file for FT4222 or MPSSE platform
-    │   └───Msvc_Emulator | Microsoft Visual Studio C++ 2019 IDE solution file for Eve emulator platform
+    │   └───Msvc          | Microsoft Visual Studio C++ 2019 IDE solution file for FT4222 or MPSSE platform
     ├───Hdr               | Header files
     ├───Src               | Source files
     ├───Test              | Eve specific Assets: bitmap data, flash image, font data etc. 
 
 2. SUPPORTED PLATFORM
     * Microsoft Visual C++ platform with FT4222 or MPSSE
-    * Microsoft Visual C++ platform with Emulator
     
     EVE platform: EVE5
     LCD size: WUXGA(1920x1200)
@@ -36,9 +34,6 @@
         3.1.1 Microsoft Visual C++ platform with FT4222 and MPSSE
             - Connect PC with EVE platform via FT4222 or MPSSE
             - Connect power to EVE platform
-            
-        3.1.2 Microsoft Visual C++ platform with Emulator
-            - This setup uses window PC only
 
     3.2 DOWNLOAD ASSETS
         3.2.1 Use EAB to program the board with the flash.bin file located in the Flash folder.
@@ -50,18 +45,12 @@
             - Open project in Project\MSVC with Microsoft Visual C++
             - Build (Ctrl + B)
             - Run (F5)
-            
-        3.3.2 Microsoft Visual C++ platform with Emulator
-            - Open project in Project\Msvc_Emulator with Microsoft Visual C++
-            - Build (Ctrl + B)
-            - Run (F5)
 
 4. CONFIGURATION INSTRUCTIONS
     Sample application uses the macros to configure the platforms: 
 	
     Host platform:
         - Window host: EVE_PLATFORM_FT4222, EVE_PLATFORM_MPSSE
-        - Emulator   : EVE_PLATFORM_BT8XXEMU
     
     EVE platform: EVE_GRAPHICS_BT820
     
