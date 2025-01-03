@@ -42,9 +42,19 @@ Note:
 ## Build instructions
 
 ### FT4222 and MPSSE
-Way 1: Open SampleApp_MSVC.sln, press F5 to build and run
+#### Way 1: Open SampleApp_MSVC.sln
 
-Way 2: Use Cmake: (Need Cmake 3.19)
+Go to property
+
+![property](https://github.com/user-attachments/assets/953dd3b1-3a9b-4747-ae0d-1daeda844b94)
+
+Change settings (EVE_PLATFORM_FT4222 / EVE_PLATFORM_MPSSE)
+
+![setting](https://github.com/user-attachments/assets/9ea058a0-e7a5-497c-a7da-cb71f9b23cb0)
+
+press F5 to build and run
+
+#### Way 2: Use Cmake: (Need Cmake 3.19 installed)
 ```sh
 #Launch the Developer Command Prompt for VS
 cd X:\source\EveApps
@@ -59,8 +69,6 @@ nmake [Project name]
 ```
 
 example: 
-```
-$ cmake.exe -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA ..
-$ nmake 
-```
+![image](https://github.com/user-attachments/assets/93515ee2-33c7-4b45-9c88-42c2b2949860)
 
+![image](https://github.com/user-attachments/assets/a7d0cc56-bd20-4baa-93d7-84a02bcceb1f)
