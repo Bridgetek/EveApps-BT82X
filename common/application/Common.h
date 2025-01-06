@@ -99,7 +99,5 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext *phost, const uint8_t* title, const ui
 void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
 void Flash_Init(EVE_HalContext *phost, const uint8_t *filePath, const uint8_t *fileName);
 void WelcomeScreen(EVE_HalContext *phost, char *info[]);
-void fadeout(EVE_HalContext *phost);
-void fadein(EVE_HalContext *phost);
 void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t testcase);
 #endif /* COMMON_H_ */
