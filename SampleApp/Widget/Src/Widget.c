@@ -33,7 +33,6 @@
 #include "Widget.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
-#define SCANOUT_FORMAT         YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -77,7 +76,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -248,7 +247,7 @@ void SAMAPP_Widget_gauge()
     EVE_Util_loadRawFile(s_pHalContext, RAM_G, TEST_DIR "\\SAMAPP_Bitmap_RawData.bin");
 
     /* Draw gauge with blue as background and read as needle color */
-	Display_Start(s_pHalContext);
+    Display_Start(s_pHalContext);
 
     /* flat effect and default color background */
     xOffset = xDistBtwClocks / 2;
@@ -1061,7 +1060,7 @@ void SAMAPP_Widget_spinner()
     /* will wait untill stop command is sent from the mcu. Spinner has option*/
     /* for displaying points in circle fashion or in a line fashion.         */
     /*************************************************************************/
-	Display_StartColor(s_pHalContext, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
     EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 100, 31, OPT_CENTER, "Spinner circle");
     EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 200, 31, OPT_CENTER, "Please Wait ...");
     EVE_CoCmd_spinner(s_pHalContext, (int16_t) (s_pHalContext->Width / 2),
@@ -1413,7 +1412,7 @@ void SAMAPP_Widget_sketch()
     EVE_CoCmd_sketch(s_pHalContext, BorderSz, BorderSz,
         (int16_t)(s_pHalContext->Width - 2 * BorderSz),
         (int16_t)(s_pHalContext->Height - 2 * BorderSz), RAM_G, L1); //sketch in L1 format
-	while ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && (tag != 'S'))
+    while ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && (tag != 'S'))
     {
         /* Display the sketch */
         Display_Start(s_pHalContext);

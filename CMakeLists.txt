@@ -46,27 +46,13 @@ ENDIF ()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/") 
 
 # Valid option input ###########################################################
-set(LIST_GRAPHICS DEFAULT
-                  EVE_GRAPHICS_BT820
+set(LIST_GRAPHICS EVE_GRAPHICS_BT820
   )
-set(LIST_PLATFORM DEFAULT
-                  EVE_PLATFORM_FT4222
+set(LIST_PLATFORM EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
   )
-set(LIST_DISPLAY  DEFAULT
-                  EVE_DISPLAY_WUXGA
+set(LIST_DISPLAY  EVE_DISPLAY_WUXGA
   )
-
-# Set cache ####################################################################
-SET(EVE_APPS_GRAPHICS "DEFAULT" CACHE STRING "Graphics Module")
-SET_PROPERTY(CACHE EVE_APPS_GRAPHICS PROPERTY STRINGS ${LIST_GRAPHICS})
-
-# TODO: Set a better default here automatically when CMake is run with an embedded platform
-SET(EVE_APPS_PLATFORM "DEFAULT" CACHE STRING "Platform Target")
-SET_PROPERTY(CACHE EVE_APPS_PLATFORM PROPERTY STRINGS ${LIST_PLATFORM})
-
-SET(EVE_APPS_DISPLAY "DEFAULT" CACHE STRING "Display Resolution")
-SET_PROPERTY(CACHE EVE_APPS_DISPLAY PROPERTY STRINGS ${LIST_DISPLAY})
 
 # Validate input ###############################################################
 function(give_sugguest value array global_set)
@@ -151,18 +137,10 @@ ENDIF()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# Most graphics boards have a default display and platform specified in the configuration header
-# MULTI and DEFAULT behave the same, it depends on the selected graphics board
 # For embedded targets, the platforma always needs to be specified, though, since CMake needs to set the proper build options
-if(NOT EVE_APPS_GRAPHICS STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_GRAPHICS}")
-endif()
-if(NOT EVE_APPS_PLATFORM STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_PLATFORM}")
-endif()
-if(NOT EVE_APPS_DISPLAY STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_DISPLAY}")
-endif()
+add_definitions("-D${EVE_APPS_GRAPHICS}")
+add_definitions("-D${EVE_APPS_PLATFORM}")
+add_definitions("-D${EVE_APPS_DISPLAY}")
 
 # Common setup #################################################################
 ADD_SUBDIRECTORY(common)
@@ -170,8 +148,6 @@ INCLUDE_DIRECTORIES("common/eve_hal")
 INCLUDE_DIRECTORIES("common/eve_hal/Hdr")
 
 # Project setup ################################################################
-IF(NOT EVE_APPS_GRAPHICS STREQUAL "MULTI")
-  ADD_SUBDIRECTORY(SampleApp)
-ENDIF()
+ADD_SUBDIRECTORY(SampleApp)
 
 ################################################################################

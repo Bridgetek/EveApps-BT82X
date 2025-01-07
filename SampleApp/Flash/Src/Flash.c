@@ -32,8 +32,6 @@
 #include "Common.h"
 #include "Flash.h"
 
-#define SCANOUT_FORMAT YCBCR
-
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
 void SAMAPP_Flash();
@@ -42,7 +40,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-		LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -221,7 +219,7 @@ void SAMAPP_Flash_program() {
     eve_sprintf(mes, sizeof(mes), "Erasing flash");
     helperAppendMessage(mes, mesLen);
     EVE_CoCmd_flashErase(s_pHalContext);
-	EVE_Cmd_waitFlush(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
 
     eve_sprintf(mes, sizeof(mes), "Flash is erased");
     helperAppendMessage(mes, mesLen);

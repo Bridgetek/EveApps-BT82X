@@ -33,7 +33,6 @@
 #include "Audio.h"
 
 #define pgm_read_byte(x) (*(x))
-#define SCANOUT_FORMAT YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -43,7 +42,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif

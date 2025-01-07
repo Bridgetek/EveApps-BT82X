@@ -75,10 +75,10 @@
 
 #define DDR_FRAMEBUFFER_STARTADDR (72 << 20) /**< from 72M(size : 9M) */
 
-#define TESTCASE_PICTURE        1 /**< 1 */
-#define TESTCASE_DIRECTVIDEO    2 /**< 2 */
-#define TESTCASE_VIDEO          3 /**< 3 */
-#define TESTCASE_LVDSRX         4 /**< 4 */
+#define MODE_PICTURE        1 /**< 1 */
+#define MODE_DIRECTVIDEO    2 /**< 2 */
+#define MODE_VIDEO          3 /**< 3 */
+#define MODE_LVDSRX         4 /**< 4 */
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/

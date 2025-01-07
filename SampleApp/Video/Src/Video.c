@@ -32,8 +32,6 @@
 #include "Common.h"
 #include "Video.h"
 
-#define SCANOUT_FORMAT         YCBCR
-
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
 void SAMAPP_Video();
@@ -42,7 +40,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_VIDEO);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_VIDEO);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_VIDEO);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_VIDEO);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -210,7 +208,7 @@ void SAMAPP_Video_fromFileDirect()
 {
 #if defined(DISPLAY_RESOLUTION_WUXGA)
     Draw_Text(s_pHalContext, "Example for: Video display direct from file");
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_DIRECTVIDEO);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_DIRECTVIDEO);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
@@ -222,7 +220,7 @@ void SAMAPP_Video_fromFileDirect()
     EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\flowers_1920x1200.avi", &transfered);
 
     EVE_Cmd_waitFlush(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_VIDEO);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_VIDEO);
     EVE_Util_clearScreen(s_pHalContext);
 #endif
 }
@@ -471,7 +469,7 @@ void SAMAPP_Video_frameByFrameMediafifo()
         if (s_pHalContext->LoadFileRemaining > 0)
             EVE_Util_loadMediaFile(s_pHalContext, NULL, &transfered);
     } while ((EVE_CoCmd_regRead(s_pHalContext, videoFrameStatusAddr, &ptr_val)) && (ptr_val != 0) && (EVE_MediaFifo_space(s_pHalContext) != mediafifolen - 4)); //loop till end of the file
-	EVE_Cmd_waitFlush(s_pHalContext);
+    EVE_Cmd_waitFlush(s_pHalContext);
     EVE_MediaFifo_close(s_pHalContext);
 }
 
