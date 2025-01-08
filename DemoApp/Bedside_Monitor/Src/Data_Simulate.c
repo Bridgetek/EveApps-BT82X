@@ -12,7 +12,7 @@ int read_time_simulate(int sample_rate, int time_start_ms)
 	int duration_ms = now_ms - time_start_ms;
 
 	int num_samples = duration_ms * sample_rate / 1000;
-	return 5;
+	//return 5;
 	return num_samples;
 }
 
