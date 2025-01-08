@@ -119,7 +119,7 @@ static void graph_append_and_display(app_graph_t *graph, int *lines, int line_co
 		
 		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
 		{ // loopback
-			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write);
+			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write * GRAPH_BYTE_PER_LINE);
 			graph->bitmap_wplb += line_to_write * GRAPH_BYTE_PER_LINE;
 		}
 
