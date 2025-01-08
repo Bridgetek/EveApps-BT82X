@@ -94,6 +94,7 @@ static void graph_append(app_graph_t* graph, int* lines, int line_to_write) {
 	uint8_t buffer_1line[GRAPH_BYTE_PER_LINE] = { {0} };
 	uint32_t addr = graph->bitmap_wp;
 	for (int i = 0; i < line_to_write; i++) {
+		memset(buffer_1line, 0, sizeof(buffer_1line));
 		int x = lines[i] & 0xFF;
 
 		x = normalize_to_graph(x, 0, 255);
