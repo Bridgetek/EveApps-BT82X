@@ -132,8 +132,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FDB9B229-7B35-4D61-BE5F-B717D27B3F0E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Bedside_Monitor_Emulator</RootNamespace>
-    <ProjectName>SAMAPP_Bedside_Monitor_Emulator</ProjectName>
+    <RootNamespace>Demo_Bedside_Monitor</RootNamespace>
+    <ProjectName>Demo_Bedside_Monitor</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -159,27 +159,33 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Add the DLL folder to the PATH -->
-    <LocalDllPath>$(ProjectDir)BT81x\\eve_hal\\Bin\\Simulation\\$(Platform)</LocalDllPath>
-    <Environment>PATH=$(LocalDllPath);$(PATH)</Environment>
+    <EmulatorDllPath>$(ProjectDir)BT81x\\eve_hal\\Bin\\Simulation\\$(Platform)</EmulatorDllPath>
+    <SPIDllPath>$(ProjectDir)BT81x\\eve_hal\\Bin\\MSVC\\$(Platform)</SPIDllPath>
+    <Environment>PATH=$(EmulatorDllPath);$(SPIDllPath);$(PATH)</Environment>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);EMUAPI=12;%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_BT8XXEMU;EVE_DISPLAY_WXGA</PreprocessorDefinitions>
+      
+      <!-- FT4222: EVE_PLATFORM_FT4222 -->
+      <!-- MPSSE: EVE_PLATFORM_MPSSE -->
+      <!-- EMU: EVE_PLATFORM_BT8XXEMU -->
+      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_MPSSE;EVE_DISPLAY_WXGA;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)BT81x\\application;$(ProjectDir)BT81x\\eve_hal;$(ProjectDir)BT81x\\eve_hal\\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(LocalDllPath)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);bt8xxemu.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(EmulatorDllPath);$(SPIDllPath);</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);bt8xxemu.lib;libMPSSE.lib;ftd2xx.lib;LibFT4222.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
         mkdir "$(OutDir)"
-        echo D | xcopy /ecfhrsy  "$(LocalDllPath)\\*.*" "$(OutDir)" || exit 0
+        echo D | xcopy /ecfhrsy  "$(EmulatorDllPath)\\*.*" "$(OutDir)" || exit 0
+        echo D | xcopy /ecfhrsy  "$(SPIDllPath)\\*.*" "$(OutDir)" || exit 0
         echo F | xcopy /ecfhrsy  "$(ProjectDir)..\..\Test\Flash\*.bin" "$(OutDir)\__Flash.bin" || exit 0
       </Command>
     </PreBuildEvent>
