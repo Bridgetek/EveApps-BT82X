@@ -12,7 +12,7 @@ int new_data_co2(int** data, int* data_size);
 
 #define GRAPH_BIT_PER_PIXEL 8 // bargraph 8 bit per pixel, 1 pixel per line, value 0-255
 #define GRAPH_BIT_PER_LINE GRAPH_BIT_PER_PIXEL // bargraph 8 bit per x coordinate
-#define GRAPH_BYTE_PER_LINE (ALIGN_TO_8(GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
+#define GRAPH_BYTE_PER_LINE (GRAPH_BIT_PER_LINE / BIT_PER_CHAR)
 #define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
@@ -31,22 +31,15 @@ typedef struct {
 	int byte_count;// Count of bytes collected
 	int addr_tf;//transfer address
 }app_graph_t;
-app_graph_t graph_heartbeat;
-app_graph_t graph_pleth;
-app_graph_t graph_co2;
+
+static app_graph_t graph_heartbeat;
+static app_graph_t graph_pleth;
+static app_graph_t graph_co2;
 
 // Function to normalize sensor data to fit within the graph range
-int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
+static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
 #define graph_max GRAPH_W
 #define graph_min 5
-
-	int t = 0;
-	int t1 = GRAPH_BIT_PER_PIXEL;
-	int t2 = GRAPH_BIT_PER_LINE;
-	int t3 = GRAPH_BYTE_PER_LINE;
-	int t4 = GRAPH_BYTE_PER_BUFFER;
-	int t5 = GRAPH_BUFFER_NUM;
-	int t6 = GRAPH_BUFFER_SIZE;
 
 	// Ensure the sensor range is valid to prevent division by zero
 	if (sensor_max == sensor_min) {
@@ -64,59 +57,22 @@ int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-// Gather 4bytes to a block and flush it, because BT820 is only accept wr32
-void graph_transfer_queue(app_graph_t* graph, int* data, int data_count) {
+static void graph_append(app_graph_t* graph, int* data, int data_count) {
 	graph->addr_tf = graph->bitmap_wp;
 	int addr = graph->bitmap_wp;
 	for (int i = 0; i < data_count; i++) {
-		// Get the current byte (considering `data` as an int array)
 		int byte = data[i] & 0xFF;
 
 		byte = normalize_to_graph(byte, 0, 255);
 		byte = 255 - min(255, byte);
-		EVE_Hal_wr8(s_pHalContext, addr++, byte);
+		EVE2_wr8(s_pHalContext, addr++, byte);
 		continue;
 	}
 }
 
-void graph_append_and_display(app_graph_t *graph, int *lines, int line_count)
-{
-	// write data to ramg
-	while (line_count > 0)
-	{
-		// Calculate how much data can be written continuously to the buffer
-		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
-		int line_to_write = (line_count < contiguous_space) ? line_count : contiguous_space;
-
-		// if data size >= buffer2, write to buffer0, and set rp with gap
-		if (graph->bitmap_wp + line_to_write >= graph->buffer2_end)
-		{
-			int buffer2_gap = graph->bitmap_wp + line_to_write - graph->buffer2_end;
-			graph->bitmap_wp = graph->bitmap_wplb;
-			graph_transfer_queue(graph, lines, line_to_write);
-
-			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
-			graph->bitmap_wplb = graph->buffer0;
-			continue;
-		}
-
-		graph_transfer_queue(graph, lines, line_to_write);
-		
-		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
-		{ // loopback
-			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write);
-			graph->bitmap_wplb += line_to_write;
-		}
-
-		// increase write pointer
-		graph->bitmap_rp += line_to_write;
-		graph->bitmap_wp += line_to_write;
-		lines += line_to_write;
-		line_count -= line_to_write;
-	}
-
+static void graph_display(app_graph_t* graph) {
 	//EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(graph->handler));
-	EVE_Cmd_wr32(s_pHalContext, BITMAP_SOURCE(graph->bitmap_rp+1));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SOURCE(graph->bitmap_rp + 1));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_LAYOUT(BARGRAPH, graph->w, BARGRAPH_H));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, graph->w, BARGRAPH_H));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(graph->w >> 9, BARGRAPH_H >> 9));
@@ -130,12 +86,51 @@ void graph_append_and_display(app_graph_t *graph, int *lines, int line_count)
 
 	int linewidth = 1;
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-	EVE_DRAW_AT(graph->x, graph->y-linewidth);
-	EVE_DRAW_AT(graph->x-1, graph->y-linewidth);
-	EVE_DRAW_AT(graph->x+1, graph->y-linewidth);
+	EVE_DRAW_AT(graph->x, graph->y - linewidth);
+	EVE_DRAW_AT(graph->x - 1, graph->y - linewidth);
+	EVE_DRAW_AT(graph->x + 1, graph->y - linewidth);
 
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
 	EVE_DRAW_AT(graph->x, graph->y);
+}
+
+static void graph_append_and_display(app_graph_t *graph, int *lines, int line_count)
+{
+	// write data to ramg
+	while (line_count > 0)
+	{
+		// Calculate how much data can be written continuously to the buffer
+		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
+		int line_to_write = (line_count < contiguous_space) ? line_count : contiguous_space;
+
+		// if data size >= buffer2, write to buffer0, and set rp with gap
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2_end)
+		{
+			int buffer2_gap = graph->bitmap_wp + line_to_write - graph->buffer2_end;
+			graph->bitmap_wp = graph->bitmap_wplb;
+			graph_append(graph, lines, line_to_write);
+
+			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
+			graph->bitmap_wplb = graph->buffer0;
+			continue;
+		}
+
+		graph_append(graph, lines, line_to_write);
+		
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
+		{ // loopback
+			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write);
+			graph->bitmap_wplb += line_to_write * GRAPH_BYTE_PER_LINE;
+		}
+
+		// increase write pointer
+		graph->bitmap_rp += line_to_write * GRAPH_BYTE_PER_LINE;
+		graph->bitmap_wp += line_to_write * GRAPH_BYTE_PER_LINE;
+		lines += line_to_write;
+		line_count -= line_to_write;
+	}
+
+	graph_display(graph);
 }
 
 void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {

@@ -23,7 +23,7 @@ typedef struct {
 	int buffer0, buffer1, buffer2; // 3 buffer on ramg
 	int buffer2_end; // end addreff of buffer 2
 	int x, y, w, h;
-	int rgba;
+	uint32_t rgba;
 
 	uint32_t accumulator;// To accumulate 4 bytes
 	int byte_count;// Count of bytes collected
@@ -36,13 +36,12 @@ static app_graph_t graph_heartbeat;
 static app_graph_t graph_pleth;
 static app_graph_t graph_co2;
 
-static void draw_pixel(char* buffer, int x, int y, int rgba)
+static void draw_pixel(char* buffer, int x, int y, uint32_t rgba)
 {
 	if (y > GRAPH_H * 2)
 		return;
 	if (x < 0)
 		printf("Error: Drawing pixel at (%d, %d)\n", x, y);
-	printf("Debug: Drawing pixel at (%d, %d)\n", x, y);
 
 
 	if (x < 0 || x >= GRAPH_W)
@@ -57,7 +56,7 @@ static void draw_pixel(char* buffer, int x, int y, int rgba)
 	buffer[byte_index] |= (1 << bit_index);
 }
 
-static void bresenham_line(char* buffer, int x1, int y1, int x2, int y2, int rgba)
+static void bresenham_line(char* buffer, int x1, int y1, int x2, int y2, uint32_t rgba)
 {
 	int sx = (x2 > x1) ? 1 : -1;
 	int sy = (y2 > y1) ? 1 : -1;
@@ -91,16 +90,13 @@ static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) 
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-// Gather 4bytes to a block and flush it, because BT820 is only accept wr32
 static void graph_append(app_graph_t* graph, int* lines, int line_to_write) {
 	uint8_t buffer_1line[GRAPH_BYTE_PER_LINE] = { {0} };
 	uint32_t addr = graph->bitmap_wp;
 	for (int i = 0; i < line_to_write; i++) {
-		// Get the current byte (considering `data` as an int array)
 		int x = lines[i] & 0xFF;
 
 		x = normalize_to_graph(x, 0, 255);
-		printf("Debug: Setecling line %d\n", graph->bitmap_wp / GRAPH_BYTE_PER_LINE);
 		bresenham_line(buffer_1line, x, 0, graph->x_graph_last, 1, graph->rgba);
 		graph->x_graph_last = x;
 		EVE_Hal_wrMem(s_pHalContext, addr, buffer_1line, sizeof(buffer_1line));
