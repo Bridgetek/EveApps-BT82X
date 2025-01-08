@@ -1,143 +1,65 @@
 ﻿#include "Helpers.h"
 #include "Bedside_Monitor.h"
 
-static void graph_ecg() {}
-static void graph_ple() {}
-static void graph_co2() {}
-
 extern EVE_HalContext s_halContext;
 extern EVE_HalContext* s_pHalContext;
 
-#define GRAPH_BIT_PER_PIXEL (BIT_PER_CHAR) // paletted 8 bit per pixel
-#define GRAPH_BYTE (GRAPH_SIZE * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR)
-#define GRAPH_W_BYTE (GRAPH_W * GRAPH_BIT_PER_PIXEL / BIT_PER_CHAR)
-#define BUFFER_PER_GRAPH 3
+int new_data_heartbeat(int** data, int* data_size);
+int new_data_pleth(int** data, int* data_size);
+int new_data_co2(int** data, int* data_size);
 
-#define PALETTED_BG (ARGB_BLACK * 4)
-
-// graph palleted buffer
-char buffer_paletted1_x2[GRAPH_BYTE] = { {0} };
-char buffer_paletted2_x2[GRAPH_BYTE] = { {0} };
-char buffer_paletted3_x2[GRAPH_BYTE] = { {0} };
-
-int color_table_addr = 0;
-// buffer 0 to duplicate data from buffer 1, buffer 1 to append new data
-int paletted_size = GRAPH_BYTE * BUFFER_PER_GRAPH;
-
-int paletted_adr = 0;
-int paletted_adr2 = 0;
-int paletted_adr3 = 0;
-
-int graph_h = 0;
-
-// coloring
-uint8_t color_table[] = {
-	// blue, green, red, alpha
-	0, 0, 0, 255,		/* Black			  */
-	255, 255, 255, 255, /* White			  */
-	0, 0, 255, 255,		/* Red				  */
-	0, 255, 0, 255,		/* Green			  */
-	255, 0, 0, 255,		/* Blue				  */
-	0, 255, 255, 255,	/* Yellow			  */
-	255, 255, 0, 255,	/* Cyan				  */
-	255, 0, 255, 255,	/* Magenta			  */
-	192, 192, 192, 255, /* Light Gray		  */
-	128, 128, 128, 255, /* Dark Gray		  */
-	0, 0, 128, 255,		/* Dark Red			  */
-	0, 128, 0, 255,		/* Dark Green		  */
-	128, 0, 0, 255,		/* Dark Blue		  */
-	0, 128, 128, 255,	/* Dark Yellow		  */
-	128, 128, 0, 255,	/* Dark Cyan		  */
-	128, 0, 128, 255,	/* Dark Magenta		  */
-	128, 128, 255, 255, /* Light Red		  */
-	128, 255, 128, 255, /* Light Green		  */
-	255, 128, 128, 255, /* Light Blue		  */
-	128, 255, 255, 255, /* Light Yellow		  */
-	255, 255, 128, 255, /* Light Cyan		  */
-	255, 128, 255, 255, /* Light Magenta	  */
-	64, 64, 64, 255,	/* Very Dark Gray	  */
-	64, 64, 192, 255,	/* Warm Red			  */
-	64, 192, 64, 255,	/* Warm Green		  */
-	192, 64, 64, 255,	/* Warm Blue		  */
-	64, 192, 192, 255,	/* Olive			  */
-	192, 192, 64, 255,	/* Teal				  */
-	192, 64, 192, 255,	/* Purple			  */
-	64, 64, 0, 255,		/* Deep Teal		  */
-	64, 0, 64, 255		/* Deep Purple        */
-};
-
-enum ColorIndex
-{
-	ARGB_BLACK = 0,
-	ARGB_WHITE,
-	ARGB_RED,
-	ARGB_GREEN,
-	ARGB_BLUE,
-	ARGB_YELLOW,
-	ARGB_CYAN,
-	ARGB_MAGENTA,
-	ARGB_LIGHT_GRAY,
-	ARGB_DARK_GRAY,
-	ARGB_DARK_RED,
-	ARGB_DARK_GREEN,
-	ARGB_DARK_BLUE,
-	ARGB_DARK_YELLOW,
-	ARGB_DARK_CYAN,
-	ARGB_DARK_MAGENTA,
-	ARGB_LIGHT_RED,
-	ARGB_LIGHT_GREEN,
-	ARGB_LIGHT_BLUE,
-	ARGB_LIGHT_YELLOW,
-	ARGB_LIGHT_CYAN,
-	ARGB_LIGHT_MAGENTA,
-	ARGB_VERY_DARK_GRAY,
-	ARGB_WARM_RED,
-	ARGB_WARM_GREEN,
-	ARGB_WARM_BLUE,
-	ARGB_OLIVE,
-	ARGB_TEAL,
-	ARGB_PURPLE,
-	ARGB_DEEP_TEAL,
-	ARGB_DEEP_PURPLE
-};
-
-void set_color(char* a, int n, char color) {
-#if USEBITMAP == USE_BITMAP_L1
-	int byte_index = n / 8;    // byte nth
-	int bit_index = 7 - n % 8;    // bit nth 
-	a[byte_index] |= (1 << bit_index);
-
-#elif  USEBITMAP == USE_BITMAP_PALETTED
-	a[n] = color;
-
-#elif  USEBITMAP == USE_BITMAP_BARGRAPH
-	a[n] = color;
-
-#elif  USEBITMAP == USE_BITMAP_L1_NO_ROTATE
-	a[n] = color;
-
-#elif  USEBITMAP == USE_BITMAP_LINESTRIP
-	a[n] = color;
-
+#ifdef BT82X_ENABLE
+#define graph_display graph_display_bt82
+#else
+#define graph_display graph_display_bt81
 #endif
-}
 
-void draw_pixel(char* buffer, int x, int y, int color_offset)
+#define GRAPH_BIT_PER_PIXEL 8 // paletted8 8 bit per pixel
+#define GRAPH_BIT_PER_LINE (GRAPH_BIT_PER_PIXEL * GRAPH_W) // bbp * width
+#define GRAPH_BYTE_PER_LINE (GRAPH_BIT_PER_LINE / BIT_PER_CHAR)
+#define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
+#define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
+#define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
+
+typedef struct {
+	int handler;
+	int bitmap_rp; // bitmap read pointer, use buffer 0 and 1
+	int bitmap_wp; // bitmap write pointer, use buffer 1 and 2
+	int bitmap_wplb; // bitmap write pointer loopback, use buffer 0
+	int buffer0, buffer1, buffer2; // 3 buffer on ramg
+	int buffer2_end; // end addreff of buffer 2
+	int x, y, w, h;
+	uint8_t rgba;
+
+	uint32_t accumulator;// To accumulate 4 bytes
+	int byte_count;// Count of bytes collected
+	int addr_tf;//transfer address
+
+	int x_graph_last;
+	int paletted_color_source;
+}app_graph_t;
+
+static app_graph_t graph_heartbeat;
+static app_graph_t graph_pleth;
+static app_graph_t graph_co2;
+
+static void draw_pixel(char* buffer, int x, int y, uint32_t rgba)
 {
 	if (y > GRAPH_H * 2)
 		return;
-	if (x < 0)
-		printf("Error: Drawing pixel at (%d, %d)\n", x, y);
-
 
 	if (x < 0 || x >= GRAPH_W)
 	{
+		printf("Error: Drawing invalid pixel at x=%d\n", x);
 		return;
 	}
-	set_color(buffer, x + y * GRAPH_W, color_offset);
+
+	// set pixel color
+	int pixel_nth = x + y * GRAPH_H;
+	buffer[pixel_nth] = rgba;
 }
 
-void bresenham_line(char* buffer, int x1, int y1, int x2, int y2, int color_offset)
+static void bresenham_line(char* buffer, int x1, int y1, int x2, int y2, uint32_t rgba)
 {
 	int sx = (x2 > x1) ? 1 : -1;
 	int sy = (y2 > y1) ? 1 : -1;
@@ -145,309 +67,49 @@ void bresenham_line(char* buffer, int x1, int y1, int x2, int y2, int color_offs
 	int dy = abs(y2 - y1);
 	while (dx-- > -1)
 	{
-		draw_pixel(buffer, x1, y1, color_offset);
+		draw_pixel(buffer, x1, y1, rgba);
 		x1 += sx;
 	}
 }
 
-// put a realtime data into ramg
-// return the paletted bitmap address
-int qheartbeat(int ramg_paletted, char* buffer_paletted, int color_offset)
-{
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	const int ecg_data[] = {
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2,															  // P-wave (small bump)
-		0, 2, 4, 6, 8, 6, 4, 2, 0,																  // PR segment (flat)
-		0, 0, 0, 0, 0,																			  // QRS complex (sharp spike)
-		2, 4, 8, 20, 40, 70, 30, 10, 5, 2,														  // ST segment (flat)
-		2, 2, 2, 2, 2, 2, 2,																	  // T-wave (broad bump)
-		2, 4, 6, 10, 14, 16, 14, 10, 6, 4, 2,													  // Baseline (flat)
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // end
-	};
+// Function to normalize sensor data to fit within the graph range
+static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
+#define graph_max GRAPH_W
+#define graph_min 5
 
-	int* data = ecg_data;
-	const int sample_total = sizeof(ecg_data) / sizeof(int);
-	int data_duration = 1; // unit: second
-	int dividor = 2;
-	int multipler = 3;
-
-	const int sample_per_second = sample_total / data_duration;
-	static int sample_offset = 0;
-
-	static int lastx = 0;
-	static int lasty = 0;
-
-	static int bitmap_rp_offet = 0; // bitmap read pointer, start from buffer 0
-	static int bitmap_wp_offet = GRAPH_BYTE; // bitmap write pointer, start from buffer 1
-
-	int buffer0 = ramg_paletted; // image pointer (bitmap_rp) start from this buffer and move until reach next buffer
-	int buffer1 = ramg_paletted + GRAPH_BYTE; // data append (bitmap_wp) to this buffer until reach next buffer
-	int buffer2 = ramg_paletted + GRAPH_BYTE * 2; // this buffer contain new data appended, image pointer never reach this buffer
-
-	int bitmap_rp = ramg_paletted + bitmap_rp_offet;
-	int bitmap_wp = ramg_paletted + bitmap_wp_offet;
-
-	static uint32_t time_start_ms = 0;
-	if (time_start_ms == 0)
-	{
-		time_start_ms = EVE_millis();
-	}
-	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
-	if (num_samples == 0) {
-		return bitmap_rp;
-	}
-	else {
-		time_start_ms = EVE_millis();
-		num_samples = min(num_samples, sample_total);
+	// Ensure the sensor range is valid to prevent division by zero
+	if (sensor_max == sensor_min) {
+		return 0; // Default to minimum y-value if range is zero
 	}
 
-	int copy_bytes = 0;
-	// one sample take 1 line
-	for (int i = 0; i < num_samples; i++)
-	{
-		// reset pixel color to background
-		for (int j = 0; j < GRAPH_W_BYTE; j++)
-		{
-			buffer_paletted[i * GRAPH_W_BYTE + j] = PALETTED_BG;
-		}
-
-		// get sample (x,y) coordinate
-		int pixel_y = i;
-		int pixel_x = data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
-
-		// Draw graph to buffer
-		bresenham_line(buffer_paletted, pixel_x, pixel_y, lastx, lasty, color_offset);
-		lastx = pixel_x;
-		lasty = pixel_y;
-
-		copy_bytes += GRAPH_W_BYTE;
-
-		if ((bitmap_wp + copy_bytes) >= buffer2 + GRAPH_BYTE) // if buffer 2nd full, start over
-		{
-			bitmap_rp = buffer0;	// reset write pointer
-			bitmap_wp = buffer1;	// reset write pointer
-			break;
-		}
-	}
-	sample_offset = (sample_offset + num_samples) % sample_total;
-
-	// copy to display buffer
-	EVE_Hal_wrMem(s_pHalContext, bitmap_wp, buffer_paletted, copy_bytes);
-
-	// duplicate to buffer 1st for next cycle
-	if (bitmap_wp >= buffer2) {
-		int duplicate_to = buffer0 + (bitmap_wp - buffer2);
-		int duplicate_from = bitmap_wp;
-		EVE_CoCmd_memCpy(s_pHalContext, duplicate_to, duplicate_from, copy_bytes);
-	}
-
-	bitmap_rp += copy_bytes;
-	bitmap_wp += copy_bytes;
-
-	bitmap_rp_offet = bitmap_rp - ramg_paletted;
-	bitmap_wp_offet = bitmap_wp - ramg_paletted;
-
-	return bitmap_rp;
+	/* Normalize the sensor value to the range[graph_min, graph_max]
+	   here is the formular:
+		 data range:  sensor_min  --> sensor_value ------> sensor_max
+		 graph range: graph_min   --> x            ------> graph_max
+		 find x: => (graph_max - x) / (graph_max - graph_min) = (sensor_max - sensor_value) / (sensor_max - sensor_min)
+		 find x: => (graph_max - x) = (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
+		 find x: => x = graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
+	*/
+	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-int qpleth(int ramg_paletted, char* buffer_paletted, int color_offset)
-{
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	const int pleth_data[] = {
-		0, 6, 12, 18, 30, 42, 60, 78, 102, 126,			  // Cycle 1 - Inhalation
-		150, 174, 192, 210, 228, 240, 252, 264, 270, 276, // Cycle 1 - Continued Inhalation
-		282, 288, 285, 282, 288, 285, 276, 270, 264, 252, // Cycle 1 - Peak
-		240, 228, 210, 192, 174, 160, 140, 120, 130, 110, // Cycle 1 - Exhalation with fluctuations
-		90, 100, 85, 75, 95, 65, 50, 42, 30, 35,		  // Cycle 1 - Continued Exhalation
-		20, 15, 12, 10, 8, 6, 9, 12, 18, 30,			  // Cycle 1 - Trough with fluctuations
-		42, 70, 100, 120, 140, 160, 180, 200, 210, 220,	  // Cycle 2 - Inhalation
-		225, 230, 235, 240, 238, 236, 240, 235, 225, 210, // Cycle 2 - Peak and decline
-		195, 180, 165, 150, 130, 110, 90, 70, 50, 30,	  // Cycle 2 - Faster Exhalation
-		20, 10, 5, 0, 0, 0, 0, 0, 0, 0					  // Cycle 2 - End
-	};
-	int* data = pleth_data;
-	const int sample_total = sizeof(pleth_data) / sizeof(int);
-	int data_duration = 2; // unit: second
-	int dividor = 2;
-	int multipler = 1;
+static void graph_append(app_graph_t* graph, int* lines, int line_to_write) {
+	uint8_t buffer_1line[GRAPH_BYTE_PER_LINE] = { {0} };
+	uint32_t addr = graph->bitmap_wp;
+	for (int i = 0; i < line_to_write; i++) {
+		memset(buffer_1line, 0, sizeof(buffer_1line));
+		int x = lines[i] & 0xFF;
 
-	const int sample_per_second = sample_total / data_duration;
-	static int sample_offset = 0;
-
-	static int lastx = 0;
-	static int lasty = 0;
-
-	static int bitmap_rp_offet = 0; // bitmap read pointer, start from buffer 0
-	static int bitmap_wp_offet = GRAPH_BYTE; // bitmap write pointer, start from buffer 1
-
-	int buffer0 = ramg_paletted; // image pointer (bitmap_rp) start from this buffer and move until reach next buffer
-	int buffer1 = ramg_paletted + GRAPH_BYTE; // data append (bitmap_wp) to this buffer until reach next buffer
-	int buffer2 = ramg_paletted + GRAPH_BYTE * 2; // this buffer contain new data appended, image pointer never reach this buffer
-
-	int bitmap_rp = ramg_paletted + bitmap_rp_offet;
-	int bitmap_wp = ramg_paletted + bitmap_wp_offet;
-
-	static uint32_t time_start_ms = 0;
-	if (time_start_ms == 0)
-	{
-		time_start_ms = EVE_millis();
+		x = normalize_to_graph(x, 0, 255);
+		bresenham_line(buffer_1line, x, 0, graph->x_graph_last, 1, graph->rgba);
+		graph->x_graph_last = x;
+		EVE_Hal_wrMem(s_pHalContext, addr, buffer_1line, sizeof(buffer_1line));
+		addr += GRAPH_BYTE_PER_LINE;
 	}
-	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
-	if (num_samples == 0) {
-		return bitmap_rp;
-	}
-	else {
-		time_start_ms = EVE_millis();
-		num_samples = min(num_samples, sample_total);
-	}
-
-	int copy_bytes = 0;
-	// one sample take 1 line
-	for (int i = 0; i < num_samples; i++)
-	{
-		// reset pixel color to background
-		for (int j = 0; j < GRAPH_W_BYTE; j++)
-		{
-			buffer_paletted[i * GRAPH_W_BYTE + j] = PALETTED_BG;
-		}
-
-		// get sample (x,y) coordinate
-		int pixel_y = i;
-		int pixel_x = data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
-
-		// Draw graph to buffer
-		bresenham_line(buffer_paletted, pixel_x, pixel_y, lastx, lasty, color_offset);
-		lastx = pixel_x;
-		lasty = pixel_y;
-
-		copy_bytes += GRAPH_W_BYTE;
-
-		if ((bitmap_wp + copy_bytes) >= buffer2 + GRAPH_BYTE) // if buffer 2nd full, start over
-		{
-			bitmap_rp = buffer0;	// reset write pointer
-			bitmap_wp = buffer1;	// reset write pointer
-			break;
-		}
-	}
-	sample_offset = (sample_offset + num_samples) % sample_total;
-
-	// copy to display buffer
-	EVE_Hal_wrMem(s_pHalContext, bitmap_wp, buffer_paletted, copy_bytes);
-
-	// duplicate to buffer 1st for next cycle
-	if (bitmap_wp >= buffer2) {
-		int duplicate_to = buffer0 + (bitmap_wp - buffer2);
-		int duplicate_from = bitmap_wp;
-		EVE_CoCmd_memCpy(s_pHalContext, duplicate_to, duplicate_from, copy_bytes);
-	}
-
-	bitmap_rp += copy_bytes;
-	bitmap_wp += copy_bytes;
-
-	bitmap_rp_offet = bitmap_rp - ramg_paletted;
-	bitmap_wp_offet = bitmap_wp - ramg_paletted;
-
-	return bitmap_rp;
 }
 
-int qco2(int ramg_paletted, char* buffer_paletted, int color_offset)
-{
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	const int co2_data[] = {												  // 1 second sample
-							30, 45, 60, 75, 90, 105, 120, 135, 150, 165,	  //
-							180, 195, 210, 225, 240, 255, 255, 255, 255, 255, //
-							255, 255, 255, 255, 255, 240, 225, 210, 195, 180, //
-							165, 150, 135, 120, 105, 90, 75, 60, 45, 30,	  //
-							15, 10, 5, 0, 0, 0, 0, 0, 0, 0,					  //
-							0, 0, 0, 0, 0, 5, 10, 15, 15 };
-
-	int* data = co2_data;
-	const int sample_total = sizeof(co2_data) / sizeof(int);
-	int data_duration = 1; // unit: second
-	int dividor = 2;
-	int multipler = 1;
-
-	const int sample_per_second = sample_total / data_duration;
-	static int sample_offset = 0;
-
-	static int lastx = 0;
-	static int lasty = 0;
-
-	static int bitmap_rp_offet = 0; // bitmap read pointer, start from buffer 0
-	static int bitmap_wp_offet = GRAPH_BYTE; // bitmap write pointer, start from buffer 1
-
-	int buffer0 = ramg_paletted; // image pointer (bitmap_rp) start from this buffer and move until reach next buffer
-	int buffer1 = ramg_paletted + GRAPH_BYTE; // data append (bitmap_wp) to this buffer until reach next buffer
-	int buffer2 = ramg_paletted + GRAPH_BYTE * 2; // this buffer contain new data appended, image pointer never reach this buffer
-
-	int bitmap_rp = ramg_paletted + bitmap_rp_offet;
-	int bitmap_wp = ramg_paletted + bitmap_wp_offet;
-
-	static uint32_t time_start_ms = 0;
-	if (time_start_ms == 0)
-	{
-		time_start_ms = EVE_millis();
-	}
-	int num_samples = read_time_simulate(sample_per_second, time_start_ms);
-	if (num_samples == 0) {
-		return bitmap_rp;
-	}
-	else {
-		time_start_ms = EVE_millis();
-		num_samples = min(num_samples, sample_total);
-	}
-
-	int copy_bytes = 0;
-	// one sample take 1 line
-	for (int i = 0; i < num_samples; i++)
-	{
-		// reset pixel color to background
-		for (int j = 0; j < GRAPH_W_BYTE; j++)
-		{
-			buffer_paletted[i * GRAPH_W_BYTE + j] = PALETTED_BG;
-		}
-
-		// get sample (x,y) coordinate
-		int pixel_y = i;
-		int pixel_x = data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
-
-		// Draw graph to buffer
-		bresenham_line(buffer_paletted, pixel_x, pixel_y, lastx, lasty, color_offset);
-		lastx = pixel_x;
-		lasty = pixel_y;
-
-		copy_bytes += GRAPH_W_BYTE;
-
-		if ((bitmap_wp + copy_bytes) >= buffer2 + GRAPH_BYTE) // if buffer 2nd full, start over
-		{
-			bitmap_rp = buffer0;	// reset write pointer
-			bitmap_wp = buffer1;	// reset write pointer
-			break;
-		}
-	}
-	sample_offset = (sample_offset + num_samples) % sample_total;
-
-	// copy to display buffer
-	EVE_Hal_wrMem(s_pHalContext, bitmap_wp, buffer_paletted, copy_bytes);
-
-	// duplicate to buffer 1st for next cycle
-	if (bitmap_wp >= buffer2) {
-		int duplicate_to = buffer0 + (bitmap_wp - buffer2);
-		int duplicate_from = bitmap_wp;
-		EVE_CoCmd_memCpy(s_pHalContext, duplicate_to, duplicate_from, copy_bytes);
-	}
-
-	bitmap_rp += copy_bytes;
-	bitmap_wp += copy_bytes;
-
-	bitmap_rp_offet = bitmap_rp - ramg_paletted;
-	bitmap_wp_offet = bitmap_wp - ramg_paletted;
-
-	return bitmap_rp;
-}
-
-void graph_paletted8(int bitmap_addr, int color_source, int x, int y) {
-	int bformat = PALETTED8;
+static void graph_display_bt82(app_graph_t* graph) {
+	uint16_t bformat = PALETTED8;
 #ifdef BT82X_ENABLE
 	bformat = PALETTEDARGB8;
 #endif
@@ -457,59 +119,176 @@ void graph_paletted8(int bitmap_addr, int color_source, int x, int y) {
 #define MAX_CIRCLE_UNIT 65536
 	int rotation_angle = -90;
 
+	// reset bitmap state
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-	EVE_CoCmd_setBitmap(s_pHalContext, bitmap_addr, bformat, GRAPH_W, GRAPH_H);
-	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(color_source));
+
+	// bitmap setup
+	EVE_CoCmd_setBitmap(s_pHalContext, graph->bitmap_rp, bformat, GRAPH_W, GRAPH_H);
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
+
+	// rotate
 	EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
 	EVE_CoCmd_loadIdentity(s_pHalContext);
 	EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
 	EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
 	EVE_CoCmd_setMatrix(s_pHalContext);
+
+	// vertex
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-	EVE_DRAW_AT(x, y);
+	EVE_DRAW_AT(graph->x, graph->y);
 	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
 }
 
-void graph_p8_rotate_init(int w, int h) {
-	color_table_addr = 0;
-	// buffer 0 to duplicate data from buffer 1, buffer 1 to append new data
-	paletted_size = GRAPH_BYTE * BUFFER_PER_GRAPH;
+static void graph_display_bt81(app_graph_t* graph) {
+	uint16_t bformat = PALETTED8;
+#ifdef BT82X_ENABLE
+	bformat = PALETTEDARGB8;
+#endif
+	int lw = max(GRAPH_H, GRAPH_W);
+	int lh = max(GRAPH_H, GRAPH_W);
+#define MAX_ANGLE 360
+#define MAX_CIRCLE_UNIT 65536
+	int rotation_angle = -90;
 
-	paletted_adr = color_table_addr + sizeof(color_table);
-	paletted_adr2 = paletted_adr + paletted_size;
-	paletted_adr3 = paletted_adr2 + paletted_size;
+	// reset bitmap state
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
+	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 
-	// prepare a paletted buffer
-	EVE_Hal_wrMem(s_pHalContext, color_table_addr, color_table, sizeof(color_table));
+	// bitmap setup
+	EVE_CoCmd_setBitmap(s_pHalContext, graph->bitmap_rp, bformat, GRAPH_W, GRAPH_H);
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, lw, lh));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(lw >> 9, lh >> 9));
 
-	// init graph palleted buffer 1
-	memset(buffer_paletted1_x2, 0, sizeof(buffer_paletted1_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr, buffer_paletted1_x2, sizeof(buffer_paletted1_x2));
+	// rotate
+	EVE_Cmd_wr32(s_pHalContext, SAVE_CONTEXT());
+	EVE_CoCmd_loadIdentity(s_pHalContext);
+	EVE_CoCmd_translate(s_pHalContext, 0, GRAPH_W * MAX_CIRCLE_UNIT);
+	EVE_CoCmd_rotate(s_pHalContext, rotation_angle * MAX_CIRCLE_UNIT / MAX_ANGLE);
+	EVE_CoCmd_setMatrix(s_pHalContext);
 
-	// init graph palleted buffer 2
-	memset(buffer_paletted2_x2, 0, sizeof(buffer_paletted2_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr2, buffer_paletted2_x2, sizeof(buffer_paletted2_x2));
+	// vertex
+	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
+	EVE_Cmd_wr32(s_pHalContext, BLEND_FUNC(ONE, ZERO));
 
-	// init graph palleted buffer 3
-	memset(buffer_paletted3_x2, 0, sizeof(buffer_paletted3_x2));
-	EVE_Hal_wrMem(s_pHalContext, paletted_adr3, buffer_paletted3_x2, sizeof(buffer_paletted3_x2));
+	//Draw Alpha channel
+	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(0, 0, 0, 1));
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0 + 3));
+	EVE_DRAW_AT(graph->x, graph->y);
+	//Draw Red channel
+	EVE_Cmd_wr32(s_pHalContext, BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
+	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(1, 0, 0, 0));
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0 + 2));
+	EVE_DRAW_AT(graph->x, graph->y);
+	//Draw Green channel
+	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(0, 1, 0, 0));
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0 + 1));
+	EVE_DRAW_AT(graph->x, graph->y);
+	//Draw Blue channel
+	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(0, 0, 1, 0));
+	EVE_Cmd_wr32(s_pHalContext, PALETTE_SOURCE(0));
+	EVE_DRAW_AT(graph->x, graph->y);
+
+	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
 }
 
-void graph_p8_rotate_draw(int x, int y) {
-	int buffer_offset = paletted_adr;// heartbeat(paletted_adr, buffer_paletted1_x2, ARGB_GREEN);
-	int buffer_offset2 = paletted_adr2;// pleth(paletted_adr2, buffer_paletted2_x2, ARGB_CYAN);
-	int buffer_offset3 = paletted_adr3;//co2(paletted_adr3, buffer_paletted3_x2, ARGB_YELLOW);
+static void graph_append_and_display(app_graph_t* graph, int* lines, int line_count)
+{
+	// write data to ramg
+	while (line_count > 0)
+	{
+		// Calculate how much data can be written continuously to the buffer
+		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
+		int line_to_write = (line_count < contiguous_space) ? line_count : contiguous_space;
 
-	// Graph ecg
-	graph_paletted8(buffer_offset, color_table_addr, x, y);
+		// if data size >= buffer2, write to buffer0, and set rp with gap
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2_end)
+		{
+			int buffer2_gap = graph->bitmap_wp + line_to_write - graph->buffer2_end;
+			graph->bitmap_wp = graph->bitmap_wplb;
+			graph_append(graph, lines, line_to_write);
 
-	y += graph_h;
-	// Graph pleth
-	graph_paletted8(buffer_offset2, color_table_addr, x, y);
+			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
+			graph->bitmap_wplb = graph->buffer0;
+			continue;
+		}
 
-	// Graph co2
-	graph_paletted8(buffer_offset3, color_table_addr, x, y);
+		graph_append(graph, lines, line_to_write);
 
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
+		{ // loopback
+			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write);
+			graph->bitmap_wplb += line_to_write * GRAPH_BYTE_PER_LINE;
+		}
+
+		// increase write pointer
+		graph->bitmap_rp += line_to_write * GRAPH_BYTE_PER_LINE;
+		graph->bitmap_wp += line_to_write * GRAPH_BYTE_PER_LINE;
+		lines += line_to_write;
+		line_count -= line_to_write;
+	}
+
+	graph_display(graph);
+}
+
+void graph_p8_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
+	//      <-------- read pointer -------->x<- when write pointer reached here, start loopback to buffer 0
+	//      -------------------------------------------------         
+	//      |   buffer 0    |   buffer 1    |   buffer 2    |         
+	//      -------------------------------------------------         
+	//                      <-------- write pointer -------->
+	app_graph_t* graphs[] = { &graph_heartbeat , &graph_pleth , &graph_co2 };
+	app_box* boxs[] = { box_heartbeat , box_pleth , box_co2 };
+	uint8_t colors[] = { ARGB_GREEN, ARGB_CYAN, ARGB_YELLOW };
+	int color_source = 0;
+	int buffer_start = sizeof(color_table);
+
+	// prepare a paletted buffer
+	EVE_Hal_wrMem(s_pHalContext, color_source, color_table, sizeof(color_table));
+
+	for (int i = 0; i < 3; i++) {
+		app_graph_t* gh = graphs[i];
+		gh->buffer0 = buffer_start + i * GRAPH_BUFFER_SIZE; // loopback buffer
+		gh->buffer1 = gh->buffer0 + GRAPH_BYTE_PER_BUFFER;
+		gh->buffer2 = gh->buffer1 + GRAPH_BYTE_PER_BUFFER;
+		gh->buffer2_end = gh->buffer2 + GRAPH_BYTE_PER_BUFFER;
+
+		gh->bitmap_rp = gh->buffer0;  // display from buffer 0 and continue to buffer 1
+		gh->bitmap_wp = gh->buffer1;  // append to buffer 1 and continue to buffer 2
+		gh->bitmap_wplb = gh->buffer0;  // loopback from buffer 0
+		gh->x = boxs[i]->x + 10;
+		gh->y = boxs[i]->y - 60;
+		gh->w = GRAPH_H;
+		gh->h = GRAPH_W;
+		gh->handler = 1;
+		gh->rgba = colors[i];
+		gh->accumulator = 0;
+		gh->byte_count = 0;
+		gh->addr_tf = gh->bitmap_wp;
+		gh->paletted_color_source = color_source;
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 0, GRAPH_BUFFER_SIZE);
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 0, GRAPH_BUFFER_SIZE);
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 0, GRAPH_BUFFER_SIZE);
+	}
+}
+
+void graph_p8_rotate_draw() {
+	int* data_heartbeat;
+	int* data_pleth;
+	int* data_co2;
+	int data_heartbeat_size = 0;
+	int data_pleth_size = 0;
+	int data_co2_size = 0;
+
+	int x1 = new_data_heartbeat(&data_heartbeat, &data_heartbeat_size);
+	int x2 = new_data_pleth(&data_pleth, &data_pleth_size);
+	int x3 = new_data_co2(&data_co2, &data_co2_size);
+
+
+	graph_append_and_display(&graph_heartbeat, data_heartbeat, data_heartbeat_size);
+	//graph_append_and_display(&graph_pleth, data_pleth, data_pleth_size);
+	//graph_append_and_display(&graph_co2, data_co2, data_co2_size);
 }

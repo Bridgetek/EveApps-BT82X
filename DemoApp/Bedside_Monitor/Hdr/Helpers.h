@@ -108,4 +108,76 @@ void bt82x_wr8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
 	#define EVE2_flush EVE_Hal_flush
 #endif // BT82X_ENABLE
 
+
+// coloring
+static uint8_t color_table[] = {
+	// blue , green, red   , alpha
+	0    , 0    , 0     , 255  , /* Black			 */
+	255  , 255  , 255   , 255  , /* White			 */
+	0    , 0    , 255   , 255  , /* Red				 */
+	0    , 255  , 0     , 255  , /* Green			 */
+	255  , 0    , 0     , 255  , /* Blue			 */
+	0    , 255  , 255   , 255  , /* Yellow			 */
+	255  , 255  , 0     , 255  , /* Cyan			 */
+	255  , 0    , 255   , 255  , /* Magenta			 */
+	192  , 192  , 192   , 255  , /* Light Gray		 */
+	128  , 128  , 128   , 255  , /* Dark Gray		 */
+	0    , 0    , 128   , 255  , /* Dark Red		 */
+	0    , 128  , 0     , 255  , /* Dark Green		 */
+	128  , 0    , 0     , 255  , /* Dark Blue		 */
+	0    , 128  , 128   , 255  , /* Dark Yellow		 */
+	128  , 128  , 0     , 255  , /* Dark Cyan		 */
+	128  , 0    , 128   , 255  , /* Dark Magenta	 */
+	128  , 128  , 255   , 255  , /* Light Red		 */
+	128  , 255  , 128   , 255  , /* Light Green		 */
+	255  , 128  , 128   , 255  , /* Light Blue		 */
+	128  , 255  , 255   , 255  , /* Light Yellow	 */
+	255  , 255  , 128   , 255  , /* Light Cyan		 */
+	255  , 128  , 255   , 255  , /* Light Magenta	 */
+	64   , 64   , 64    , 255  , /* Very Dark Gray	 */
+	64   , 64   , 192   , 255  , /* Warm Red		 */
+	64   , 192  , 64    , 255  , /* Warm Green		 */
+	192  , 64   , 64    , 255  , /* Warm Blue		 */
+	64   , 192  , 192   , 255  , /* Olive			 */
+	192  , 192  , 64    , 255  , /* Teal			 */
+	192  , 64   , 192   , 255  , /* Purple			 */
+	64   , 64   , 0     , 255  , /* Deep Teal		 */
+	64   , 0    , 64    , 255    /* Deep Purple      */
+};
+
+enum ColorIndex
+{
+	ARGB_BLACK = 0,
+	ARGB_WHITE,
+	ARGB_RED,
+	ARGB_GREEN,
+	ARGB_BLUE,
+	ARGB_YELLOW,
+	ARGB_CYAN,
+	ARGB_MAGENTA,
+	ARGB_LIGHT_GRAY,
+	ARGB_DARK_GRAY,
+	ARGB_DARK_RED,
+	ARGB_DARK_GREEN,
+	ARGB_DARK_BLUE,
+	ARGB_DARK_YELLOW,
+	ARGB_DARK_CYAN,
+	ARGB_DARK_MAGENTA,
+	ARGB_LIGHT_RED,
+	ARGB_LIGHT_GREEN,
+	ARGB_LIGHT_BLUE,
+	ARGB_LIGHT_YELLOW,
+	ARGB_LIGHT_CYAN,
+	ARGB_LIGHT_MAGENTA,
+	ARGB_VERY_DARK_GRAY,
+	ARGB_WARM_RED,
+	ARGB_WARM_GREEN,
+	ARGB_WARM_BLUE,
+	ARGB_OLIVE,
+	ARGB_TEAL,
+	ARGB_PURPLE,
+	ARGB_DEEP_TEAL,
+	ARGB_DEEP_PURPLE
+};
+
 #endif /* HELPERS_H_ */
