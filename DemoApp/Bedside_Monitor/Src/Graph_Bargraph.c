@@ -10,10 +10,12 @@ int new_data_heartbeat(int** data, int* data_size);
 int new_data_pleth(int** data, int* data_size);
 int new_data_co2(int** data, int* data_size);
 
-#define GRAPH_BIT_PER_LINE   8 // bargraph 8 bit per line, value 0-255
-#define GRAPH_BYTE_BER_BUFFER (GRAPH_H * GRAPH_BIT_PER_LINE / BIT_PER_CHAR)
+#define GRAPH_BIT_PER_PIXEL 8 // bargraph 8 bit per pixel, 1 pixel per line, value 0-255
+#define GRAPH_BIT_PER_LINE GRAPH_BIT_PER_PIXEL // bargraph 8 bit per x coordinate
+#define GRAPH_BYTE_PER_LINE (ALIGN_TO_8(GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
+#define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
-#define GRAPH_BUFFER_SIZE (GRAPH_BYTE_BER_BUFFER * GRAPH_BUFFER_NUM) 
+#define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
 
 typedef struct {
 	int handler;
@@ -33,14 +35,18 @@ app_graph_t graph_heartbeat;
 app_graph_t graph_pleth;
 app_graph_t graph_co2;
 
-void bt820_transfer32(int addr, int data) {
-	EVE_Hal_wr32(s_pHalContext, addr, data);
-}
-
 // Function to normalize sensor data to fit within the graph range
 int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
 #define graph_max GRAPH_W
 #define graph_min 5
+
+	int t = 0;
+	int t1 = GRAPH_BIT_PER_PIXEL;
+	int t2 = GRAPH_BIT_PER_LINE;
+	int t3 = GRAPH_BYTE_PER_LINE;
+	int t4 = GRAPH_BYTE_PER_BUFFER;
+	int t5 = GRAPH_BUFFER_NUM;
+	int t6 = GRAPH_BUFFER_SIZE;
 
 	// Ensure the sensor range is valid to prevent division by zero
 	if (sensor_max == sensor_min) {
@@ -58,85 +64,59 @@ int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-void graph_flush(app_graph_t* graph) {
-	bt820_transfer32(graph->addr_tf, graph->accumulator);
-	// Reset the accumulator and byte count
-	graph->accumulator = 0;
-	graph->byte_count = 0;
-}
-
 // Gather 4bytes to a block and flush it, because BT820 is only accept wr32
 void graph_transfer_queue(app_graph_t* graph, int* data, int data_count) {
 	graph->addr_tf = graph->bitmap_wp;
-
+	int addr = graph->bitmap_wp;
 	for (int i = 0; i < data_count; i++) {
 		// Get the current byte (considering `data` as an int array)
 		int byte = data[i] & 0xFF;
 
 		byte = normalize_to_graph(byte, 0, 255);
 		byte = 255 - min(255, byte);
-		
-		// Add the byte to the accumulator
-		graph->accumulator |= (byte << (8 * graph->byte_count));
-		graph->byte_count++;
-
-		// If 4 bytes are collected, send them using tf()
-		if (graph->byte_count == 4) {
-			graph_flush(graph);
-			graph->addr_tf += 4;
-		}
+		EVE_Hal_wr8(s_pHalContext, addr++, byte);
+		continue;
 	}
 }
 
-void graph_append_and_display(app_graph_t* graph, int* data, int data_count) {
+void graph_append_and_display(app_graph_t *graph, int *lines, int line_count)
+{
 	// write data to ramg
-	while (data_count > 0) {
+	while (line_count > 0)
+	{
 		// Calculate how much data can be written continuously to the buffer
 		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
-		int to_write = data_count;// (data_count < contiguous_space) ? data_count : contiguous_space;
+		int line_to_write = (line_count < contiguous_space) ? line_count : contiguous_space;
 
-		if (graph->bitmap_wp + to_write >= graph->buffer2_end) {
-			EVE_CoCmd_memSet(s_pHalContext, graph->buffer0, 255, GRAPH_BYTE_BER_BUFFER);
-			EVE_CoCmd_memCpy(s_pHalContext, graph->buffer0, graph->buffer2, GRAPH_BYTE_BER_BUFFER);
-			EVE_CoCmd_memSet(s_pHalContext, graph->buffer1, 255, GRAPH_BYTE_BER_BUFFER);
-			EVE_CoCmd_memSet(s_pHalContext, graph->buffer2, 255, GRAPH_BYTE_BER_BUFFER);
+		// if data size >= buffer2, write to buffer0, and set rp with gap
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2_end)
+		{
+			int buffer2_gap = graph->bitmap_wp + line_to_write - graph->buffer2_end;
+			graph->bitmap_wp = graph->bitmap_wplb;
+			graph_transfer_queue(graph, lines, line_to_write);
 
-			graph->bitmap_wp = graph->buffer1;
-			graph->bitmap_rp = graph->buffer0;
+			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
 			graph->bitmap_wplb = graph->buffer0;
-			graph->addr_tf= graph->bitmap_wp;
-
-			graph->accumulator = 0;
-			graph->byte_count = 0;
-			break;
+			continue;
 		}
 
-		// Transfer the contiguous block of data
-		graph_transfer_queue(graph, data, to_write);
+		graph_transfer_queue(graph, lines, line_to_write);
 		
-		if (graph->bitmap_wp  >= graph->buffer2) { // loopback
-// Macro to convert an argument into a string
-#define TO_STRING2(x) #x
-#define TO_STRING(x) TO_STRING2(x)
-// Macro to evaluate the macro result and then convert to a string
-#define TO_STRING_EVAL(x) TO_STRING(x)
-#define FN "bargraph_1000x256_8000_bytes.raw"
-			//uint8_t evemem[10000];
-			//EVE_Hal_rdMem(s_pHalContext, evemem, graph->bitmap_rp, GRAPH_BYTE_BER_BUFFER);
-			//save_buffer_to_file(FN, evemem, GRAPH_BYTE_BER_BUFFER);
-			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, to_write);
-			graph->bitmap_wplb += to_write;
+		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
+		{ // loopback
+			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write);
+			graph->bitmap_wplb += line_to_write;
 		}
-		
+
 		// increase write pointer
-		graph->bitmap_rp += to_write;
-		graph->bitmap_wp += to_write;
-		data += to_write;
-		data_count -= to_write;
+		graph->bitmap_rp += line_to_write;
+		graph->bitmap_wp += line_to_write;
+		lines += line_to_write;
+		line_count -= line_to_write;
 	}
 
 	//EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(graph->handler));
-	EVE_Cmd_wr32(s_pHalContext, BITMAP_SOURCE(graph->bitmap_rp));
+	EVE_Cmd_wr32(s_pHalContext, BITMAP_SOURCE(graph->bitmap_rp+1));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_LAYOUT(BARGRAPH, graph->w, BARGRAPH_H));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE(NEAREST, BORDER, BORDER, graph->w, BARGRAPH_H));
 	EVE_Cmd_wr32(s_pHalContext, BITMAP_SIZE_H(graph->w >> 9, BARGRAPH_H >> 9));
@@ -171,9 +151,9 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 	for (int i = 0; i < 3; i++) {
 		app_graph_t* gh = graphs[i];
 		gh->buffer0 = i* GRAPH_BUFFER_SIZE; // loopback buffer
-		gh->buffer1 = gh->buffer0 + GRAPH_BYTE_BER_BUFFER;
-		gh->buffer2 = gh->buffer1 + GRAPH_BYTE_BER_BUFFER;
-		gh->buffer2_end = gh->buffer2 + GRAPH_BYTE_BER_BUFFER;
+		gh->buffer1 = gh->buffer0 + GRAPH_BYTE_PER_BUFFER;
+		gh->buffer2 = gh->buffer1 + GRAPH_BYTE_PER_BUFFER;
+		gh->buffer2_end = gh->buffer2 + GRAPH_BYTE_PER_BUFFER;
 		
 		gh->bitmap_rp = gh->buffer0;  // display from buffer 0 and continue to buffer 1
 		gh->bitmap_wp = gh->buffer1;  // append to buffer 1 and continue to buffer 2
@@ -187,7 +167,9 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 		gh->accumulator = 0;
 		gh->byte_count = 0;
 		gh->addr_tf = gh->bitmap_wp;
-		EVE_CoCmd_memSet(s_pHalContext, gh->bitmap_rp, 255, GRAPH_BUFFER_SIZE);
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 255, GRAPH_BUFFER_SIZE);
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 255, GRAPH_BUFFER_SIZE);
+		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 255, GRAPH_BUFFER_SIZE);
 	}
 }
 

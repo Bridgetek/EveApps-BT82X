@@ -28,7 +28,9 @@ int main(int argc, char *argv[])
 {
 	s_pHalContext = &s_halContext;
 	Gpu_Init(s_pHalContext);
+#if defined(BT82X_ENABLE)
 	LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+#endif
 
 	// read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 0
@@ -115,8 +117,12 @@ void draw_app_window(app_box app_window)
 #define USEBITMAP USE_BITMAP_BARGRAPH
 
 #if  USEBITMAP == USE_BITMAP_L1
-#define GRAPH_INIT graph_p8_rotate_init
-#define GRAPH_DRAW graph_p8_rotate_draw
+#define GRAPH_INIT graph_l1_rotate_init
+#define GRAPH_DRAW graph_l1_rotate_draw
+
+#elif  USEBITMAP == USE_BITMAP_L1_NO_ROTATE
+#define GRAPH_INIT graph_l1_init
+#define GRAPH_DRAW graph_l1_draw
 
 #elif  USEBITMAP == USE_BITMAP_PALETTED
 #define GRAPH_INIT graph_p8_rotate_init
@@ -126,13 +132,9 @@ void draw_app_window(app_box app_window)
 #define GRAPH_INIT graph_bargraph_init
 #define GRAPH_DRAW graph_bargraph_draw
 
-#elif  USEBITMAP == USE_BITMAP_L1_NO_ROTATE
-#define GRAPH_INIT graph_p8_rotate_init
-#define GRAPH_DRAW graph_p8_rotate_draw
-
 #elif  USEBITMAP == USE_BITMAP_LINESTRIP
-#define GRAPH_INIT graph_p8_rotate_init
-#define GRAPH_DRAW graph_p8_rotate_draw
+#define GRAPH_INIT graph_linestrip_init
+#define GRAPH_DRAW graph_linestrip_draw
 
 #endif
 

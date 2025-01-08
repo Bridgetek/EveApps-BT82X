@@ -12,7 +12,7 @@ int read_time_simulate(int sample_rate, int time_start_ms)
 	int duration_ms = now_ms - time_start_ms;
 
 	int num_samples = duration_ms * sample_rate / 1000;
-	//return 5;
+	return 5;
 	return num_samples;
 }
 
@@ -78,18 +78,18 @@ int new_data_pleth(int** data, int* data_size)
 {
 	// Simulated sinus rhythm data (adjusted to resemble the waveform)
 	static int pleth_data[] = {
-		0, 6, 12, 18, 30, 42, 60, 78, 102, 126,			  // Cycle 1 - Inhalation
-		150, 174, 192, 210, 228, 240, 252, 264, 270, 276, // Cycle 1 - Continued Inhalation
-		282, 288, 285, 282, 288, 285, 276, 270, 264, 252, // Cycle 1 - Peak
+		0, 6, 12, 18, 30, 42, 60, 78, 102, 126,			     // Cycle 1 - Inhalation
+		150, 174, 192, 210, 228, 240, 252, 264, 270, 276,    // Cycle 1 - Continued Inhalation
+		282, 288, 285, 282, 288, 285, 276, 270, 264, 252,    // Cycle 1 - Peak
 		// 240, 228, 210, 192, 174, 160, 140, 120, 130, 110, // Cycle 1 - Exhalation with fluctuations
-		// 90, 100, 85, 75, 95, 65, 50, 42, 30, 35,		  // Cycle 1 - Continued Exhalation
-		240, 228, 210, 192, 174, 160, 140, 130, 120, 110, // Cycle 1 - Exhalation no fluctuations
-		100, 85, 75, 65, 50, 42, 35, 30,         		  // Cycle 1 - Continued Exhalation
-		20, 15, 12, 10, 8, 6, 9, 12, 18, 30,			  // Cycle 1 - Trough with fluctuations
-		42, 70, 100, 120, 140, 160, 180, 200, 210, 220,	  // Cycle 2 - Inhalation
-		225, 230, 235, 240, 238, 236, 240, 235, 225, 210, // Cycle 2 - Peak and decline
-		195, 180, 165, 150, 130, 110, 90, 70, 50, 30,	  // Cycle 2 - Faster Exhalation
-		20, 10, 5, 0, 0, 0, 0, 0, 0, 0					  // Cycle 2 - End
+		// 90, 100, 85, 75, 95, 65, 50, 42, 30, 35,		     // Cycle 1 - Continued Exhalation with fluctuations
+		240, 228, 210, 192, 174, 160, 140, 130, 120, 110,    // Cycle 1 - Exhalation no fluctuations
+		100, 85, 75, 65, 50, 42, 35, 30,         		     // Cycle 1 - Continued Exhalation no fluctuations
+		20, 15, 12, 10, 8, 6, 9, 12, 18, 30,			     // Cycle 1 - Trough
+		42, 70, 100, 120, 140, 160, 180, 200, 210, 220,	     // Cycle 2 - Inhalation
+		225, 230, 235, 240, 238, 236, 240, 235, 225, 210,    // Cycle 2 - Peak and decline
+		195, 180, 165, 150, 130, 110, 90, 70, 50, 30,	     // Cycle 2 - Faster Exhalation
+		20, 10, 5, 0, 0, 0, 0, 0, 0, 0					     // Cycle 2 - End
 	};
 	int data_duration = 2; // unit: second
 	int dividor = 2;

@@ -55,6 +55,10 @@
 
 #define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * 1, (y) * 1))
 
+#define ALIGN_TO_N_2POWER(x, n)    (((x) + ((n) - 1)) & ~((n) - 1)) // Only works correctly if n is a power of 2.
+#define ALIGN_UP_TO_N(x, n) (((x) + ((n) - 1)) / (n) * (n))  // Works for any positive integer n (including non-powers of 2).
+#define ALIGN_TO_8(x) ALIGN_UP_TO_N((x), 8)
+
 typedef struct
 {
 	int x, y, w, h, x_end, y_end, x_mid, y_mid;
@@ -84,4 +88,9 @@ int save_buffer_to_file(const char* filename, const void* buffer, size_t buffer_
 // Function to take a DDR screenshot
 void take_ddr_screenshot(EVE_HalContext* phost, char* name, int ramg_render);
 
+void bt820_transfer_flush(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
+void bt820_transfer_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t data_size);
+void bt820_transfer32(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
+void bt820_transfer16(EVE_HalContext* phost, uint32_t addr, uint16_t data16);
+void bt820_transfer8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
 #endif /* HELPERS_H_ */
