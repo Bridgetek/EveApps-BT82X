@@ -179,46 +179,46 @@ static uint32_t transfer_addr0 = 0;
 static uint32_t accumulator32 = 0;
 static uint32_t byte_count = 0;
 
-void bt820_transfer_flush(EVE_HalContext* phost, uint32_t addr, uint8_t data32) {
+void bt82x_wr_flush(EVE_HalContext* phost, uint32_t addr, uint8_t data32) {
 	EVE_Hal_wr32(phost, addr, data32);
 	transfer_addr0 = 0;
 	byte_count = 0;
 	accumulator32 = 0;
 }
 
-void bt820_transfer_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t data_size) {
+void bt82x_wr_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t data_size) {
 	for (int i = 0; i < data_size; i++) {
-		bt820_transfer8(phost, addr+i, (uint8_t)(data[i] & 0xFF));
+		bt82x_wr8(phost, addr+i, (uint8_t)(data[i] & 0xFF));
 	}
 }
 
-void bt820_transfer32(EVE_HalContext* phost, uint32_t addr, uint8_t data32) {
+void bt82x_wr32(EVE_HalContext* phost, uint32_t addr, uint8_t data32) {
 	// Transfer the lowest byte
-	bt820_transfer8(phost, addr, (uint8_t)(data32 & 0xFF));
+	bt82x_wr8(phost, addr, (uint8_t)(data32 & 0xFF));
 
 	// Transfer the second byte
-	bt820_transfer8(phost, addr + 1, (uint8_t)((data32 >> 8) & 0xFF));
+	bt82x_wr8(phost, addr + 1, (uint8_t)((data32 >> 8) & 0xFF));
 
 	// Transfer the third byte
-	bt820_transfer8(phost, addr + 2, (uint8_t)((data32 >> 16) & 0xFF));
+	bt82x_wr8(phost, addr + 2, (uint8_t)((data32 >> 16) & 0xFF));
 
 	// Transfer the highest byte
-	bt820_transfer8(phost, addr + 3, (uint8_t)((data32 >> 24) & 0xFF));
+	bt82x_wr8(phost, addr + 3, (uint8_t)((data32 >> 24) & 0xFF));
 }
 
-void bt820_transfer16(EVE_HalContext* phost, uint32_t addr, uint16_t data16) {
+void bt82x_wr16(EVE_HalContext* phost, uint32_t addr, uint16_t data16) {
 	// Transfer the lower byte
-	bt820_transfer8(phost, addr, (uint8_t)(data16 & 0xFF));
+	bt82x_wr8(phost, addr, (uint8_t)(data16 & 0xFF));
 
 	// Transfer the higher byte
-	bt820_transfer8(phost, addr + 1, (uint8_t)((data16 >> 8) & 0xFF));
+	bt82x_wr8(phost, addr + 1, (uint8_t)((data16 >> 8) & 0xFF));
 }
 
-void bt820_transfer8(EVE_HalContext* phost, uint32_t addr, uint8_t data8) {
+void bt82x_wr8(EVE_HalContext* phost, uint32_t addr, uint8_t data8) {
 	// Check if address is contiguous
 	if (byte_count > 0 && addr != (transfer_addr0 + byte_count)) {
 		// Flush the current transfer as the address is not contiguous
-		bt820_transfer_flush(phost, transfer_addr0, accumulator32);
+		bt82x_wr_flush(phost, transfer_addr0, accumulator32);
 
 		// Reset the accumulator and byte count
 		accumulator32 = 0;
@@ -236,7 +236,7 @@ void bt820_transfer8(EVE_HalContext* phost, uint32_t addr, uint8_t data8) {
 
 	// Flush if 4 bytes are collected
 	if (byte_count == 4) {
-		bt820_transfer_flush(phost, transfer_addr0, accumulator32);
+		bt82x_wr_flush(phost, transfer_addr0, accumulator32);
 
 		// Reset the accumulator and byte count after flushing
 		accumulator32 = 0;

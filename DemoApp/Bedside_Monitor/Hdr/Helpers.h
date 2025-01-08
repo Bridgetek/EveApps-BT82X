@@ -88,9 +88,24 @@ int save_buffer_to_file(const char* filename, const void* buffer, size_t buffer_
 // Function to take a DDR screenshot
 void take_ddr_screenshot(EVE_HalContext* phost, char* name, int ramg_render);
 
-void bt820_transfer_flush(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
-void bt820_transfer_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t data_size);
-void bt820_transfer32(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
-void bt820_transfer16(EVE_HalContext* phost, uint32_t addr, uint16_t data16);
-void bt820_transfer8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
+void bt82x_wr_flush(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
+void bt82x_wr_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t data_size);
+void bt82x_wr32(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
+void bt82x_wr16(EVE_HalContext* phost, uint32_t addr, uint16_t data16);
+void bt82x_wr8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
+
+#ifdef BT82X_ENABLE
+	#define EVE2_wr8  bt82x_wr8
+	#define EVE2_wr16 bt82x_wr16
+	#define EVE2_wr32 bt82x_wr32
+	#define EVE2_wrmem bt82x_wr_mem
+	#define EVE2_flush bt82x_wr_flush
+#else
+	#define EVE2_wr8  EVE_Hal_wr8
+	#define EVE2_wr16 EVE_Hal_wr16
+	#define EVE2_wr32 EVE_Hal_wr32
+	#define EVE2_wrmem EVE_Hal_wrmem
+	#define EVE2_flush EVE_Hal_flush
+#endif // BT82X_ENABLE
+
 #endif /* HELPERS_H_ */
