@@ -10,7 +10,7 @@ The collection is divided into two categories: **Sample** and **Demo** applicati
 
 All applications rely on shared resources located in the "common" folder.
 
-Each application includes a "project" subfolder containing the necessary files for building the application using the MS Visual Studio 2022.
+Each application includes a "project" subfolder containing the necessary files for building the application using the MS Visual Studio 2019.
 
 Users are expected to have familiarity with the BT82X programming guide and datasheet.
 
