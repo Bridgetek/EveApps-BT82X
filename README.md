@@ -1,14 +1,18 @@
 
 
-# EveApps 2.0
+# EveApps-BT82X
+EveApps-BT82X is a collection of applications designed as reference resources for Bridgetek's 5th-generation graphics controller, the BT82X.
 
-EveApps 2.0 is a collection of applications that use Eve Series chip (BT820) for reference purposes. The collection includes 10 sample applications, all written in ANSI C code, and the complete source code is provided.
+The collection is divided into two categories: **Sample** and **Demo** applications. Both are written in ANSI C, with complete source code provided.
 
-The sample applications are intended for instructional purposes, focusing on individual display lists or commands.
+- **Sample applications** focus on instructional use, demonstrating individual display lists or commands. 
+- **Demo applications** are more complex, closely resembling real-world projects.  (To be updated) 
 
-All the applications rely on a set of common files located under the "common" folder. Each application has a subfolder named "project," which contains the project file necessary for building the application with the toolchain.
+All applications rely on shared resources located in the "common" folder.
 
-Users are expected to be familiar with the programming guide and data sheet for the Eve Series chips.
+Each application includes a "project" subfolder containing the necessary files for building the application using the MS Visual Studio 2022.
+
+Users are expected to have familiarity with the BT82X programming guide and datasheet.
 
 
 
@@ -35,7 +39,10 @@ Users are expected to be familiar with the programming guide and data sheet for 
 
 Note:
 - For Eve registers and commands/instructions definition, user can find it at the file common/eve_hal/EVE_GpuDef.h and common/eve_hal/Eve_CoCmd.h.
-- For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.  
+- For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.
+
+## Hardeware dependency 
+Unless specified otherwise, the default hardware platform is the VM820C.  You may refer to the details at www.brtchip.com
 
 ## Build instructions
 
