@@ -120,7 +120,6 @@ It may also set platform, display, and flash values if none are configured.
 
 // Re-Mapping BT820 Series to BT82X
 #if defined(BT820_ENABLE)
-#define BT82X_ENABLE
 #define EVE_SUPPORT_CHIPID EVE_BT820
 #define EVE_SUPPORT_GEN EVE5
 #endif

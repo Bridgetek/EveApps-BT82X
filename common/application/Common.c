@@ -588,7 +588,6 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode)
 #if defined(DISPLAY_RESOLUTION_WUXGA)
     w = 1920;
     h = 1200;
-    extsyncmode = FOUR_PIXEL_DUAL_LVDS;
     TXPLLDiv = 0x03;
     eve_printf_debug("TXPLLDiv %d\n", TXPLLDiv);
     lvdspll_cks = TXPLLDiv > 4 ? 1 : 2;
@@ -615,7 +614,7 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode)
     EVE_Hal_wr32(phost, REG_SC2_PTR1, SC2_PTR1_STARTADDR);
     EVE_Cmd_waitFlush(phost);
 
-    EVE_Hal_wr32(phost, REG_SO_MODE, extsyncmode);
+    EVE_Hal_wr32(phost, REG_SO_MODE, FOUR_PIXEL_DUAL_LVDS);
     if (mode == MODE_PICTURE)
     {
         scanout_single(phost, format, w, h);

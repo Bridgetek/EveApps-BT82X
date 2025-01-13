@@ -5,8 +5,6 @@
  * This header is separated and included last 
  * in case of conflicts with other libraries.
  * 
- * Expects BT82X_ENABLE to be defined.
- * 
  * @author Bridgetek
  *
  * @date 2024
@@ -37,8 +35,6 @@
 #ifndef EVE_GPU_DEFS__H
 #define EVE_GPU_DEFS__H
 
-#ifdef BT82X_ENABLE
-
 /* Definitions used for BT820 coprocessor command buffer */
 #define EVE_DL_SIZE                   (16 * 1024UL) /**< 16kB Display List buffer size */
 #define EVE_CMD_FIFO_SIZE             ((16) * 1024UL) /**< 16kB coprocessor FIFO size */
@@ -56,7 +52,6 @@
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
 #define FREQUENCY                72000000UL
-#define POLLING_BYTES            10 /**< For QUAD mode */
 #define READ_TIMOUT              0x10
 
 /**************
@@ -72,9 +67,6 @@
 #define RAM_ERR_REPORT           (BASE + 0x4800)
 #define REG_CORE_R1              (BASE + 0x6000)
 #define RAM_DL                   (BASE + 0x8000)
-
-#define CMDB_WRITE               (BASE + 0x10000)
-#define RAM_J1CODE               (BASE + 0x20000)
 
 #define REG_LVDSTX               (BASE + 0x800300)
 #define REG_SYS                  (BASE + 0x800400)
@@ -210,7 +202,7 @@
 #define REG_CMD_WRITE            (REG_CORE_R1 + 0x0150)
 #define REG_CMD_DL               (REG_CORE_R1 + 0x0154)
 #define REG_CMDB_SPACE           (REG_CORE_R1 + 0x0594)
-#define REG_CMDB_WRITE           CMDB_WRITE
+#define REG_CMDB_WRITE           (BASE + 0x10000)
 #define CMDBUF_SIZE              0x4000
 ///@}
 
@@ -316,9 +308,6 @@
 #define CMD_ANIMSTART        4294967135UL /**< 0xFFFFFF5FUL */
 #define CMD_ANIMSTOP         4294967117UL /**< 0xFFFFFF4DUL */
 #define CMD_ANIMXY           4294967118UL /**< 0xFFFFFF4EUL */
-#define CMD_APBREAD          4294967138UL /**< 0xFFFFFF62UL */
-#define CMD_APBTHRASH        4294967146UL /**< 0xFFFFFF6AUL */
-#define CMD_APBWRITE         4294967139UL /**< 0xFFFFFF63UL */
 #define CMD_APPEND           4294967068UL /**< 0xFFFFFF1CUL */
 #define CMD_APPENDF          4294967122UL /**< 0xFFFFFF52UL */
 #define CMD_ARC              4294967175UL /**< 0xFFFFFF87UL */
@@ -386,7 +375,6 @@
 #define CMD_LOADIDENTITY     4294967075UL /**< 0xFFFFFF23UL */
 #define CMD_LOADIMAGE        4294967073UL /**< 0xFFFFFF21UL */
 #define CMD_LOADPATCH        4294967170UL /**< 0xFFFFFF82UL */
-#define CMD_LOADQRCODE       4294967163UL /**< 0xFFFFFF7BUL */
 #define CMD_LOADWAV          4294967173UL /**< 0xFFFFFF85UL */
 #define CMD_LOGO             4294967085UL /**< 0xFFFFFF2DUL */
 #define CMD_MEDIAFIFO        4294967092UL /**< 0xFFFFFF34UL */
@@ -454,7 +442,6 @@
 #define CMD_WAITCHANGE       4294967143UL /**< 0xFFFFFF67UL */
 #define CMD_WAITCOND         4294967160UL /**< 0xFFFFFF78UL */
 #define CMD_WATCHDOG         4294967171UL /**< 0xFFFFFF83UL */
-#define CMD_WORKAREA         4294967148UL /**< 0xFFFFFF6CUL */
 ///@}
 
 /*****************
@@ -778,7 +765,6 @@
 ///@}
 
 // clang-format on
-#endif /* BT82X_ENABLE */
 
 #endif /* #ifndef EVE_GPU_DEFS__H */
 
