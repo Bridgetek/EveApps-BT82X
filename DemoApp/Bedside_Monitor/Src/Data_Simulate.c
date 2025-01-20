@@ -1,4 +1,5 @@
 ﻿#include "Helpers.h"
+#include "signals_arrays.h"
 
 /**
  * @brief Simulate reading data from time
@@ -10,9 +11,8 @@ int read_time_simulate(int sample_rate, int time_start_ms)
 {
 	int now_ms = EVE_millis();
 	int duration_ms = now_ms - time_start_ms;
-
 	int num_samples = duration_ms * sample_rate / 1000;
-	//return 5;
+	//return 3;
 	return num_samples;
 }
 
@@ -22,10 +22,10 @@ int read_time_simulate(int sample_rate, int time_start_ms)
  * @param data_size Pointer to int to store size of data
  * @return Pixel x coordinate
  */
-int new_data_heartbeat(int** data, int *data_size)
+int new_data_heartbeat(SIGNALS_DATA_TYPE** data, int *data_size)
 {
 	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	static int ecg_data[] = {
+	static int ecg_data_test[] = {
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2,															  // P-wave (small bump)
 		0, 2, 4, 6, 8, 6, 4, 2, 0,																  // PR segment (flat)
 		0, 0, 0, 0, 0,																			  // QRS complex (sharp spike)
@@ -34,20 +34,21 @@ int new_data_heartbeat(int** data, int *data_size)
 		2, 4, 6, 10, 14, 16, 14, 10, 6, 4, 2,													  // Baseline (flat)
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // end
 	};
-	int data_duration = 1; // unit: second
+	int data_duration = 10 * 60; // unit: second
 	int dividor = 2;
 	int multipler = 3;
-	const int sample_total = sizeof(ecg_data) / sizeof(int);
+	SIGNALS_DATA_TYPE* sample_buffer = ecg_data;
+	const int sample_total = sizeof(ecg_data) / sizeof(char);
 
 	static uint32_t time_start_ms = 0;
 	const int sample_per_second = sample_total / data_duration;
 	static int sample_offset = 0;
-	
+
 	if (time_start_ms == 0)
 	{
 		time_start_ms = EVE_millis();
-		for(int i=0; i< sample_total;i++){
-			ecg_data[i] = ecg_data[i] *multipler / dividor;
+		for (int i = 0; i < sample_total; i++) {
+			// sample_buffer[i] = sample_buffer[i] * multipler / dividor;
 		}
 	}
 
@@ -57,14 +58,14 @@ int new_data_heartbeat(int** data, int *data_size)
 		num_samples = min(num_samples, sample_total - sample_offset);
 	}
 
-	*data = &ecg_data[sample_offset];
+	*data = &sample_buffer[sample_offset];
 	*data_size = num_samples;
 
 	// get sample (x,y) coordinate
 	int pixel_y = num_samples;
-	int pixel_x = ecg_data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
+	//int pixel_x = sample_buffer[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
 	sample_offset = (sample_offset + num_samples) % sample_total;
-	return pixel_x;
+	return 0;
 }
 
 
@@ -74,7 +75,7 @@ int new_data_heartbeat(int** data, int *data_size)
  * @param data_size Pointer to int to store size of data
  * @return Pixel x coordinate
  */
-int new_data_pleth(int** data, int* data_size)
+int new_data_pleth(SIGNALS_DATA_TYPE** data, int* data_size)
 {
 	// Simulated sinus rhythm data (adjusted to resemble the waveform)
 	static int pleth_data[] = {
@@ -91,10 +92,11 @@ int new_data_pleth(int** data, int* data_size)
 		195, 180, 165, 150, 130, 110, 90, 70, 50, 30,	     // Cycle 2 - Faster Exhalation
 		20, 10, 5, 0, 0, 0, 0, 0, 0, 0					     // Cycle 2 - End
 	};
-	int data_duration = 2; // unit: second
+	int data_duration = 10*60; // unit: second
 	int dividor = 2;
 	int multipler = 1;
-	const int sample_total = sizeof(pleth_data) / sizeof(int);
+	SIGNALS_DATA_TYPE* sample_buffer = ppg_data;
+	const int sample_total = sizeof(ppg_data) / sizeof(char);
 
 	static uint32_t time_start_ms = 0;
 	const int sample_per_second = sample_total / data_duration;
@@ -104,7 +106,7 @@ int new_data_pleth(int** data, int* data_size)
 	{
 		time_start_ms = EVE_millis();
 		for (int i = 0; i < sample_total; i++) {
-			pleth_data[i] = pleth_data[i] * multipler / dividor;
+			// sample_buffer[i] = sample_buffer[i] * multipler / dividor;
 		}
 	}
 
@@ -114,14 +116,14 @@ int new_data_pleth(int** data, int* data_size)
 		num_samples = min(num_samples, sample_total - sample_offset);
 	}
 
-	*data = &pleth_data[sample_offset];
+	*data = &sample_buffer[sample_offset];
 	*data_size = num_samples;
 
 	// get sample (x,y) coordinate
 	int pixel_y = num_samples;
-	int pixel_x = pleth_data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
+	//int pixel_x = sample_buffer[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
 	sample_offset = (sample_offset + num_samples) % sample_total;
-	return pixel_x;
+	return 0;
 }
 
 /**
@@ -130,10 +132,10 @@ int new_data_pleth(int** data, int* data_size)
  * @param data_size Pointer to int to store size of data
  * @return Pixel x coordinate
  */
-int new_data_co2(int** data, int* data_size)
+int new_data_co2(SIGNALS_DATA_TYPE** data, int* data_size)
 {
 	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	static int co2_data[] = {												  // 1 second sample
+	static int co2_data_test[] = {												  // 1 second sample
 							30, 45, 60, 75, 90, 105, 120, 135, 150, 165,	  //
 							180, 195, 210, 225, 240, 255, 255, 255, 255, 255, //
 							255, 255, 255, 255, 255, 240, 225, 210, 195, 180, //
@@ -141,10 +143,11 @@ int new_data_co2(int** data, int* data_size)
 							15, 10, 5, 0, 0, 0, 0, 0, 0, 0,					  //
 							0, 0, 0, 0, 0, 5, 10, 15, 15 };
 
-	int data_duration = 1; // unit: second
+	int data_duration = 10 * 60; // unit: second
 	int dividor = 2;
 	int multipler = 1;
-	const int sample_total = sizeof(co2_data) / sizeof(int);
+	SIGNALS_DATA_TYPE* sample_buffer = co2_data;
+	const int sample_total = sizeof(co2_data) / sizeof(char);
 
 	static uint32_t time_start_ms = 0;
 	const int sample_per_second = sample_total / data_duration;
@@ -154,7 +157,7 @@ int new_data_co2(int** data, int* data_size)
 	{
 		time_start_ms = EVE_millis();
 		for (int i = 0; i < sample_total; i++) {
-			co2_data[i] = co2_data[i] * multipler / dividor;
+			// sample_buffer[i] = sample_buffer[i] * multipler / dividor;
 		}
 	}
 
@@ -164,12 +167,12 @@ int new_data_co2(int** data, int* data_size)
 		num_samples = min(num_samples, sample_total - sample_offset);
 	}
 
-	*data = &co2_data[sample_offset];
+	*data = &sample_buffer[sample_offset];
 	*data_size = num_samples;
 
 	// get sample (x,y) coordinate
 	int pixel_y = num_samples;
-	int pixel_x = co2_data[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
+	//int pixel_x = sample_buffer[(sample_offset + pixel_y) % sample_total] * multipler / dividor;
 	sample_offset = (sample_offset + num_samples) % sample_total;
-	return pixel_x;
+	return 0;
 }

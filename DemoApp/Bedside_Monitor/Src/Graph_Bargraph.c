@@ -16,6 +16,7 @@ int new_data_co2(int** data, int* data_size);
 #define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
+//#define g_graph_zoom_lv 6 // Zoom level
 
 typedef struct {
 	int handler;
@@ -57,16 +58,17 @@ static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) 
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-static void graph_append(app_graph_t* graph, int* data, int data_count) {
+static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count) {
 	graph->addr_tf = graph->bitmap_wp;
 	int addr = graph->bitmap_wp;
-	for (int i = 0; i < data_count; i++) {
-		int byte = data[i] & 0xFF;
+	
+	for (int i = 0; i < line_count; i++) {
+		int byte = lines[i] & 0xFF;
 
 		byte = normalize_to_graph(byte, 0, 255);
 		byte = 255 - min(255, byte);
 		EVE2_wr8(s_pHalContext, addr++, byte);
-		continue;
+		addr += g_graph_zoom_lv;
 	}
 }
 
@@ -86,37 +88,39 @@ static void graph_display(app_graph_t* graph) {
 
 	int linewidth = 1;
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
+	EVE_DRAW_AT(graph->x - linewidth, graph->y - linewidth);
 	EVE_DRAW_AT(graph->x, graph->y - linewidth);
-	EVE_DRAW_AT(graph->x - 1, graph->y - linewidth);
-	EVE_DRAW_AT(graph->x + 1, graph->y - linewidth);
+	EVE_DRAW_AT(graph->x + linewidth, graph->y - linewidth);
 
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
 	EVE_DRAW_AT(graph->x, graph->y);
 }
 
-static void graph_append_and_display(app_graph_t *graph, int *lines, int line_count)
+static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count)
 {
 	// write data to ramg
 	while (line_count > 0)
 	{
+		int line_count_graph = line_count * g_graph_zoom_lv;
+
 		// Calculate how much data can be written continuously to the buffer
 		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
-		int line_to_write = (line_count < contiguous_space) ? line_count : contiguous_space;
+		int line_to_write = (line_count_graph < contiguous_space) ? line_count_graph : contiguous_space;
 
 		// if data size >= buffer2, write to buffer0, and set rp with gap
 		if (graph->bitmap_wp + line_to_write >= graph->buffer2_end)
 		{
 			int buffer2_gap = graph->bitmap_wp + line_to_write - graph->buffer2_end;
 			graph->bitmap_wp = graph->bitmap_wplb;
-			graph_append(graph, lines, line_to_write);
+			graph_append(graph, lines, line_to_write / g_graph_zoom_lv);
 
 			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
 			graph->bitmap_wplb = graph->buffer0;
 			continue;
 		}
 
-		graph_append(graph, lines, line_to_write);
-		
+		graph_append(graph, lines, line_to_write / g_graph_zoom_lv);
+
 		if (graph->bitmap_wp + line_to_write >= graph->buffer2)
 		{ // loopback
 			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, line_to_write * GRAPH_BYTE_PER_LINE);
@@ -126,8 +130,8 @@ static void graph_append_and_display(app_graph_t *graph, int *lines, int line_co
 		// increase write pointer
 		graph->bitmap_rp += line_to_write * GRAPH_BYTE_PER_LINE;
 		graph->bitmap_wp += line_to_write * GRAPH_BYTE_PER_LINE;
-		lines += line_to_write;
-		line_count -= line_to_write;
+		lines += line_to_write / g_graph_zoom_lv;
+		line_count -= line_to_write / g_graph_zoom_lv;
 	}
 
 	graph_display(graph);
@@ -157,7 +161,7 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 		gh->y = boxs[i]->y - 60;
 		gh->w = GRAPH_H;
 		gh->h = GRAPH_W;
-		gh->handler = 1;
+		gh->handler = i+1;
 		gh->rgba = colors[i];
 		gh->accumulator = 0;
 		gh->byte_count = 0;
@@ -169,9 +173,9 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 }
 
 void graph_bargraph_draw() {
-	int* data_heartbeat;
-	int* data_pleth;
-	int* data_co2;
+	SIGNALS_DATA_TYPE* data_heartbeat;
+	SIGNALS_DATA_TYPE* data_pleth;
+	SIGNALS_DATA_TYPE* data_co2;
 	int data_heartbeat_size = 0;
 	int data_pleth_size = 0;
 	int data_co2_size = 0;
@@ -179,7 +183,6 @@ void graph_bargraph_draw() {
 	int x1 = new_data_heartbeat(&data_heartbeat, &data_heartbeat_size);
 	int x2 = new_data_pleth(&data_pleth, &data_pleth_size);
 	int x3 = new_data_co2(&data_co2, &data_co2_size);
-
 
 	graph_append_and_display(&graph_heartbeat, data_heartbeat, data_heartbeat_size);
 	graph_append_and_display(&graph_pleth, data_pleth, data_pleth_size);

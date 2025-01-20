@@ -21,5 +21,6 @@
 #define BIT_PER_CHAR (BITS_IN_TYPE(char))
 
 #define MSG printf
+#define SIGNALS_DATA_TYPE unsigned char 
 
 #endif /* APP_H_ */

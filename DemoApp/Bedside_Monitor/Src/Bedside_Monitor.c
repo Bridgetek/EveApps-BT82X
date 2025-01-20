@@ -108,23 +108,23 @@ void draw_app_window(app_box app_window)
 
 #define ENABLE_SCREENSHOT_CAPTURE 0
 
-#define USE_BITMAP_L1           0
-#define USE_BITMAP_PALETTED     1
-#define USE_BITMAP_BARGRAPH     2
-#define USE_BITMAP_L1_NO_ROTATE 3
-#define USE_BITMAP_LINESTRIP    4
+#define USE_BITMAP_L1                  0
+#define USE_BITMAP_L1_ROTATE           1
+#define USE_BITMAP_PALETTED_ROTATE     2
+#define USE_BITMAP_BARGRAPH            3
+#define USE_BITMAP_LINESTRIP           4
 
-#define USEBITMAP USE_BITMAP_PALETTED
+#define USEBITMAP USE_BITMAP_L1_ROTATE
 
 #if  USEBITMAP == USE_BITMAP_L1
-#define GRAPH_INIT graph_l1_rotate_init
-#define GRAPH_DRAW graph_l1_rotate_draw
-
-#elif  USEBITMAP == USE_BITMAP_L1_NO_ROTATE
 #define GRAPH_INIT graph_l1_init
 #define GRAPH_DRAW graph_l1_draw
 
-#elif  USEBITMAP == USE_BITMAP_PALETTED
+#elif  USEBITMAP == USE_BITMAP_L1_ROTATE
+#define GRAPH_INIT graph_l1_rotate_init
+#define GRAPH_DRAW graph_l1_rotate_draw
+
+#elif  USEBITMAP == USE_BITMAP_PALETTED_ROTATE
 #define GRAPH_INIT graph_p8_rotate_init
 #define GRAPH_DRAW graph_p8_rotate_draw
 
@@ -146,17 +146,41 @@ void GRAPH_DRAW();
 #define GRAPH_W 160
 #define GRAPH_H 1000
 
+int g_graph_zoom_lv = 3;
+
+app_box box_menu_top;
+app_box box_graph_ecg;
+app_box box_graph_pleth;
+app_box box_graph_co2;
+app_box box_menu_bottom;
+
+void process_event() {
+	Gesture_Touch_t *ges = Gesture_Renew(s_pHalContext);
+	if(ges->tagReleased == TAG_ZOOM_DOWN) {
+		g_graph_zoom_lv--;
+		g_graph_zoom_lv = max(g_graph_zoom_lv, 1);
+		//GRAPH_INIT(&box_graph_ecg, &box_graph_pleth, &box_graph_co2);
+	}
+
+	else if (ges->tagReleased == TAG_ZOOM_UP) {
+		g_graph_zoom_lv++;
+		g_graph_zoom_lv = min(g_graph_zoom_lv, GRAPH_ZOOM_LV_MAX);
+		//GRAPH_INIT(&box_graph_ecg, &box_graph_pleth, &box_graph_co2);
+	}
+
+}
+
 void SAMAPP_Bedside_Monitor()
 {
 	app_box lcd_size = {0, 0, s_pHalContext->Width, s_pHalContext->Height, s_pHalContext->Width, s_pHalContext->Height };
 	app_box app_window = INIT_APP_BOX((s_pHalContext->Width - WINDOW_W) / 2, (s_pHalContext->Height - WINDOW_H) / 2, WINDOW_W, WINDOW_H);
 	int graph_start = app_window.x + 35;
 
-	app_box box_menu_top = INIT_APP_BOX(app_window.x, app_window.y, GRAPH_H, app_window.h * 8 / 100);
-	app_box box_graph_ecg = INIT_APP_BOX(graph_start, box_menu_top.y_end, box_menu_top.w, app_window.h * 28 / 100);
-	app_box box_graph_pleth = INIT_APP_BOX(graph_start, box_graph_ecg.y_end, box_menu_top.w, box_graph_ecg.h);
-	app_box box_graph_co2 = INIT_APP_BOX(graph_start, box_graph_pleth.y_end, box_menu_top.w, box_graph_ecg.h);
-	app_box box_menu_bottom = INIT_APP_BOX(app_window.x, box_graph_co2.y_end, box_menu_top.w, box_menu_top.h);
+	box_menu_top    = INIT_APP_BOX(app_window.x, app_window.y, GRAPH_H, app_window.h * 8 / 100);
+	box_graph_ecg   = INIT_APP_BOX(graph_start, box_menu_top.y_end, box_menu_top.w, app_window.h * 28 / 100);
+	box_graph_pleth = INIT_APP_BOX(graph_start, box_graph_ecg.y_end, box_menu_top.w, box_graph_ecg.h);
+	box_graph_co2   = INIT_APP_BOX(graph_start, box_graph_pleth.y_end, box_menu_top.w, box_graph_ecg.h);
+	box_menu_bottom = INIT_APP_BOX(app_window.x, box_graph_co2.y_end, box_menu_top.w, box_menu_top.h);
 
 	int x = box_menu_top.x_end;
 	int w = app_window.w - box_menu_top.w;
@@ -187,6 +211,7 @@ void SAMAPP_Bedside_Monitor()
 
 	while (1)
 	{
+		process_event();
 		Display_Start(s_pHalContext);
 		EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(0));
 
@@ -255,19 +280,36 @@ void SAMAPP_Bedside_Monitor()
 		EVE_CoCmd_romFont(s_pHalContext, FONT_32, 32);
 		EVE_CoCmd_romFont(s_pHalContext, FONT_33, 33);
 		EVE_CoCmd_romFont(s_pHalContext, FONT_34, 34);
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 
 		int x = box_menu_top.x;
 		int y = box_menu_top.y_mid;
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		EVE_CoCmd_text(s_pHalContext, x + 5, y, FONT_32, OPT_CENTERY, "BED");
 		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "no 5");
 		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm());
 		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy());
 
+		// zoom level control
+		y = box_menu_top.y;
+		x = box_menu_top.x_end + 30;
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		EVE_CoCmd_text(s_pHalContext, x, y , 25, OPT_FORMAT, "Zoom %d", g_graph_zoom_lv);
+		
+		int r = 20;
+		y = box_menu_top.y_end - r;;
+		x = app_window.x_end - r -50 - 5;
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_UP));
+		DRAW_CIRCLE_WITH_TEXT(x, y, r, "+", 31, 0, 0x00FFFFFF);
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_DOWN));
+		DRAW_CIRCLE_WITH_TEXT(x + 50, y, r, "-", 31, 0, 0x00FFFFFF);
+
 		// Graph title text information
-		EVE_CoCmd_text(s_pHalContext, box_graph_ecg.x + 15, box_graph_ecg.y + 30, 30, 0, "ECG");
-		EVE_CoCmd_text(s_pHalContext, box_graph_pleth.x + 15, box_graph_pleth.y + 30, 30, 0, "PLETH");
-		EVE_CoCmd_text(s_pHalContext, box_graph_co2.x + 15, box_graph_co2.y + 30, 30, 0, "CO2");
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		EVE_CoCmd_text(s_pHalContext, box_graph_ecg.x + 15, box_graph_ecg.y + 10, 30, 0, "ECG");
+		EVE_CoCmd_text(s_pHalContext, box_graph_pleth.x + 15, box_graph_pleth.y + 10, 30, 0, "PLETH");
+		EVE_CoCmd_text(s_pHalContext, box_graph_co2.x + 15, box_graph_co2.y + 10, 30, 0, "CO2");
 
 		// create random data change
 		int time_end_ms = EVE_millis();

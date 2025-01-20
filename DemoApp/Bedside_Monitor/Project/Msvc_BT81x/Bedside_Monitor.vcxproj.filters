@@ -302,6 +302,9 @@
     <ClInclude Include="BT81x\application\Maths.h">
       <Filter>Common\application</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Hdr\signals_arrays.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <!--# 2nd filter header list-->

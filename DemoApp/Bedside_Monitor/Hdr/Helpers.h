@@ -6,7 +6,7 @@
 #define ALIGN_TWO_POWER_N(Value, alignval)  (((Value) + (alignval - 1)) & (~(alignval - 1)))
 
 #define INIT_APP_BOX(x_val, y_val, w_val, h_val) \
-	{                                            \
+	(app_box){                                            \
 		(x_val),                                 \
 		(y_val),                                 \
 		(w_val),                                 \
@@ -53,6 +53,21 @@
 		EVE_DRAW_AT(box.x_end - border, box.y_end - border);                                                      \
 	}
 
+#define DRAW_CIRCLE(x, y, r)                                 \
+	{                                                        \
+		EVE_Cmd_wr32(s_pHalContext, POINT_SIZE(r * 16)); \
+		EVE_Cmd_wr32(s_pHalContext, BEGIN(POINTS));          \
+		EVE_DRAW_AT(x, y);                                   \
+	}
+
+#define DRAW_CIRCLE_WITH_TEXT(x, y, r, txt, font, opt, txtcolor)                   \
+	{                                                                              \
+		DRAW_CIRCLE(x, y, r);                                                      \
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB((txtcolor) & 0xFF, ((txtcolor) >> 8) & 0xFF, ((txtcolor) >> 16) & 0xFF));    \
+		EVE_CoCmd_text(s_pHalContext, x, y, font, opt | OPT_CENTER, txt); \
+	}
+
+
 #define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * 1, (y) * 1))
 
 #define ALIGN_TO_N_2POWER(x, n)    (((x) + ((n) - 1)) & ~((n) - 1)) // Only works correctly if n is a power of 2.
@@ -93,19 +108,20 @@ void bt82x_wr_mem(EVE_HalContext* phost, uint32_t addr, uint8_t* data, uint32_t 
 void bt82x_wr32(EVE_HalContext* phost, uint32_t addr, uint8_t data32);
 void bt82x_wr16(EVE_HalContext* phost, uint32_t addr, uint16_t data16);
 void bt82x_wr8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
+uint8_t Gesture_GetTag(EVE_HalContext* phost);
 
 #ifdef BT82X_ENABLE
-	#define EVE2_wr8  bt82x_wr8
-	#define EVE2_wr16 bt82x_wr16
-	#define EVE2_wr32 bt82x_wr32
-	#define EVE2_wrmem bt82x_wr_mem
-	#define EVE2_flush bt82x_wr_flush
+#define EVE2_wr8  bt82x_wr8
+#define EVE2_wr16 bt82x_wr16
+#define EVE2_wr32 bt82x_wr32
+#define EVE2_wrmem bt82x_wr_mem
+#define EVE2_flush bt82x_wr_flush
 #else
-	#define EVE2_wr8  EVE_Hal_wr8
-	#define EVE2_wr16 EVE_Hal_wr16
-	#define EVE2_wr32 EVE_Hal_wr32
-	#define EVE2_wrmem EVE_Hal_wrmem
-	#define EVE2_flush EVE_Hal_flush
+#define EVE2_wr8  EVE_Hal_wr8
+#define EVE2_wr16 EVE_Hal_wr16
+#define EVE2_wr32 EVE_Hal_wr32
+#define EVE2_wrmem EVE_Hal_wrmem
+#define EVE2_flush EVE_Hal_flush
 #endif // BT82X_ENABLE
 
 
