@@ -151,9 +151,6 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 
 static void graph_display(app_graph_t* graph) {
 	int bformat = L1;
-#ifdef BT82X_ENABLE
-	bformat = PALETTEDARGB8;
-#endif
 	int lw = max(GRAPH_H, GRAPH_W);
 	int lh = max(GRAPH_H, GRAPH_W);
 #define MAX_ANGLE 360
