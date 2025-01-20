@@ -17,6 +17,7 @@
 #include "EVE_CoCmd.h"
 #include "Bedside_Monitor.h"
 #include "Helpers.h"
+#include "Gesture.h"
 
 EVE_HalContext s_halContext;
 EVE_HalContext *s_pHalContext;
@@ -114,7 +115,7 @@ void draw_app_window(app_box app_window)
 #define USE_BITMAP_BARGRAPH            3
 #define USE_BITMAP_LINESTRIP           4
 
-#define USEBITMAP USE_BITMAP_L1_ROTATE
+#define USEBITMAP USE_BITMAP_BARGRAPH
 
 #if  USEBITMAP == USE_BITMAP_L1
 #define GRAPH_INIT graph_l1_init
@@ -155,6 +156,14 @@ app_box box_graph_co2;
 app_box box_menu_bottom;
 
 void process_event() {
+#if defined(BT82X_ENABLE)
+	return; // disable touch on bt820
+#endif
+
+#if  USEBITMAP == USE_BITMAP_BARGRAPH
+	return; // disable touch on bargraph
+#endif
+
 	Gesture_Touch_t *ges = Gesture_Renew(s_pHalContext);
 	if(ges->tagReleased == TAG_ZOOM_DOWN) {
 		g_graph_zoom_lv--;
@@ -172,6 +181,9 @@ void process_event() {
 
 void SAMAPP_Bedside_Monitor()
 {
+#if  USEBITMAP == USE_BITMAP_BARGRAPH
+	g_graph_zoom_lv = 1; // disable touch on bargraph
+#endif
 	app_box lcd_size = {0, 0, s_pHalContext->Width, s_pHalContext->Height, s_pHalContext->Width, s_pHalContext->Height };
 	app_box app_window = INIT_APP_BOX((s_pHalContext->Width - WINDOW_W) / 2, (s_pHalContext->Height - WINDOW_H) / 2, WINDOW_W, WINDOW_H);
 	int graph_start = app_window.x + 35;

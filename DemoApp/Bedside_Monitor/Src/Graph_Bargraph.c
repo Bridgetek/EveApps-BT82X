@@ -63,12 +63,12 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 	int addr = graph->bitmap_wp;
 	
 	for (int i = 0; i < line_count; i++) {
-		int byte = lines[i] & 0xFF;
+		SIGNALS_DATA_TYPE byte = lines[i] & 0xFF;
 
 		byte = normalize_to_graph(byte, 0, 255);
 		byte = 255 - min(255, byte);
-		EVE2_wr8(s_pHalContext, addr++, byte);
-		addr += g_graph_zoom_lv;
+		EVE2_wr8(s_pHalContext, addr, byte);
+		addr += GRAPH_BYTE_PER_LINE * g_graph_zoom_lv;
 	}
 }
 
