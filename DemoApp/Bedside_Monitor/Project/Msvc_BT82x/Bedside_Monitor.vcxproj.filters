@@ -26,60 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <!--# filter source list-->
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Cmd.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Hal.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMU.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_FT4222.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_MPSSE.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_WIN32.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_LoadFile_STDIO.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Util.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\application\FileTransfer.c">
-      <Filter>Common\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\application\Common.c">
-      <Filter>Common\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\application\Maths.c">
-      <Filter>Common\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\application\FlashHelper.c">
-      <Filter>Common\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_IO.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_State.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_Widgets.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMUC.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Src\Bedside_Monitor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,10 +50,79 @@
     <ClCompile Include="..\..\Src\Helpers.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Cmd.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_IO.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_State.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_Widgets.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Hal.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMU.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMUC.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_FT4222.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_MPSSE.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_WIN32.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_LoadFile_STDIO.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Util.c">
+      <Filter>Common\eve_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\application\Common.c">
+      <Filter>Common\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\application\FileTransfer.c">
+      <Filter>Common\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\application\FlashHelper.c">
+      <Filter>Common\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\application\Maths.c">
+      <Filter>Common\application</Filter>
+    </ClCompile>
+    <ClCompile Include="BT82x\Gesture.c">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!--# filter header list-->
+    <ClInclude Include="..\..\Hdr\Bedside_Monitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Hdr\Helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Cmd.h">
+      <Filter>Common\eve_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoCmd.h">
+      <Filter>Common\eve_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoDl.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Config.h">
@@ -122,6 +137,9 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Hal.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalDefs.h">
+      <Filter>Common\eve_hal</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalImpl.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
@@ -132,6 +150,9 @@
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_LoadFile.h">
+      <Filter>Common\eve_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform.h">
@@ -170,48 +191,35 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\WinTypes.h">
       <Filter>Common\eve_hal\Hdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoCmd.h">
-      <Filter>Common\eve_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.h">
-      <Filter>Common\eve_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Hdr\Bedside_Monitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\Common.h">
       <Filter>Common\application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\FileTransfer.h">
       <Filter>Common\application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\common\application\Maths.h">
-      <Filter>Common\application</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\FlashHelper.h">
       <Filter>Common\application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoDl.h">
-      <Filter>Common\eve_hal</Filter>
+    <ClInclude Include="..\..\..\..\common\application\Maths.h">
+      <Filter>Common\application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalDefs.h">
-      <Filter>Common\eve_hal</Filter>
+    <ClInclude Include="BT82x\Gesture.h">
+      <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Hdr\Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <!--# 2nd filter header list-->
-    <None Include="..\..\..\..\common\eve_hal\EVE_Hal.md">
-      <Filter>Common\eve_hal</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <!--# 3rd filter header list-->
     <Text Include="..\..\..\..\common\eve_hal\CMakeLists.txt">
       <Filter>Common\eve_hal</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\common\eve_hal\EVE_Hal.md">
+      <Filter>Common\eve_hal</Filter>
+    </None>
+    <None Include="..\..\..\..\common\eve_flash\bt82x.blob">
+      <Filter>Common\eve_flash</Filter>
+    </None>
   </ItemGroup>
   <!--# filter end header list-->
 </Project>
