@@ -115,7 +115,7 @@ void draw_app_window(app_box app_window)
 #define USE_BITMAP_BARGRAPH            3
 #define USE_BITMAP_LINESTRIP           4
 
-#define USEBITMAP USE_BITMAP_BARGRAPH
+#define USEBITMAP USE_BITMAP_L1_ROTATE
 
 #if  USEBITMAP == USE_BITMAP_L1
 #define GRAPH_INIT graph_l1_init

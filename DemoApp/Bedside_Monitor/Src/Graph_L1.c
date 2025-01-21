@@ -24,11 +24,6 @@ typedef struct {
 	int buffer2_end; // end addreff of buffer 2
 	int x, y, w, h;
 	uint32_t rgba;
-
-	uint32_t accumulator;// To accumulate 4 bytes
-	int byte_count;// Count of bytes collected
-	int addr_tf;//transfer address
-
 	int x_graph_last;
 }app_graph_t;
 
@@ -215,9 +210,6 @@ void graph_l1_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2)
 		gh->h = GRAPH_H;
 		gh->handler = i+1;
 		gh->rgba = colors[i];
-		gh->accumulator = 0;
-		gh->byte_count = 0;
-		gh->addr_tf = gh->bitmap_wp;
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 0, GRAPH_BUFFER_SIZE);
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 0, GRAPH_BUFFER_SIZE);
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 0, GRAPH_BUFFER_SIZE);

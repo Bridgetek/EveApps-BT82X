@@ -20,7 +20,6 @@ int new_data_co2(int** data, int* data_size);
 #define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
-//#define g_graph_zoom_lv 6 // zoom level
 
 typedef struct {
 	int handler;
@@ -31,11 +30,6 @@ typedef struct {
 	int buffer2_end; // end addreff of buffer 2
 	int x, y, w, h;
 	uint8_t rgba;
-
-	uint32_t accumulator;// To accumulate 4 bytes
-	int byte_count;// Count of bytes collected
-	int addr_tf;//transfer address
-
 	int x_graph_last;
 	int paletted_color_source;
 }app_graph_t;
@@ -298,9 +292,6 @@ void graph_p8_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* b
 		gh->h = GRAPH_W;
 		gh->handler = i+1;
 		gh->rgba = colors[i];
-		gh->accumulator = 0;
-		gh->byte_count = 0;
-		gh->addr_tf = gh->bitmap_wp;
 		gh->paletted_color_source = color_source;
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 0, GRAPH_BUFFER_SIZE);
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 0, GRAPH_BUFFER_SIZE);

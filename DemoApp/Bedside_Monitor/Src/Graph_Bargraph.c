@@ -16,7 +16,6 @@ int new_data_co2(int** data, int* data_size);
 #define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
-//#define g_graph_zoom_lv 6 // Zoom level
 
 typedef struct {
 	int handler;
@@ -27,10 +26,6 @@ typedef struct {
 	int buffer2_end; // end addreff of buffer 2
 	int x, y, w, h;
 	int rgba;
-
-	uint32_t accumulator;// To accumulate 4 bytes
-	int byte_count;// Count of bytes collected
-	int addr_tf;//transfer address
 }app_graph_t;
 
 static app_graph_t graph_heartbeat;
@@ -59,7 +54,6 @@ static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) 
 }
 
 static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count) {
-	graph->addr_tf = graph->bitmap_wp;
 	int addr = graph->bitmap_wp;
 	
 	for (int i = 0; i < line_count; i++) {
@@ -163,9 +157,6 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 		gh->h = GRAPH_W;
 		gh->handler = i+1;
 		gh->rgba = colors[i];
-		gh->accumulator = 0;
-		gh->byte_count = 0;
-		gh->addr_tf = gh->bitmap_wp;
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 255, GRAPH_BUFFER_SIZE);
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 255, GRAPH_BUFFER_SIZE);
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 255, GRAPH_BUFFER_SIZE);
