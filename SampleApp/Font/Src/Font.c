@@ -327,7 +327,7 @@ void SAMAPP_Font_fromConvertedTTF_CMDB()
 
     Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
     EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 20, 30, OPT_CENTER,
-        "Legacy - from SD");
+        "Legacy - from CMDB");
     EVE_CoCmd_setFont(s_pHalContext, 6, RAM_G, 32);
     EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 80, 6, OPT_CENTER,
         "The quick brown fox jumps");
