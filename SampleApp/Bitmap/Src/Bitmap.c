@@ -100,7 +100,7 @@ void SAMAPP_Bitmap_getImage()
 
     Draw_Text(s_pHalContext, "Example for: CMD_GETIMAGE");
 
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR, TEST_DIR "/CR_003_dithering.png", NULL, 0);
+    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR, TEST_DIR "\\CR_003_dithering.png", NULL, 0);
 
     // Start drawing bitmap
     Display_Start(s_pHalContext);

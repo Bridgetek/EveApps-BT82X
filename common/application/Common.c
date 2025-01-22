@@ -519,7 +519,7 @@ void WelcomeScreen(EVE_HalContext *phost, char *info[])
         EVE_CoCmd_setMatrix(phost);
         Display_End(phost);
 
-    } while (EVE_Hal_rd8(phost, REG_TOUCH_TAG) != 'P');
+    } while (EVE_Hal_rd32(phost, REG_TOUCH_TAG) != 'P');
 
     Play_Sound(phost, 0x50, 255, 0xc0);
 }

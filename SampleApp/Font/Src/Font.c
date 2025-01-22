@@ -309,6 +309,38 @@ void SAMAPP_Font_fromConvertedTTF_SD()
 }
 
 /**
+* @brief API to demonstrate custom font display from a converted font file from CMDB
+*/
+void SAMAPP_Font_fromConvertedTTF_CMDB()
+{
+    EVE_Gpu_Fonts fontstruct;
+
+    Draw_Text(s_pHalContext, "Example for: Custom font from a converted font file from CMDB");
+    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\Roboto-BoldCondensed_30_L4.reloc", NULL);
+
+    EVE_Hal_rdMem(s_pHalContext, (uint8_t*)&fontstruct, RAM_G, EVE_GPU_FONT_TABLE_SIZE);
+    eve_printf_debug("font structure fmt 0x%x flags 0x%x hight 0x%x line stride 0x%x width 0x%x Fontaddr 0x%x \n",
+        fontstruct.FontBitmapFormat, fontstruct.FontFlags, fontstruct.FontHeightInPixels,
+        fontstruct.FontLineStride, fontstruct.FontWidthInPixels,
+        fontstruct.PointerToFontGraphicsData);
+
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 20, 30, OPT_CENTER,
+        "Legacy - from SD");
+    EVE_CoCmd_setFont(s_pHalContext, 6, RAM_G, 32);
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 80, 6, OPT_CENTER,
+        "The quick brown fox jumps");
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 120, 6, OPT_CENTER,
+        "over the lazy dog.");
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 160, 6, OPT_CENTER,
+        "1234567890");
+    EVE_CoCmd_resetFonts(s_pHalContext);
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
+}
+
+/**
 * @brief API to demonstrate custom extened font display from a converted font file
 */
 void SAMAPP_Font_extendedFormat()
@@ -600,6 +632,7 @@ void SAMAPP_Font() {
     SAMAPP_Font_fromConvertedTTF();
     SAMAPP_Font_fromConvertedTTF_flash();
     SAMAPP_Font_fromConvertedTTF_SD();
+    SAMAPP_Font_fromConvertedTTF_CMDB();
     SAMAPP_Font_extendedFormat();
     SAMAPP_Font_indexer();
     SAMAPP_Font_romFontsExt2();

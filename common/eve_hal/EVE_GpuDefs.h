@@ -533,6 +533,8 @@
 ///@{
 #define OPT_3D            0UL /**< 0x0 */
 #define OPT_RGB565        0UL /**< 0x0 */
+#define OPT_1BIT          0UL /**< 0x0 */
+#define OPT_FULLSPEED     0UL /**< 0x0 */
 #define OPT_MONO          1UL /**< 0x1 */
 #define OPT_SFNLOWER      1UL /**< 0x1 */
 #define OPT_NODL          2UL /**< 0x2 */
