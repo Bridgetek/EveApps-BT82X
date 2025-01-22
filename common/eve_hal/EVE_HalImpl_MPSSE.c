@@ -164,6 +164,20 @@ bool EVE_HalImpl_defaults(EVE_HalParameters *parameters, size_t deviceIdx)
 		{
 			if (SPI_GetChannelInfo((uint32_t)i, &chanInfo) != FT_OK)
 				continue;
+			// Skip channel A on UMFTPD2A this is connected to the One-Wire debugger.
+			if (!strcmp(chanInfo.Description, "UMFTPD2A A"))
+			{
+				continue;
+			}
+			// Use channel B on UMFTPD2A by default. 
+			// This is the SPI bus on CN2 and CN3.
+			if (!strcmp(chanInfo.Description, "UMFTPD2A B"))
+			{
+				deviceIdx = i;
+				res = true;
+				break;
+			}
+
 			if (!(chanInfo.Flags & FT_FLAGS_OPENED))
 			{
 				deviceIdx = i;
@@ -186,8 +200,13 @@ bool EVE_HalImpl_defaults(EVE_HalParameters *parameters, size_t deviceIdx)
 		/* parameters->SpiClockrateKHz = 600; */
 
 		/* Settings for FT9xx hardware SPI passthrough */
-		parameters->PowerDownPin = 0x80 + 43; /* GPIO pin 43 */
-		parameters->SpiClockrateKHz = 2000; // 2000;
+		/* parameters->PowerDownPin = 0x80 + 43; */ /* GPIO pin 43 */
+		/* parameters->SpiClockrateKHz = 2000; */ // 2000;
+
+		// Settings for UMFTPD2A hardware on CN2 and CN3. 
+		// BDBUS7 is defined as the RESET# pin.
+		parameters->PowerDownPin = 0x7;
+		parameters->SpiClockrateKHz = 2000;
 	}
 	return res;
 }

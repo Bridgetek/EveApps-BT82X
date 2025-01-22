@@ -326,6 +326,10 @@ void EVE_Hal_SPICmd_pwr_state(EVE_HalContext *phost, EVE_PWR_STATE_T state)
 		CmdBuf[0] = 0xFF;
 		CmdBuf[1] = 0xE2;
 		break;
+	case EVE_PWR_STATE_PULSE:
+		CmdBuf[0] = 0xFF;
+		CmdBuf[1] = 0xE7;
+		break;
 	default:
 		break;
 	}
