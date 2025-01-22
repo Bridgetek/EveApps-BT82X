@@ -206,7 +206,7 @@ bool EVE_HalImpl_defaults(EVE_HalParameters *parameters, size_t deviceIdx)
 		// Settings for UMFTPD2A hardware on CN2 and CN3. 
 		// BDBUS7 is defined as the RESET# pin.
 		parameters->PowerDownPin = 0x7;
-		parameters->SpiClockrateKHz = 2000;
+		parameters->SpiClockrateKHz = 600;
 	}
 	return res;
 }

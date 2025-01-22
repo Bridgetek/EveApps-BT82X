@@ -5,6 +5,8 @@
  * This header is separated and included last 
  * in case of conflicts with other libraries.
  * 
+ * Expects BT82X_ENABLE to be defined.
+ * 
  * @author Bridgetek
  *
  * @date 2024
@@ -35,6 +37,8 @@
 #ifndef EVE_GPU_DEFS__H
 #define EVE_GPU_DEFS__H
 
+#ifdef BT82X_ENABLE
+
 /* Definitions used for BT820 coprocessor command buffer */
 #define EVE_DL_SIZE                   (16 * 1024UL) /**< 16kB Display List buffer size */
 #define EVE_CMD_FIFO_SIZE             ((16) * 1024UL) /**< 16kB coprocessor FIFO size */
@@ -52,6 +56,7 @@
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
 #define FREQUENCY                72000000UL
+#define POLLING_BYTES            10 /**< For QUAD mode */
 #define READ_TIMOUT              0x10
 
 /**************
@@ -67,6 +72,9 @@
 #define RAM_ERR_REPORT           (BASE + 0x4800)
 #define REG_CORE_R1              (BASE + 0x6000)
 #define RAM_DL                   (BASE + 0x8000)
+
+#define CMDB_WRITE               (BASE + 0x10000)
+#define RAM_J1CODE               (BASE + 0x20000)
 
 #define REG_LVDSTX               (BASE + 0x800300)
 #define REG_SYS                  (BASE + 0x800400)
@@ -202,7 +210,7 @@
 #define REG_CMD_WRITE            (REG_CORE_R1 + 0x0150)
 #define REG_CMD_DL               (REG_CORE_R1 + 0x0154)
 #define REG_CMDB_SPACE           (REG_CORE_R1 + 0x0594)
-#define REG_CMDB_WRITE           (BASE + 0x10000)
+#define REG_CMDB_WRITE           CMDB_WRITE
 #define CMDBUF_SIZE              0x4000
 ///@}
 
@@ -261,12 +269,12 @@
 
 /** @name LVDSTX system registers */
 ///@{
-#define REG_LVDSTX_EN              (REG_LVDSTX + 0x0000)
-#define REG_LVDSTX_PLLCFG          (REG_LVDSTX + 0x0004)
-#define REG_LVDSTX_CTRL_CH0        (REG_LVDSTX + 0x0014)
-#define REG_LVDSTX_CTRL_CH1        (REG_LVDSTX + 0x0018)
-#define REG_LVDSTX_STAT            (REG_LVDSTX + 0x001C)
-#define REG_LVDSTX_ERR_STAT        (REG_LVDSTX + 0x0020)
+#define REG_LVDS_EN              (REG_LVDSTX + 0x0000)
+#define REG_LVDS_PLLCFG          (REG_LVDSTX + 0x0004)
+#define REG_LVDS_CTRL_CH0        (REG_LVDSTX + 0x0014)
+#define REG_LVDS_CTRL_CH1        (REG_LVDSTX + 0x0018)
+#define REG_LVDS_STAT            (REG_LVDSTX + 0x001C)
+#define REG_LVDS_ERR_STAT        (REG_LVDSTX + 0x0020)
 ///@}
 
 /** @name System Registers */
@@ -308,6 +316,9 @@
 #define CMD_ANIMSTART        4294967135UL /**< 0xFFFFFF5FUL */
 #define CMD_ANIMSTOP         4294967117UL /**< 0xFFFFFF4DUL */
 #define CMD_ANIMXY           4294967118UL /**< 0xFFFFFF4EUL */
+#define CMD_APBREAD          4294967138UL /**< 0xFFFFFF62UL */
+#define CMD_APBTHRASH        4294967146UL /**< 0xFFFFFF6AUL */
+#define CMD_APBWRITE         4294967139UL /**< 0xFFFFFF63UL */
 #define CMD_APPEND           4294967068UL /**< 0xFFFFFF1CUL */
 #define CMD_APPENDF          4294967122UL /**< 0xFFFFFF52UL */
 #define CMD_ARC              4294967175UL /**< 0xFFFFFF87UL */
@@ -348,7 +359,7 @@
 #define CMD_FLASHUPDATE      4294967105UL /**< 0xFFFFFF41UL */
 #define CMD_FLASHWRITE       4294967103UL /**< 0xFFFFFF3FUL */
 #define CMD_FSDIR            4294967182UL /**< 0xFFFFFF8EUL */
-#define CMD_FSOPTION         4294967149UL /**< 0xFFFFFF6DUL */
+#define CMD_FSOPTIONS        4294967149UL /**< 0xFFFFFF6DUL */
 #define CMD_FSREAD           4294967153UL /**< 0xFFFFFF71UL */
 #define CMD_FSSIZE           4294967168UL /**< 0xFFFFFF80UL */
 #define CMD_FSSOURCE         4294967167UL /**< 0xFFFFFF7FUL */
@@ -375,6 +386,7 @@
 #define CMD_LOADIDENTITY     4294967075UL /**< 0xFFFFFF23UL */
 #define CMD_LOADIMAGE        4294967073UL /**< 0xFFFFFF21UL */
 #define CMD_LOADPATCH        4294967170UL /**< 0xFFFFFF82UL */
+#define CMD_LOADQRCODE       4294967163UL /**< 0xFFFFFF7BUL */
 #define CMD_LOADWAV          4294967173UL /**< 0xFFFFFF85UL */
 #define CMD_LOGO             4294967085UL /**< 0xFFFFFF2DUL */
 #define CMD_MEDIAFIFO        4294967092UL /**< 0xFFFFFF34UL */
@@ -442,6 +454,7 @@
 #define CMD_WAITCHANGE       4294967143UL /**< 0xFFFFFF67UL */
 #define CMD_WAITCOND         4294967160UL /**< 0xFFFFFF78UL */
 #define CMD_WATCHDOG         4294967171UL /**< 0xFFFFFF83UL */
+#define CMD_WORKAREA         4294967148UL /**< 0xFFFFFF6CUL */
 ///@}
 
 /*****************
@@ -533,8 +546,6 @@
 ///@{
 #define OPT_3D            0UL /**< 0x0 */
 #define OPT_RGB565        0UL /**< 0x0 */
-#define OPT_1BIT          0UL /**< 0x0 */
-#define OPT_FULLSPEED     0UL /**< 0x0 */
 #define OPT_MONO          1UL /**< 0x1 */
 #define OPT_SFNLOWER      1UL /**< 0x1 */
 #define OPT_NODL          2UL /**< 0x2 */
@@ -727,46 +738,8 @@
 #define EDGE_ZERO                  1UL
 ///@}
 
-/** @name for REG_LVDSTX_EN */
-///@{
-#define LVDS_CH1_EN                4UL
-#define LVDS_CH0_EN                2UL
-///@}
-
-/** @name for REG_I2S_CTL */
-///@{
-#define I2S_AUDIO_DISABLE          8UL
-#define I2S_TX_EN                  2UL
-#define I2S_SRST                   1UL
-///@}
-
-/** @name for REG_I2S_CFG */
-///@{
-#define I2S_FORMAT                 0UL
-#define LEFT_FORMAT                1UL
-#define RIGHT_FORMAT               2UL
-///@}
-
-/** @name for REG_I2S_EN */
-///@{
-#define I2S_ENABLE                 1UL
-#define I2S_DISABLE                0UL
-///@}
-
-/** @name for REG_SO_MODE */
-///@{
-#define ONE_PIXEL_SINGLE_LVDS      0UL
-#define TWO_PIXEL_SINGLE_LVDS      1UL
-#define TWO_PIXEL_DUAL_LVDS        2UL
-#define FOUR_PIXEL_DUAL_LVDS       3UL
-///@}
-
-/** @name for REG_LVDSTX_PLLCFG */
-///@{
-#define LVDSTX_PLLCFG(cps, lock, cks, ns, clkdiv)   ((((cps)&0x7) << 25) | (((lock)&0xFFF) << 13) | (((cks)&0x3) << 11) | (((ns)&0x7F) << 4) | ((clkdiv)&0xF))
-///@}
-
 // clang-format on
+#endif /* BT82X_ENABLE */
 
 #endif /* #ifndef EVE_GPU_DEFS__H */
 

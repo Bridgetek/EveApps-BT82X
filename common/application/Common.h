@@ -75,10 +75,10 @@
 
 #define DDR_FRAMEBUFFER_STARTADDR (72 << 20) /**< from 72M(size : 9M) */
 
-#define MODE_PICTURE        1 /**< 1 */
-#define MODE_DIRECTVIDEO    2 /**< 2 */
-#define MODE_VIDEO          3 /**< 3 */
-#define MODE_LVDSRX         4 /**< 4 */
+#define TESTCASE_PICTURE        1 /**< 1 */
+#define TESTCASE_DIRECTVIDEO    2 /**< 2 */
+#define TESTCASE_VIDEO          3 /**< 3 */
+#define TESTCASE_LVDSRX         4 /**< 4 */
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -99,5 +99,7 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext *phost, const uint8_t* title, const ui
 void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
 void Flash_Init(EVE_HalContext *phost, const uint8_t *filePath, const uint8_t *fileName);
 void WelcomeScreen(EVE_HalContext *phost, char *info[]);
-void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode);
+void fadeout(EVE_HalContext *phost);
+void fadein(EVE_HalContext *phost);
+void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t testcase);
 #endif /* COMMON_H_ */
