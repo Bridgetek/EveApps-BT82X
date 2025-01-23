@@ -34,9 +34,8 @@ int main(int argc, char *argv[])
 #endif
 
 	// read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 0
-	EVE_Calibrate(s_pHalContext);
-	Calibration_Save(s_pHalContext);
+#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+	Calibration_New(s_pHalContext);
 #endif
 
 	EVE_Util_clearScreen(s_pHalContext);

@@ -171,7 +171,7 @@
       <!-- FT4222: EVE_PLATFORM_FT4222 -->
       <!-- MPSSE: EVE_PLATFORM_MPSSE -->
       <!-- EMU: EVE_PLATFORM_BT8XXEMU -->
-      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_BT8XXEMU;EVE_DISPLAY_WXGA;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_MPSSE;EVE_DISPLAY_WXGA;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)BT81x\\application;$(ProjectDir)BT81x\\eve_hal;$(ProjectDir)BT81x\\eve_hal\\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>

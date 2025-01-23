@@ -388,6 +388,73 @@ void Calibration_Save(EVE_HalContext* phost) {
 	f = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_F);
 }
 
+/**
+ * @brief Do calibration
+ *
+ * @return ft_bool_t True on successfull or otherwise
+ */
+bool Calibration_Init(EVE_HalContext* phost, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
+{
+	printf("utils_calibrateInit with data:0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x\r\n", a, b, c, d, e, f);
+
+	if ((a | b | c | d | e | f) == 0)
+	{
+		printf("utils_calibrateInit zero\r\n");
+		Calibration_Show(phost);
+		Calibration_Save(phost);
+	}
+	else
+	{
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_A, a);
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_B, b);
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_C, c);
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_D, d);
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_E, e);
+		EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_F, f);
+		Calibration_Save(phost);
+	}
+	return 0;
+}
+
+bool Calibration_New(EVE_HalContext* phost) {
+	return Calibration_Init(phost, 0, 0, 0, 0, 0, 0);
+}
+
+bool Calibration_Show(EVE_HalContext* phost)
+{
+	uint32_t result;
+	uint32_t transMatrix[6] = { 0 };
+#if defined(EVE_SUPPORT_CAPACITIVE)
+	EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, CTOUCH_MODE_COMPATIBILITY);
+#else
+	EVE_Hal_wr8(phost, REG_TOUCH_ADC_MODE, ADC_DIFFERENTIAL);
+#endif
+
+	eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
+
+#ifdef BT82x_ENABLE
+	EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
+#endif
+
+	EVE_CoCmd_dlStart(phost);
+	EVE_CoDl_clearColorRgb(phost, 64, 64, 64);
+	EVE_CoDl_clear(phost, 1, 1, 1);
+	EVE_CoDl_colorRgb(phost, 0xff, 0xff, 0xff);
+
+	EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
+	result = EVE_CoCmd_calibrate(phost, 0);
+	EVE_Cmd_waitFlush(phost);
+
+	eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
+
+	// Print the configured values
+	EVE_Hal_rdMem(phost, (uint8_t*)transMatrix, REG_TOUCH_TRANSFORM_A, 4 * 6); // read all the 6 coefficients
+	eve_printf_debug("Touch screen transform values are A 0x%lx,B 0x%lx,C 0x%lx,D 0x%lx,E 0x%lx, F 0x%lx\n",
+		transMatrix[0], transMatrix[1], transMatrix[2], transMatrix[3], transMatrix[4], transMatrix[5]);
+
+	return result != 0;
+}
+
 void Display_StartColor(EVE_HalContext* phost, uint8_t *bgColor, uint8_t *textColor) {
 	EVE_CoCmd_dlStart(phost);
 	EVE_Cmd_wr32(phost, CLEAR_COLOR_RGB(bgColor[0], bgColor[1], bgColor[2]));
