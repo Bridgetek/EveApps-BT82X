@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 #endif
 
 	// read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if !defined(BT8XXEMU_PLATFORM) && !defined(BT82X_ENABLE) && GET_CALIBRATION == 1
 	Calibration_New(s_pHalContext);
 #endif
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
 		/* Init HW Hal for next loop*/
 		Gpu_Init(s_pHalContext);
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if !defined(BT8XXEMU_PLATFORM) && !defined(BT82X_ENABLE) && GET_CALIBRATION == 1
 		Calibration_Restore(s_pHalContext);
 #endif
 	}
@@ -224,6 +224,9 @@ void SAMAPP_Bedside_Monitor()
 	{
 		process_event();
 		Display_Start(s_pHalContext);
+#if defined(BT82X_ENABLE)
+		EVE_CoCmd_sync(s_pHalContext);
+#endif
 		EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(0));
 
 		draw_app_window(app_window);
