@@ -33,7 +33,6 @@
 #include "Font.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
-#define SCANOUT_FORMAT         YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -43,7 +42,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -310,6 +309,38 @@ void SAMAPP_Font_fromConvertedTTF_SD()
 }
 
 /**
+* @brief API to demonstrate custom font display from a converted font file from CMDB
+*/
+void SAMAPP_Font_fromConvertedTTF_CMDB()
+{
+    EVE_Gpu_Fonts fontstruct;
+
+    Draw_Text(s_pHalContext, "Example for: Custom font from a converted font file from CMDB");
+    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\Roboto-BoldCondensed_30_L4.reloc", NULL);
+
+    EVE_Hal_rdMem(s_pHalContext, (uint8_t*)&fontstruct, RAM_G, EVE_GPU_FONT_TABLE_SIZE);
+    eve_printf_debug("font structure fmt 0x%x flags 0x%x hight 0x%x line stride 0x%x width 0x%x Fontaddr 0x%x \n",
+        fontstruct.FontBitmapFormat, fontstruct.FontFlags, fontstruct.FontHeightInPixels,
+        fontstruct.FontLineStride, fontstruct.FontWidthInPixels,
+        fontstruct.PointerToFontGraphicsData);
+
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 20, 30, OPT_CENTER,
+        "Legacy - from CMDB");
+    EVE_CoCmd_setFont(s_pHalContext, 6, RAM_G, 32);
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 80, 6, OPT_CENTER,
+        "The quick brown fox jumps");
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 120, 6, OPT_CENTER,
+        "over the lazy dog.");
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 160, 6, OPT_CENTER,
+        "1234567890");
+    EVE_CoCmd_resetFonts(s_pHalContext);
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
+}
+
+/**
 * @brief API to demonstrate custom extened font display from a converted font file
 */
 void SAMAPP_Font_extendedFormat()
@@ -410,8 +441,8 @@ void SAMAPP_Font_indexer()
 EVE_FontsExt2_chblk *get_FontsExt2_glyph_addr(uint32_t xf, uint32_t cp)
 {
     uint32_t *page = &((uint32_t *)(XF2_OPTR(xf)))[cp / 128];
-    uint32_t *cd = (uint32_t *)(EVE_Hal_rd32(s_pHalContext, page) + 4 * (cp % 128));
-    return((EVE_FontsExt2_chblk *)EVE_Hal_rd32(s_pHalContext, cd));
+    uint32_t *cd = (uint32_t *)(EVE_Hal_rd32(s_pHalContext, (uint32_t)page) + 4 * (cp % 128));
+    return((EVE_FontsExt2_chblk *)EVE_Hal_rd32(s_pHalContext, (uint32_t)cd));
 }
 
 /**
@@ -467,7 +498,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string1[j]);
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;
@@ -478,7 +509,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string2[j]); 
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;
@@ -489,7 +520,7 @@ void SAMAPP_Font_romFontsExt2()
         {
             EVE_FontsExt2_chblk *pChblk = get_FontsExt2_glyph_addr(FontTableAddress, Display_string3[j]);
             EVE_FontsExt2_chblk chblk;
-            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, pChblk, sizeof(EVE_FontsExt2_chblk));
+            EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&chblk, (uint32_t)pChblk, sizeof(EVE_FontsExt2_chblk));
             EVE_CoCmd_setBitmap(s_pHalContext, chblk.glyph, fontstruct.format, fontstruct.pixel_width, fontstruct.pixel_height);
             EVE_CoDl_vertex2f_4(s_pHalContext, hoffset * 16, voffset * 16);
             hoffset += chblk.width;
@@ -601,6 +632,7 @@ void SAMAPP_Font() {
     SAMAPP_Font_fromConvertedTTF();
     SAMAPP_Font_fromConvertedTTF_flash();
     SAMAPP_Font_fromConvertedTTF_SD();
+    SAMAPP_Font_fromConvertedTTF_CMDB();
     SAMAPP_Font_extendedFormat();
     SAMAPP_Font_indexer();
     SAMAPP_Font_romFontsExt2();

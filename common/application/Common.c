@@ -154,29 +154,29 @@ int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value)
  */
 bool EVE_Calibrate(EVE_HalContext *phost)
 {
-	uint32_t result;
-	uint32_t transMatrix[6] = { 0 };
+    uint32_t result;
+    uint32_t transMatrix[6] = { 0 };
 #if defined(EVE_SUPPORT_CAPACITIVE)
-	EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, CTOUCH_MODE_COMPATIBILITY);
+    EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, CTOUCH_MODE_COMPATIBILITY);
 #endif
 
-	eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
+    eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
 
-	EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
-	Display_StartColor(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
-	EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
-	result = EVE_CoCmd_calibrate(phost, 0);
-	eve_printf("result %x\n", result);
-	EVE_Cmd_waitFlush(phost);
+    EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
+    Display_StartColor(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
+    result = EVE_CoCmd_calibrate(phost, 0);
+    eve_printf("result %x\n", result);
+    EVE_Cmd_waitFlush(phost);
 
-	eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
+    eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
 
-	// Print the configured values
-	EVE_Hal_rdMem(phost, (uint8_t *)transMatrix, REG_TOUCH_TRANSFORM_A, 4 * 6); // read all the 6 coefficients
-	eve_printf_debug("Touch screen transform values are A 0x%x,B 0x%x,C 0x%x,D 0x%x,E 0x%x, F 0x%x\n",
-	    transMatrix[0], transMatrix[1], transMatrix[2], transMatrix[3], transMatrix[4], transMatrix[5]);
+    // Print the configured values
+    EVE_Hal_rdMem(phost, (uint8_t *)transMatrix, REG_TOUCH_TRANSFORM_A, 4 * 6); // read all the 6 coefficients
+    eve_printf_debug("Touch screen transform values are A 0x%x,B 0x%x,C 0x%x,D 0x%x,E 0x%x, F 0x%x\n",
+        transMatrix[0], transMatrix[1], transMatrix[2], transMatrix[3], transMatrix[4], transMatrix[5]);
 
-	return result != 0;
+    return result != 0;
 }
 
 void Calibration_Restore(EVE_HalContext* phost)
@@ -452,7 +452,7 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
         /// diag button yes/no
         EVE_CoDl_colorRgb(phost, 0xFF, 0xFF, 0xFF);
         const uint16_t btn_margin = 25;
-		EVE_CoDl_tag(phost, tag_y);
+        EVE_CoDl_tag(phost, tag_y);
         EVE_CoCmd_button(phost, x + w / 2 - btn_w - btn_margin,
                 y + h - hbottom + border + (hbottom - btn_h) / 2, btn_w, btn_h,
                 font, 0, "Yes");

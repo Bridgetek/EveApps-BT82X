@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Font_MSVC", "Font\Pr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Primitives_MSVC", "Primitives\Project\Msvc\Primitives_Msvc.vcxproj", "{CF9BD4DD-26F1-4A44-B70E-B57C02164C08}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Sound_MSVC", "Sound\Project\Msvc\Sound_Msvc.vcxproj", "{C0872233-F79B-4BCE-A4F3-AC5785CCE488}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Audio_MSVC", "Audio\Project\Msvc\Audio_Msvc.vcxproj", "{C0872233-F79B-4BCE-A4F3-AC5785CCE488}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Touch_MSVC", "Touch\Project\Msvc\Touch_Msvc.vcxproj", "{68237987-E83B-4397-A03E-C405C3BA5632}"
 EndProject

@@ -33,7 +33,6 @@
 #include "Utility.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
-#define SCANOUT_FORMAT         YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -43,7 +42,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -72,7 +71,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -533,7 +532,7 @@ void SAMAPP_Utility_CmdInflateFromFifo()
     /*Load data to mediafifo */
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", &transfered);
 
     Display_Start(s_pHalContext);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);

@@ -1,16 +1,18 @@
 
 
-# EveApps 2.0
+# EveApps-BT82X
+EveApps-BT82X is a collection of applications designed as reference resources for Bridgetek's 5th-generation graphics controller, the BT82X.
 
-EveApps 2.0 is a collection of applications that use Eve Series chip (BT820) for reference purposes. The collection includes 10 sample applications, all written in ANSI C code, and the complete source code is provided.
+The collection is divided into two categories: **Sample** and **Demo** applications. Both are written in ANSI C, with complete source code provided.
 
-The sample applications are intended for instructional purposes, focusing on individual display lists or commands.
+- **Sample applications** focus on instructional use, demonstrating individual display lists or commands. 
+- **Demo applications** are more complex, closely resembling real-world projects.  (To be updated) 
 
-All the applications rely on a set of common files located under the "common" folder. Each application has a subfolder named "project," which contains the project file necessary for building the application with the toolchain.
+All applications rely on shared resources located in the "common" folder.
 
-Users are expected to be familiar with the programming guide and data sheet for the Eve Series chips.
+Each application includes a "project" subfolder containing the necessary files for building the application using the MS Visual Studio 2019.
 
-It should be noted that certain applications are specifically developed for particular host platforms (refer to "Support platforms").
+Users are expected to have familiarity with the BT82X programming guide and datasheet.
 
 
 
@@ -18,17 +20,17 @@ It should be noted that certain applications are specifically developed for part
 ```
 📂 EveApps
     ├───common                  
-    │   ├───application      | Application's common functions and fatfs library
+    │   ├───application      | Application's common functions
     │   ├───eve_flash        | Blob binary for flash programming
     │   └───eve_hal          | Hardware abstraction layer to bridge different platforms
     │    
     ├───SampleApp
     │    ├───Animation       | Sample usage of animation 
+    |    ├───Audio           | Sample usage of audio functionality    
     │    ├───Bitmap          | Sample usage of bitmap 
     │    ├───Flash           | Sample usage of flash 
     │    ├───Font            | Sample usage of font 
     │    ├───Primitives      | Sample usage of drawing primitives
-    |    ├───Sound           | Sample usage of sound functionality    
     │    ├───Touch           | Sample usage of touch functionality
     │    ├───Utility         | Sample usage of helper utilities
     │    ├───Video           | Sample usage of video playback
@@ -37,15 +39,27 @@ It should be noted that certain applications are specifically developed for part
 
 Note:
 - For Eve registers and commands/instructions definition, user can find it at the file common/eve_hal/EVE_GpuDef.h and common/eve_hal/Eve_CoCmd.h.
-- For Eve Emulator, it is for windows platform only and located at common/eve_hal/Bin/Simulation and common/eve_hal/Hdr
-- For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.  
+- For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.
+
+## Hardeware dependency 
+Unless specified otherwise, the default hardware platform is the VM820C.  You may refer to the details at www.brtchip.com
 
 ## Build instructions
 
-### Emulator, FT4222 and MPSSE
-Way 1: Open EveApps_Emulator.sln or EveApps_MSVC.sln, press F5 to build and run
+### FT4222 and MPSSE
+#### Way 1: Open SampleApp_MSVC.sln
 
-Way 2: Use Cmake: (Need Cmake 3.19)
+Go to property
+
+![property](https://github.com/user-attachments/assets/953dd3b1-3a9b-4747-ae0d-1daeda844b94)
+
+Change settings (EVE_PLATFORM_FT4222 / EVE_PLATFORM_MPSSE)
+
+![setting](https://github.com/user-attachments/assets/9ea058a0-e7a5-497c-a7da-cb71f9b23cb0)
+
+press F5 to build and run
+
+#### Way 2: Use Cmake: (Need Cmake 3.19 installed)
 ```sh
 #Launch the Developer Command Prompt for VS
 cd X:\source\EveApps
@@ -54,14 +68,12 @@ cd build
 cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] ..
 nmake [Project name]
 
-# EVE_APPS_PLATFORM can be BT8XXEMU_PLATFORM, FT4222 or MPSSE
+# EVE_APPS_PLATFORM can be FT4222 or MPSSE
 # [EVE graphics] can be BT820
 # [Project name] is the folder name of a subfolder inside SampleApp
 ```
 
 example: 
-```
-$ cmake.exe -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA ..
-$ nmake 
-```
+![image](https://github.com/user-attachments/assets/93515ee2-33c7-4b45-9c88-42c2b2949860)
 
+![image](https://github.com/user-attachments/assets/a7d0cc56-bd20-4baa-93d7-84a02bcceb1f)

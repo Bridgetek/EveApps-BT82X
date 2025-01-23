@@ -32,8 +32,6 @@
 #include "Common.h"
 #include "Flash.h"
 
-#define SCANOUT_FORMAT YCBCR
-
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
 void SAMAPP_Flash();
@@ -42,7 +40,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-		LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -129,11 +127,11 @@ void SAMAPP_Flash_state() {
 
     eve_printf_debug("\nFLASH STATES\n");
     EVE_CoCmd_regRead(s_pHalContext, REG_FLASH_STATUS, &status);
-    eve_sprintf(mes, "Flash State: %s (%d)\n", flash_status[status], status);
+    eve_sprintf(mes, sizeof(mes), "Flash State: %s (%d)\n", flash_status[status], status);
     helperAppendMessage(mes, mesLen);
     EVE_sleep(1000);
 
-    eve_sprintf(mes, "CMD_FLASHDETACH");
+    eve_sprintf(mes, sizeof(mes), "CMD_FLASHDETACH");
     helperAppendMessage(mes, mesLen);
 
     EVE_CoCmd_flashDetach(s_pHalContext);
@@ -141,19 +139,19 @@ void SAMAPP_Flash_state() {
     EVE_CoCmd_regRead(s_pHalContext, REG_FLASH_STATUS, &status);
     if (status != FLASH_STATUS_DETACHED)
     {
-        eve_sprintf(mes, "Flash is not able to detach");
+        eve_sprintf(mes, sizeof(mes), "Flash is not able to detach");
         helperAppendMessage(mes, mesLen);
     }
     else
     {
-        eve_sprintf(mes, "Flash is detached");
+        eve_sprintf(mes, sizeof(mes), "Flash is detached");
         helperAppendMessage(mes, mesLen);
     }
-    eve_sprintf(mes, "Flash State: %s (%d)\n", flash_status[status], status);
+    eve_sprintf(mes, sizeof(mes), "Flash State: %s (%d)\n", flash_status[status], status);
     helperAppendMessage(mes, mesLen);
     EVE_sleep(1000);
 
-    eve_sprintf(mes, "CMD_FLASHATTACH");
+    eve_sprintf(mes, sizeof(mes), "CMD_FLASHATTACH");
     helperAppendMessage(mes, mesLen);
 
     EVE_CoCmd_flashAttach(s_pHalContext);
@@ -161,19 +159,19 @@ void SAMAPP_Flash_state() {
     EVE_CoCmd_regRead(s_pHalContext, REG_FLASH_STATUS, &status);
     if (status != FLASH_STATUS_BASIC)
     {
-        eve_sprintf(mes, "Flash is not able to attach");
+        eve_sprintf(mes, sizeof(mes), "Flash is not able to attach");
         helperAppendMessage(mes, mesLen);
     }
     else
     {
-        eve_sprintf(mes, "Flash is attached");
+        eve_sprintf(mes, sizeof(mes), "Flash is attached");
         helperAppendMessage(mes, mesLen);
     }
-    eve_sprintf(mes, "Flash State: %s (%d)\n", flash_status[status], status);
+    eve_sprintf(mes, sizeof(mes), "Flash State: %s (%d)\n", flash_status[status], status);
     helperAppendMessage(mes, mesLen);
     EVE_sleep(1000);
 
-    eve_sprintf(mes, "CMD_FLASHFAST");
+    eve_sprintf(mes, sizeof(mes), "CMD_FLASHFAST");
     helperAppendMessage(mes, mesLen);
 
     EVE_CoCmd_flashFast(s_pHalContext, 0);
@@ -181,23 +179,23 @@ void SAMAPP_Flash_state() {
 
     if (status != FLASH_STATUS_FULL)
     {
-        eve_sprintf(mes, "Flash is not able to get into full mode");
+        eve_sprintf(mes, sizeof(mes), "Flash is not able to get into full mode");
         helperAppendMessage(mes, mesLen);
     }
     else
     {
-        eve_sprintf(mes, "Flash gets into full mode");
+        eve_sprintf(mes, sizeof(mes), "Flash gets into full mode");
         helperAppendMessage(mes, mesLen);
     }
-    eve_sprintf(mes, "Flash State: %s (%d)\n", flash_status[status], status);
+    eve_sprintf(mes, sizeof(mes), "Flash State: %s (%d)\n", flash_status[status], status);
     helperAppendMessage(mes, mesLen);
     EVE_sleep(1000); 
 
-    eve_sprintf(mes, "Check Flash Size");
+    eve_sprintf(mes, sizeof(mes), "Check Flash Size");
     helperAppendMessage(mes, mesLen);
 
     EVE_CoCmd_regRead(s_pHalContext, REG_FLASH_SIZE, &status);
-    eve_sprintf(mes, "Flash size : %d MBytes", status);
+    eve_sprintf(mes, sizeof(mes), "Flash size : %d MBytes", status);
     helperAppendMessage(mes, mesLen);
 
     helperClearMessage();
@@ -218,16 +216,15 @@ void SAMAPP_Flash_program() {
     FlashHelper_SwitchState(s_pHalContext, FLASH_STATUS_FULL);
     EVE_Cmd_waitFlush(s_pHalContext);
 
-    eve_sprintf(mes, "Erasing flash");
+    eve_sprintf(mes, sizeof(mes), "Erasing flash");
     helperAppendMessage(mes, mesLen);
     EVE_CoCmd_flashErase(s_pHalContext);
-    EVE_CoCmd_nop(s_pHalContext);
     EVE_Cmd_waitFlush(s_pHalContext);
 
-    eve_sprintf(mes, "Flash is erased");
+    eve_sprintf(mes, sizeof(mes), "Flash is erased");
     helperAppendMessage(mes, mesLen);
 
-    eve_sprintf(mes, "Programming flash....");
+    eve_sprintf(mes, sizeof(mes), "Programming flash....");
     helperAppendMessage(mes, mesLen);
     EVE_sleep(500);
 

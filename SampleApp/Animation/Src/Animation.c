@@ -33,7 +33,6 @@
 #include "Animation.h"
 
 #define SAMAPP_DELAY EVE_sleep(2000)
-#define SCANOUT_FORMAT YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -43,7 +42,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -72,7 +71,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -109,6 +108,35 @@ void SAMAPP_Animation_flash()
 }
 
 /**
+* @brief API to demonstrate CMD_RUNANIM from Flash
+*/
+void SAMAPP_Animation_flash_no_reloc()
+{
+    uint32_t waitmask = -1;
+    uint32_t play_control = 1024 * 512;
+    uint32_t ch = 0;
+    uint32_t anim_addr = 1454080;
+    uint32_t anim_len = 123956;
+
+    if (!FlashHelper_SwitchFullMode(s_pHalContext))
+    {
+        eve_printf("Flash is not able to switch full mode");
+        return;
+    }
+    Draw_Text(s_pHalContext, "Example for: Run animation from Flash which is not relocatable");
+
+    EVE_CoCmd_flashRead_flush(s_pHalContext, 0, anim_addr, anim_len);
+    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
+    EVE_CoCmd_animStart(s_pHalContext, ch, 0, ANIM_ONCE);
+    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
+    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
+    EVE_Cmd_waitFlush(s_pHalContext);
+
+    SAMAPP_DELAY;
+    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+}
+
+/**
 * @brief API to demonstrate CMD_RUNANIM from SD
 */
 void SAMAPP_Animation_SD()
@@ -123,7 +151,7 @@ void SAMAPP_Animation_SD()
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
     eve_printf_debug("SD attach status 0x%x \n", result);
 
-    result = EVE_CoCmd_fssource(s_pHalContext, "abstract.anim.ram_g", 0);
+    result = EVE_CoCmd_fssource(s_pHalContext, "abstract.anim.ram_g.reloc", 0);
     eve_printf_debug("file read status 0x%x \n", result);
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FS);
 
@@ -150,7 +178,7 @@ void SAMAPP_Animation_CMDB()
     Draw_Text(s_pHalContext, "Example for: Run animation from command buffer");
 
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, 0);
-    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g", &transfered);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", &transfered);
 
     EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
     EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
@@ -178,7 +206,7 @@ void SAMAPP_Animation_mediafifo()
 
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", &transfered);
 
     EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
     EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
@@ -365,6 +393,7 @@ void SAMAPP_Animation_animFrame()
 void SAMAPP_Animation() 
 {
     SAMAPP_Animation_flash();
+    SAMAPP_Animation_flash_no_reloc();
     SAMAPP_Animation_SD();
     SAMAPP_Animation_CMDB();
     SAMAPP_Animation_mediafifo();

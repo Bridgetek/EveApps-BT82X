@@ -8,10 +8,6 @@
 #  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
-# 3. Build for EMULATOR example: Use Deveoper Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_BT8XXEMU -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
-#  nmake SampleApp
-#
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13 FATAL_ERROR)
 
@@ -50,28 +46,13 @@ ENDIF ()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/") 
 
 # Valid option input ###########################################################
-set(LIST_GRAPHICS DEFAULT
-                  EVE_GRAPHICS_BT820
+set(LIST_GRAPHICS EVE_GRAPHICS_BT820
   )
-set(LIST_PLATFORM DEFAULT
-                  EVE_PLATFORM_FT4222
+set(LIST_PLATFORM EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
-                  EVE_PLATFORM_BT8XXEMU
   )
-set(LIST_DISPLAY  DEFAULT
-                  EVE_DISPLAY_WUXGA
+set(LIST_DISPLAY  EVE_DISPLAY_WUXGA
   )
-
-# Set cache ####################################################################
-SET(EVE_APPS_GRAPHICS "DEFAULT" CACHE STRING "Graphics Module")
-SET_PROPERTY(CACHE EVE_APPS_GRAPHICS PROPERTY STRINGS ${LIST_GRAPHICS})
-
-# TODO: Set a better default here automatically when CMake is run with an embedded platform
-SET(EVE_APPS_PLATFORM "DEFAULT" CACHE STRING "Platform Target")
-SET_PROPERTY(CACHE EVE_APPS_PLATFORM PROPERTY STRINGS ${LIST_PLATFORM})
-
-SET(EVE_APPS_DISPLAY "DEFAULT" CACHE STRING "Display Resolution")
-SET_PROPERTY(CACHE EVE_APPS_DISPLAY PROPERTY STRINGS ${LIST_DISPLAY})
 
 # Validate input ###############################################################
 function(give_sugguest value array global_set)
@@ -106,15 +87,6 @@ function(validate_input option_name array)
   MESSAGE(STATUS "Other ${option_name}'s are: ${list_str} \n")
 endfunction()
 
-function(validate_env_rp2040 env env_name)
-    MESSAGE(STATUS "${env_name} is ${env}")
-    
-    if ("${env}" STREQUAL "")
-        MESSAGE(FATAL_ERROR "${env_name} is not set, stop compile!")
-    endif()
-    MESSAGE(STATUS "${env_name} is ${env}")
-endfunction()
-
 validate_input("EVE_APPS_GRAPHICS" LIST_GRAPHICS)
 validate_input("EVE_APPS_PLATFORM" LIST_PLATFORM)
 validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
@@ -122,17 +94,14 @@ validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
 # Find host platform name ######################################################
 STRING(REGEX MATCH "(EVE_PLATFORM_FT4222|EVE_PLATFORM_MPSSE|EVE_PLATFORM_BT8XXEMU)" IS_PLATFORM_WINDOW   ${EVE_APPS_PLATFORM})
 STRING(REGEX MATCH "EVE_PLATFORM_FT4222"       IS_PLATFORM_FT4222   ${EVE_APPS_PLATFORM})
-STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM})
-STRING(REGEX MATCH "EVE_PLATFORM_BT8XXEMU"     IS_PLATFORM_EMULATOR ${EVE_APPS_PLATFORM})  
+STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM}) 
 SET(IS_PLATFORM_WINDOW   "${IS_PLATFORM_WINDOW}"   CACHE STRING "Platform Target WINDOW  ")
 SET(IS_PLATFORM_FT4222   "${IS_PLATFORM_FT4222}"   CACHE STRING "Platform Target FT4222  ")
 SET(IS_PLATFORM_MPSSE    "${IS_PLATFORM_MPSSE}"    CACHE STRING "Platform Target MPSSE   ")
-SET(IS_PLATFORM_EMULATOR "${IS_PLATFORM_EMULATOR}" CACHE STRING "Platform Target EMULATOR")
 
 mark_as_advanced(IS_PLATFORM_WINDOW  )
 mark_as_advanced(IS_PLATFORM_FT4222  )
 mark_as_advanced(IS_PLATFORM_MPSSE   )
-mark_as_advanced(IS_PLATFORM_EMULATOR)
 
 # Set up the basic build environment ###########################################
 IF (CMAKE_BUILD_TYPE STREQUAL "")
@@ -156,11 +125,9 @@ IF(IS_PLATFORM_WINDOW)
   
   IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
     MESSAGE(STATUS "Using 64-bit Windows dependencies")
-    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x64)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x64)
   ELSE()
     MESSAGE(STATUS "Using 32-bit Windows dependencies")
-    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x86)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x86)
   ENDIF()
 
@@ -170,18 +137,10 @@ ENDIF()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# Most graphics boards have a default display and platform specified in the configuration header
-# MULTI and DEFAULT behave the same, it depends on the selected graphics board
 # For embedded targets, the platforma always needs to be specified, though, since CMake needs to set the proper build options
-if(NOT EVE_APPS_GRAPHICS STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_GRAPHICS}")
-endif()
-if(NOT EVE_APPS_PLATFORM STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_PLATFORM}")
-endif()
-if(NOT EVE_APPS_DISPLAY STREQUAL "DEFAULT")
-  add_definitions("-D${EVE_APPS_DISPLAY}")
-endif()
+add_definitions("-D${EVE_APPS_GRAPHICS}")
+add_definitions("-D${EVE_APPS_PLATFORM}")
+add_definitions("-D${EVE_APPS_DISPLAY}")
 
 # Common setup #################################################################
 ADD_SUBDIRECTORY(common)
@@ -189,8 +148,6 @@ INCLUDE_DIRECTORIES("common/eve_hal")
 INCLUDE_DIRECTORIES("common/eve_hal/Hdr")
 
 # Project setup ################################################################
-IF(NOT EVE_APPS_GRAPHICS STREQUAL "MULTI")
-  ADD_SUBDIRECTORY(SampleApp)
-ENDIF()
+ADD_SUBDIRECTORY(SampleApp)
 
 ################################################################################

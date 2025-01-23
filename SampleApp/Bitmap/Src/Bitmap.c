@@ -37,7 +37,6 @@
 #define MAX_CIRCLE_UNIT 65536
 
 #define SAMAPP_DELAY     EVE_sleep(3000)
-#define SCANOUT_FORMAT   YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -47,7 +46,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
     Calibration_Save(s_pHalContext);
 #endif
 
-	Flash_Init(s_pHalContext, TEST_DIR "/Flash/flash.bin", "flash.bin");
+    Flash_Init(s_pHalContext, TEST_DIR "/Flash/flash.bin", "flash.bin");
     EVE_Util_clearScreen(s_pHalContext);
 
     char *info[] =
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
         //Calibration_Restore(s_pHalContext);
 #endif
 
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
     }
 
     return 0;
@@ -101,7 +100,7 @@ void SAMAPP_Bitmap_getImage()
 
     Draw_Text(s_pHalContext, "Example for: CMD_GETIMAGE");
 
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR, TEST_DIR "/CR_003_dithering.png", NULL, 0);
+    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR, TEST_DIR "\\CR_003_dithering.png", NULL, 0);
 
     // Start drawing bitmap
     Display_Start(s_pHalContext);

@@ -33,7 +33,6 @@
 #include "Widget.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
-#define SCANOUT_FORMAT         YCBCR
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
@@ -77,7 +76,7 @@ int main(int argc, char* argv[])
 
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 #if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -248,7 +247,7 @@ void SAMAPP_Widget_gauge()
     EVE_Util_loadRawFile(s_pHalContext, RAM_G, TEST_DIR "\\SAMAPP_Bitmap_RawData.bin");
 
     /* Draw gauge with blue as background and read as needle color */
-	Display_Start(s_pHalContext);
+    Display_Start(s_pHalContext);
 
     /* flat effect and default color background */
     xOffset = xDistBtwClocks / 2;
@@ -564,7 +563,7 @@ void SAMAPP_Widget_keysInteractive()
     char DispText[SAMAPP_COPRO_WIDGET_KEYS_INTERACTIVE_TEXTSIZE];
     char CurrChar = '|';
     uint32_t CurrTag = 0;
-    uint8_t PrevTag = 0;
+    uint32_t PrevTag = 0;
     uint8_t Pendown = 1;
     int32_t CurrTextIdx = 0;
 
@@ -573,7 +572,7 @@ void SAMAPP_Widget_keysInteractive()
         /* Check the user input and then add the characters into array */
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &CurrTag);
 
-        CurrChar = CurrTag;
+        CurrChar = (char)CurrTag;
         if (0 == CurrTag)
         {
             CurrChar = '|';
@@ -606,15 +605,15 @@ void SAMAPP_Widget_keysInteractive()
         EVE_CoCmd_fgColor(s_pHalContext, 0x404080);
         EVE_CoCmd_gradColor(s_pHalContext, 0x00ff00);
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "qwertyuiop");
+            (OPT_CENTER | (uint16_t)CurrTag), "qwertyuiop");
         EVE_CoCmd_gradColor(s_pHalContext, 0x00ffff);
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "asdfghjkl");
+            (OPT_CENTER | (uint16_t)CurrTag), "asdfghjkl");
         EVE_CoCmd_gradColor(s_pHalContext, 0xffff00);
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, yBtnDst, yOffset, 10 * ButtonW, ButtonH, TextFont,
-            (OPT_CENTER | CurrTag), "zxcvbnm"); //hilight button z
+            (OPT_CENTER | (uint16_t)CurrTag), "zxcvbnm"); //hilight button z
         yOffset += ButtonH + yBtnDst;
         EVE_CoDl_tag(s_pHalContext, ' ');
         if (' ' == CurrTag)
@@ -629,17 +628,17 @@ void SAMAPP_Widget_keysInteractive()
         }
         yOffset = ButtonW * 2 + 10;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "789");
+            (0 | (uint16_t)CurrTag), "789");
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "456");
+            (0 | (uint16_t)CurrTag), "456");
         yOffset += ButtonH + yBtnDst;
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "123");
+            (0 | (uint16_t)CurrTag), "123");
         yOffset += ButtonH + yBtnDst;
         EVE_CoDl_colorA(s_pHalContext, 255);
         EVE_CoCmd_keys(s_pHalContext, 11 * ButtonW, yOffset, 3 * ButtonW, ButtonH, TextFont,
-            (0 | CurrTag), "0."); //hilight button 0
+            (0 | (uint16_t)CurrTag), "0."); //hilight button 0
         Display_End(s_pHalContext);
         EVE_sleep(10);
         PrevTag = CurrTag;
@@ -1061,7 +1060,7 @@ void SAMAPP_Widget_spinner()
     /* will wait untill stop command is sent from the mcu. Spinner has option*/
     /* for displaying points in circle fashion or in a line fashion.         */
     /*************************************************************************/
-	Display_StartColor(s_pHalContext, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
     EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 100, 31, OPT_CENTER, "Spinner circle");
     EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 200, 31, OPT_CENTER, "Please Wait ...");
     EVE_CoCmd_spinner(s_pHalContext, (int16_t) (s_pHalContext->Width / 2),
@@ -1413,7 +1412,7 @@ void SAMAPP_Widget_sketch()
     EVE_CoCmd_sketch(s_pHalContext, BorderSz, BorderSz,
         (int16_t)(s_pHalContext->Width - 2 * BorderSz),
         (int16_t)(s_pHalContext->Height - 2 * BorderSz), RAM_G, L1); //sketch in L1 format
-	while ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && (tag != 'S'))
+    while ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && (tag != 'S'))
     {
         /* Display the sketch */
         Display_Start(s_pHalContext);
