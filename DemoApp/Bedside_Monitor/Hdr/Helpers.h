@@ -67,6 +67,14 @@
 		EVE_CoCmd_text(s_pHalContext, x, y, font, opt | OPT_CENTER, txt); \
 	}
 
+#define DRAW_CIRCLE_WITH_TEXT_TAG(x, y, r, txt, font, opt, txtcolor, tagval)       \
+	{                                                                              \
+        EVE_Cmd_wr32(s_pHalContext, TAG(tagval));                                  \
+		DRAW_CIRCLE(x, y, r);                                                      \
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB((txtcolor) & 0xFF, ((txtcolor) >> 8) & 0xFF, ((txtcolor) >> 16) & 0xFF));    \
+        EVE_Cmd_wr32(s_pHalContext, TAG(tagval));                                  \
+		EVE_CoCmd_text(s_pHalContext, x, y, font, opt | OPT_CENTER, txt); \
+	}
 
 #define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * 1, (y) * 1))
 

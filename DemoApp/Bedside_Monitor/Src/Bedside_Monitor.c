@@ -310,11 +310,9 @@ void SAMAPP_Bedside_Monitor()
 		y = box_menu_top.y_end - r;;
 		x = app_window.x_end - r -50 - 5;
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_UP));
-		DRAW_CIRCLE_WITH_TEXT(x, y, r, "+", 31, 0, 0x00FFFFFF);
+		DRAW_CIRCLE_WITH_TEXT_TAG(x, y, r, "+", 31, 0, 0x00FFFFFF, TAG_ZOOM_UP);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_DOWN));
-		DRAW_CIRCLE_WITH_TEXT(x + 50, y, r, "-", 31, 0, 0x00FFFFFF);
+		DRAW_CIRCLE_WITH_TEXT_TAG(x + 50, y, r, "-", 31, 0, 0x00FFFFFF, TAG_ZOOM_DOWN);
 
 		// Graph title text information
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
