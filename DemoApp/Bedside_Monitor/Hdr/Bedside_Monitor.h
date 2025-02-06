@@ -28,5 +28,11 @@ extern int g_graph_zoom_lv;
 
 #define TAG_ZOOM_UP 1
 #define TAG_ZOOM_DOWN 2
+#define TAG_START_STOP 3
+
+#define BTN_START_ACTIVE 0
+#define BTN_START_INACTIVE 1
+extern uint8_t btnStartState;
+
 
 #endif /* APP_H_ */

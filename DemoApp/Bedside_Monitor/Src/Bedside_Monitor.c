@@ -154,6 +154,11 @@ app_box box_graph_pleth;
 app_box box_graph_co2;
 app_box box_menu_bottom;
 
+char* const btnStartTxtActive = "START";
+char* const btnStartTxtInActive = "STOP";
+char* btnStartTxt = 0;
+uint8_t btnStartState = BTN_START_INACTIVE;
+
 void process_event() {
 #if defined(BT82X_ENABLE)
 	return; // disable touch on bt820
@@ -176,6 +181,16 @@ void process_event() {
 		//GRAPH_INIT(&box_graph_ecg, &box_graph_pleth, &box_graph_co2);
 	}
 
+	else if (ges->tagReleased == TAG_START_STOP) {
+		btnStartState = !btnStartState;
+		if (BTN_START_ACTIVE == btnStartState) {
+			btnStartTxt = btnStartTxtActive;
+		}
+		else {
+			btnStartTxt = btnStartTxtInActive;
+		}
+	}
+
 }
 
 void SAMAPP_Bedside_Monitor()
@@ -183,6 +198,9 @@ void SAMAPP_Bedside_Monitor()
 #if  USEBITMAP == USE_BITMAP_BARGRAPH
 	g_graph_zoom_lv = 1; // disable touch on bargraph
 #endif
+
+	btnStartTxt = btnStartTxtInActive;
+
 	app_box lcd_size = {0, 0, s_pHalContext->Width, s_pHalContext->Height, s_pHalContext->Width, s_pHalContext->Height };
 	app_box app_window = INIT_APP_BOX((s_pHalContext->Width - WINDOW_W) / 2, (s_pHalContext->Height - WINDOW_H) / 2, WINDOW_W, WINDOW_H);
 	int graph_start = app_window.x + 35;
@@ -279,8 +297,11 @@ void SAMAPP_Bedside_Monitor()
 		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 1, box_menu_bottom.y + 7, 180, 50, 30, 0, "RECORD");
 		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+
 		// Stop button
-		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 2 + 50, box_menu_bottom.y + 7, 180, 50, 30, 0, "STOP");
+		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_START_STOP));
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 2 + 50, box_menu_bottom.y + 7, 180, 50, 30, 0, btnStartTxt);
+		EVE_Cmd_wr32(s_pHalContext, TAG(0));
 		// NIBP button
 		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + 180 * 3 + 99, box_menu_bottom.y + 7, 180, 50, 30, 0, "NIBP");
 		// EXIT button
@@ -304,19 +325,20 @@ void SAMAPP_Bedside_Monitor()
 		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy());
 
 		// zoom level control
-		y = box_menu_top.y;
-		x = box_menu_top.x_end + 30;
+		int zoom_margin = 40;
+		int r = 25;
+		y = box_menu_top.y_mid;
+		x = box_right1.x + zoom_margin;
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_CoCmd_text(s_pHalContext, x, y , 25, OPT_FORMAT, "Zoom %d", g_graph_zoom_lv);
-		
-		int r = 20;
-		y = box_menu_top.y_end - r;;
-		x = app_window.x_end - r -50 - 5;
+		DRAW_CIRCLE_WITH_TEXT_TAG(x, y, r, "-", 31, 0, 0x00FFFFFF, TAG_ZOOM_DOWN);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		DRAW_CIRCLE_WITH_TEXT_TAG(x, y, r, "+", 31, 0, 0x00FFFFFF, TAG_ZOOM_UP);
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		DRAW_CIRCLE_WITH_TEXT_TAG(x + 50, y, r, "-", 31, 0, 0x00FFFFFF, TAG_ZOOM_DOWN);
 
+		x = box_right1.x_mid;
+		EVE_CoCmd_text(s_pHalContext, x, y , 25, OPT_FORMAT | OPT_CENTER, "Zoom %d", g_graph_zoom_lv);
+
+		x = box_right1.x_end - zoom_margin;
+		DRAW_CIRCLE_WITH_TEXT_TAG(x, y, r, "+", 31, 0, 0x00FFFFFF, TAG_ZOOM_UP);
+		
 		// Graph title text information
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		EVE_CoCmd_text(s_pHalContext, box_graph_ecg.x + 15, box_graph_ecg.y + 10, 30, 0, "ECG");

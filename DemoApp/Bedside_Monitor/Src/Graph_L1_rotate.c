@@ -181,7 +181,7 @@ static void graph_display(app_graph_t* graph) {
 static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count)
 {
 	// write data to ramg
-	while (line_count > 0)
+	while (line_count > 0 && btnStartState == BTN_START_INACTIVE)
 	{
 		int line_count_graph = line_count * g_graph_zoom_lv;
 
