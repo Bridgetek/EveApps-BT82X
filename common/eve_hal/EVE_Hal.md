@@ -129,7 +129,6 @@ Write transfers may be buffered in software, depending on the implementation. In
 * EVE_Hal_SPICmd_setbootcfg
 * EVE_Hal_SPICmd_bootcfgen
 * EVE_Hal_SPICmd_setddrtype
-* EVE_Hal_SPICmd_setgpreg
 
 # EVE Cmd
 

@@ -112,7 +112,7 @@ typedef struct EVE_CMD_BOOT_CFG
 	uint8_t rev : 1; /**< reserved */
 	uint8_t watchdog : 1; /**< 1 - watchdog system will init */
 	uint8_t audio : 1; /**< 1 - audio system will init */
-	uint8_t JT : 1; /**< 1 - JT coprocessor will init */
+	uint8_t touch : 1; /**< 1 - touch will init */
 	uint8_t DDR : 1; /**< 1 - DDR subsystem will init */
 } EVE_CMD_BOOT_CFG;
 
