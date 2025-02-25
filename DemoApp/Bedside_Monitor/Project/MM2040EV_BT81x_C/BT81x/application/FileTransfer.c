@@ -52,12 +52,17 @@
 
 #if defined(BT815_ENABLE)
 #define FILE_BLOB             (EVE_FLASH_DIR "\\BT815-unified.blob")
+#define BUFFER_BLOB           BT815_blob
 #elif defined(BT817_ENABLE) || defined(BT817A_ENABLE)
 #define FILE_BLOB             (EVE_FLASH_DIR "\\BT817-unified.blob")
+#define BUFFER_BLOB           BT817_blob
 #else
 /// Use BT815 blob as default
 #define FILE_BLOB             (EVE_FLASH_DIR "\\BT815-unified.blob")
+#define BUFFER_BLOB           BT815_blob
 #endif
+
+extern uint8_t BUFFER_BLOB[4096];
 
 #if defined(EVE_FLASH_AVAILABLE)
 /**
@@ -174,6 +179,8 @@ uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile) {
  * @return uint32_t 1 on successful, 0 on error
  */
 uint32_t Ftf_Write_Blob_Default(EVE_HalContext* phost) {
+#define ENABLE_BLOB_IN_SDCARD 0
+#if ENABLE_BLOB_IN_SDCARD
 	char pBuff[BLOBSIZE];
 	printf("Writing blob default\n");
 
@@ -181,7 +188,9 @@ uint32_t Ftf_Write_Blob_Default(EVE_HalContext* phost) {
 	if (!ret) {
 		printf("Unable to open file: %s\n", FILE_BLOB);
 	}
-
+#else
+	char* pBuff = BUFFER_BLOB;
+#endif
 	return Ftf_Update_Blob(phost, pBuff);
 }
 
@@ -223,6 +232,20 @@ Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, c
 			printf("Unable to open file: %s\n", filePath);
 			return 0;
 		}
+		progress.fileSize = fileSize;
+
+		/// check and write blob
+		int ret = FlashHelper_SwitchState(phost, FLASH_STATUS_FULL); // full mode
+		if (ret != 0) {
+			Ftf_Write_Blob_Default(phost);
+
+			ret = FlashHelper_SwitchState(phost, FLASH_STATUS_FULL); // full mode
+			if (ret != 0) {
+				printf("Cannot switch flash to fullmode\n");
+				return 0;
+			}
+		}
+
 		snprintf(progress.message, MSG_SIZE, "Reading %s from flash", progress.fileName);
 	}
 	else {
@@ -436,9 +459,9 @@ uint32_t Ftf_Write_File_To_Flash_With_Progressbar(EVE_HalContext* phost, const c
  * @return uint32_t Number of bytes received
  */
 uint32_t Ftf_Read_File_From_Flash_With_Progressbar(EVE_HalContext* phost, uint8_t* filePath, const char* fileName,
-	uint32_t address, uint32_t size) {
+	uint32_t address, uint32_t fileSize) {
 	Ftf_Progress_t* progress = Ftf_Progress_Init(phost, filePath, fileName, address, FTF_PROGESS_READ);
-	progress->fileSize = size;
+	progress->fileSize = fileSize; 
 	while (1) {
 		uint32_t pc = Ftf_Progress_Read_Next(phost, progress);
 		Ftf_Progress_Ui(phost, progress);

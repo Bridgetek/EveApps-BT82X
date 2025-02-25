@@ -397,18 +397,18 @@ void EVE_Host_selectSysClk(EVE_HalContext *phost, EVE_81X_PLL_FREQ_T freq)
 			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x80 << 8) | (0x07 << 8));
 		else
 #endif
-		    if (EVE_SYSCLK_72M == freq)
+		if (EVE_SYSCLK_72M == freq)
 			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x40 << 8) | (0x06 << 8));
 		else if (EVE_SYSCLK_60M == freq)
-			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x40 << 8) | (0x05 << 8));
+		EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x40 << 8) | (0x05 << 8));
 		else if (EVE_SYSCLK_48M == freq)
-			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x40 << 8) | (0x04 << 8));
-		else if (EVE_SYSCLK_36M == freq)
-			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x03 << 8));
-		else if (EVE_SYSCLK_24M == freq)
+		EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x40 << 8) | (0x04 << 8));
+	else if (EVE_SYSCLK_36M == freq)
+	EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x03 << 8));
+else if (EVE_SYSCLK_24M == freq)
 			EVE_Hal_hostCommandExt3(phost, (uint32_t)0x61 | (0x02 << 8));
 		else if (EVE_SYSCLK_DEFAULT == freq) // default clock
-			EVE_Hal_hostCommandExt3(phost, 0x61);
+		EVE_Hal_hostCommandExt3(phost, 0x61);
 	}
 	else
 #endif

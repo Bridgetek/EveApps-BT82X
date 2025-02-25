@@ -98,9 +98,9 @@ static void bresenham_line(SIGNALS_DATA_TYPE* buffer, int x1, int y1, int x2, in
 }
 
 // Function to normalize sensor data to fit within the graph range
-static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
-#define graph_max GRAPH_W
-#define graph_min 5
+static int normalize_to_graph(app_graph_t* graph, int sensor_value, int sensor_min, int sensor_max) {
+#define graph_max graph->h
+#define graph_min 1
 
 	// Ensure the sensor range is valid to prevent division by zero
 	if (sensor_max == sensor_min) {
@@ -125,7 +125,7 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 		memset(buffer_1line, 0, sizeof(buffer_1line));
 		SIGNALS_DATA_TYPE x = lines[i] & 0xFF;
 
-		x = normalize_to_graph(x, 0, 255);
+		x = normalize_to_graph(graph, x, 0, 255);
 		bresenham_line(buffer_1line, x, g_graph_zoom_lv - 1, graph->x_graph_last, 0, graph->rgba);
 		graph->x_graph_last = x;
 		EVE_Hal_wrMem(s_pHalContext, addr, buffer_1line, sizeof(buffer_1line));
@@ -261,7 +261,7 @@ static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* line
 	graph_display(graph);
 }
 
-void graph_p8_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
+uint32_t graph_p8_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
 	//      <-------- read pointer -------->x<- when write pointer reached here, start loopback to buffer 0
 	//      -------------------------------------------------         
 	//      |   buffer 0    |   buffer 1    |   buffer 2    |         
@@ -286,17 +286,16 @@ void graph_p8_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* b
 		gh->bitmap_rp = gh->buffer0;  // display from buffer 0 and continue to buffer 1
 		gh->bitmap_wp = gh->buffer1;  // append to buffer 1 and continue to buffer 2
 		gh->bitmap_wplb = gh->buffer0;  // loopback from buffer 0
-		gh->x = boxs[i]->x + 10;
-		gh->y = boxs[i]->y - 60;
+		gh->x = boxs[i]->x;
+		gh->y = boxs[i]->y;
 		gh->w = GRAPH_H;
 		gh->h = GRAPH_W;
 		gh->handler = i+1;
 		gh->rgba = colors[i];
 		gh->paletted_color_source = color_source;
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 0, GRAPH_BUFFER_SIZE);
-		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 0, GRAPH_BUFFER_SIZE);
-		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 0, GRAPH_BUFFER_SIZE);
 	}
+	return graph_co2.buffer2_end;
 }
 
 void graph_p8_rotate_draw() {

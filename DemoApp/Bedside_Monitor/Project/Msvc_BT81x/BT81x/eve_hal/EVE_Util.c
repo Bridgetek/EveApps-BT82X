@@ -1005,7 +1005,7 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 			config->VSync0 = 0;
 			config->VSync1 = 10;
 			config->PCLK = 1;
-			config->PClkFreq = 0x8B1; // 66MHz
+			config->PClkFreq = 0xD32;
 #ifdef EVE_SUPPORT_HSF
 			config->HsfWidth = 0;
 #endif

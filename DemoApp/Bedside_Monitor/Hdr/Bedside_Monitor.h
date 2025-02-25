@@ -5,13 +5,16 @@
 
 // Path to UI assets Folder
 #if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
-#define TEST_DIR                            "..\\..\\..\\Test\\"
+#define TEST_DIR                            "..\\..\\..\\Test\\Flash\\"
 #else
-#define TEST_DIR                            "/EveApps/SampleApp/Bedside_Monitor/Test"
+//#define TEST_DIR                            "/EveApps/SampleApp/Bedside_Monitor/Test/"
+#define TEST_DIR                            "/"
 #endif
 
 #define GET_CALIBRATION                     1
 
+#define WINDOW_W 1280
+#define WINDOW_H 800
 #define GRAPH_W 160
 #define GRAPH_H 1000
 #define GRAPH_SIZE (GRAPH_W * GRAPH_H)
@@ -32,7 +35,8 @@ extern int g_graph_zoom_lv;
 
 #define BTN_START_ACTIVE 0
 #define BTN_START_INACTIVE 1
-extern uint8_t btnStartState;
 
+extern uint8_t btnStartState;
+extern uint32_t grid_bytes;
 
 #endif /* APP_H_ */

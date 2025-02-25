@@ -152,6 +152,12 @@
     <ClCompile Include="BT81x\application\Maths.c">
       <Filter>Common\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\BT815-unified.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\BT817-unified.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!--# filter header list-->

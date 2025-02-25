@@ -33,9 +33,9 @@ static app_graph_t graph_pleth;
 static app_graph_t graph_co2;
 
 // Function to normalize sensor data to fit within the graph range
-static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) {
-#define graph_max GRAPH_W
-#define graph_min 5
+static int normalize_to_graph(app_graph_t* graph, int sensor_value, int sensor_min, int sensor_max) {
+#define graph_max graph->h
+#define graph_min 1
 
 	// Ensure the sensor range is valid to prevent division by zero
 	if (sensor_max == sensor_min) {
@@ -44,11 +44,11 @@ static int normalize_to_graph(int sensor_value, int sensor_min, int sensor_max) 
 
 	/* Normalize the sensor value to the range[graph_min, graph_max]
 	   here is the formular:
-	     data range:  sensor_min  --> sensor_value ------> sensor_max
-	     graph range: graph_min   --> x            ------> graph_max
-	     find x: => (graph_max - x) / (graph_max - graph_min) = (sensor_max - sensor_value) / (sensor_max - sensor_min)
-	     find x: => (graph_max - x) = (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
-	     find x: => x = graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
+		 data range:  sensor_min  --> sensor_value ------> sensor_max
+		 graph range: graph_min   --> x            ------> graph_max
+		 find x: => (graph_max - x) / (graph_max - graph_min) = (sensor_max - sensor_value) / (sensor_max - sensor_min)
+		 find x: => (graph_max - x) = (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
+		 find x: => x = graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min)
 	*/
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
@@ -59,7 +59,7 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 	for (int i = 0; i < line_count; i++) {
 		SIGNALS_DATA_TYPE byte = lines[i] & 0xFF;
 
-		byte = normalize_to_graph(byte, 0, 255);
+		byte = normalize_to_graph(graph, byte, 0, 255);
 		byte = 255 - min(255, byte);
 		EVE2_wr8(s_pHalContext, addr, byte);
 		addr += GRAPH_BYTE_PER_LINE * g_graph_zoom_lv;
@@ -131,7 +131,7 @@ static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* line
 	graph_display(graph);
 }
 
-void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
+uint32_t graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
 //      <-------- read pointer -------->x<- when write pointer reached here, start loopback to buffer 0
 //      -------------------------------------------------         
 //      |   buffer 0    |   buffer 1    |   buffer 2    |         
@@ -151,16 +151,15 @@ void graph_bargraph_init(app_box* box_heartbeat, app_box* box_pleth, app_box* bo
 		gh->bitmap_rp = gh->buffer0;  // display from buffer 0 and continue to buffer 1
 		gh->bitmap_wp = gh->buffer1;  // append to buffer 1 and continue to buffer 2
 		gh->bitmap_wplb = gh->buffer0;  // loopback from buffer 0
-		gh->x = boxs[i]->x + 10;
-		gh->y = boxs[i]->y - 60;
+		gh->x = boxs[i]->x;
+		gh->y = boxs[i]->y;
 		gh->w = GRAPH_H;
 		gh->h = GRAPH_W;
 		gh->handler = i+1;
 		gh->rgba = colors[i];
 		EVE_CoCmd_memSet(s_pHalContext, gh->buffer0, 255, GRAPH_BUFFER_SIZE);
-		EVE_CoCmd_memSet(s_pHalContext, gh->buffer1, 255, GRAPH_BUFFER_SIZE);
-		EVE_CoCmd_memSet(s_pHalContext, gh->buffer2, 255, GRAPH_BUFFER_SIZE);
 	}
+	return graph_co2.buffer2_end;
 }
 
 void graph_bargraph_draw() {

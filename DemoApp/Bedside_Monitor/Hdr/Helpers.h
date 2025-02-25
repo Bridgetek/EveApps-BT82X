@@ -76,7 +76,31 @@
 		EVE_CoCmd_text(s_pHalContext, x, y, font, opt | OPT_CENTER, txt); \
 	}
 
-#define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * 1, (y) * 1))
+#define DRAW_LINE(x, y, w, h)                      \
+	{                                              \
+		EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES)); \
+		EVE_DRAW_AT(x, y);                         \
+		EVE_DRAW_AT(x + w, y + h);                 \
+	}
+
+#define DRAW_LINE_XY(x, y, x2, y2)                 \
+	{                                              \
+		EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES)); \
+		EVE_DRAW_AT(x, y);                         \
+		EVE_DRAW_AT(x2, y2);                       \
+	}
+
+#define DRAW_LINE_XY_DEBUG(x, y, x2, y2)                 \
+	{                                              \
+		printf("DRAW_LINE_XY(%d, %d, %d, %d)\r\n", x, y, x2, y2); \
+		EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES)); \
+		EVE_DRAW_AT(x, y);                         \
+		EVE_DRAW_AT(x2, y2);                       \
+	}
+
+#define EVE_VERTEX_FORMAT 2
+#define EVE_PRECISION_FACTOR 4 // EVE_VERTEX_FORMAT ^ 2
+#define EVE_DRAW_AT(x, y) EVE_Cmd_wr32(s_pHalContext, VERTEX2F((x) * EVE_PRECISION_FACTOR, (y) * EVE_PRECISION_FACTOR))
 
 #define ALIGN_TO_N_2POWER(x, n)    (((x) + ((n) - 1)) & ~((n) - 1)) // Only works correctly if n is a power of 2.
 #define ALIGN_UP_TO_N(x, n) (((x) + ((n) - 1)) / (n) * (n))  // Works for any positive integer n (including non-powers of 2).

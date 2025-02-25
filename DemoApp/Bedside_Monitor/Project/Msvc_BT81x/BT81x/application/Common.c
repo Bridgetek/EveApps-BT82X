@@ -578,16 +578,18 @@ void hintScreen(EVE_HalContext* phost, const uint8_t* msg) {
 	Draw_Text(phost, msg);
 }
 
-void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
-		const uint8_t *fileName) {
+// return filesize
+uint32_t Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
+		const uint8_t *fileName, uint32_t address) {
 #if defined(_WIN32)
 #define _WHERE "PC"
 #elif defined(EMBEDDED_PLATFORM)
 #define _WHERE "SDcard"
 #endif
+	uint32_t sent = 0;
 
 	EVE_Util_loadSdCard(phost);
-#if !defined(BT8XXEMU_PLATFORM) && defined(EVE_FLASH_AVAILABLE)
+#if defined(EVE_FLASH_AVAILABLE)
 	/// if SD card is NOT detected, proceeds to boot up with a hint screen:
 	if (!isSDcardDetected()) {
 		hintScreen(phost,
@@ -602,8 +604,8 @@ void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
 		}
 
 		/// If YES, Program the flash with the file in SD card
-		int sent = Ftf_Write_File_To_Flash_With_Progressbar(phost, filePath,
-				fileName, 0);
+		sent = Ftf_Write_File_To_Flash_With_Progressbar(phost, filePath,
+				fileName, address);
 
 		/// If fail to program flash, reset application
 		if (0 >= sent) {
@@ -625,6 +627,7 @@ void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
 		}
 	}
 #endif
+	return sent;
 }
 
 void Show_Diaglog_Info(EVE_HalContext* phost, const uint8_t* msg) {

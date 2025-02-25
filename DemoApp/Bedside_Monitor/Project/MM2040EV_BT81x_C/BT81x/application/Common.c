@@ -578,53 +578,56 @@ void hintScreen(EVE_HalContext* phost, const uint8_t* msg) {
 	Draw_Text(phost, msg);
 }
 
-void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
-		const uint8_t *fileName) {
+// return filesize
+uint32_t Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
+	const uint8_t *fileName, uint32_t address) {
 #if defined(_WIN32)
 #define _WHERE "PC"
 #elif defined(EMBEDDED_PLATFORM)
 #define _WHERE "SDcard"
 #endif
+uint32_t sent = 0;
 
-	EVE_Util_loadSdCard(phost);
-#if !defined(BT8XXEMU_PLATFORM) && defined(EVE_FLASH_AVAILABLE)
-	/// if SD card is NOT detected, proceeds to boot up with a hint screen:
-	if (!isSDcardDetected()) {
-		hintScreen(phost,
-				"Program the correct flash image to ensure EvChargePoint boots up successfully");
+EVE_Util_loadSdCard(phost);
+#if defined(EVE_FLASH_AVAILABLE)
+/// if SD card is NOT detected, proceeds to boot up with a hint screen:
+if (!isSDcardDetected()) {
+	hintScreen(phost,
+			"Program the correct flash image to ensure EvChargePoint boots up successfully");
+	return;
+} else {
+	/// if SD card is detected, show a dialog on the screen with two options: Yes or No?
+	if (!Show_Diaglog_YesNo(phost, "Flash programming",
+			"Program the flash with the file in " _WHERE "?")) {
+		/// If No, proceeds to boot up
 		return;
-	} else {
-		/// if SD card is detected, show a dialog on the screen with two options: Yes or No?
-		if (!Show_Diaglog_YesNo(phost, "Flash programming",
-				"Program the flash with the file in " _WHERE "?")) {
-			/// If No, proceeds to boot up
-			return;
-		}
-
-		/// If YES, Program the flash with the file in SD card
-		int sent = Ftf_Write_File_To_Flash_With_Progressbar(phost, filePath,
-				fileName, 0);
-
-		/// If fail to program flash, reset application
-		if (0 >= sent) {
-			uint8_t count = 5;
-			uint8_t msg[1000];
-			while (count) {
-#if defined(FT9XX_PLATFORM) || defined(EVE_PLATFORM_RP2040)
-				snprintf(msg, 1000, "Error: Cannot open file: %s, reset in %us",
-						filePath, count);
-#else
-				snprintf(msg, 1000, "Error: Cannot open file: %s, exit in %u s",
-					fileName, count);
-#endif
-				Show_Diaglog_Info(phost, msg);
-				EVE_sleep(1000);
-				count--;
-			}
-			exit(0);
-		}
 	}
+
+	/// If YES, Program the flash with the file in SD card
+	sent = Ftf_Write_File_To_Flash_With_Progressbar(phost, filePath,
+			fileName, address);
+
+	/// If fail to program flash, reset application
+	if (0 >= sent) {
+		uint8_t count = 5;
+		uint8_t msg[1000];
+		while (count) {
+#if defined(FT9XX_PLATFORM) || defined(EVE_PLATFORM_RP2040)
+			snprintf(msg, 1000, "Error: Cannot open file: %s, reset in %us",
+					filePath, count);
+#else
+			snprintf(msg, 1000, "Error: Cannot open file: %s, exit in %u s",
+				fileName, count);
 #endif
+			Show_Diaglog_Info(phost, msg);
+			EVE_sleep(1000);
+			count--;
+		}
+		exit(0);
+	}
+}
+#endif
+return sent;
 }
 
 void Show_Diaglog_Info(EVE_HalContext* phost, const uint8_t* msg) {

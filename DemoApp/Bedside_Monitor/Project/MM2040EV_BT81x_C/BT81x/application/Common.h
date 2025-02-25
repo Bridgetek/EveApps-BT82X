@@ -149,7 +149,7 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext *phost, const uint8_t* title, const ui
 void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
 uint8_t isSDcardDetected();
 void hintScreen(EVE_HalContext *phost, const uint8_t *msg);
-void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath, const uint8_t *fileName);
+uint32_t Flash_Init(EVE_HalContext* phost, const uint8_t *filePath, const uint8_t *fileName, uint32_t address);
 void WelcomeScreen(Gpu_Hal_Context_t* phost, char* info[]);
 
 #endif /* COMMON_H_ */

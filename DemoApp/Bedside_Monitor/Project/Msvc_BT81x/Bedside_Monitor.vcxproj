@@ -21,6 +21,8 @@
   <ItemGroup>
     <!--# source file list-->
     <ClCompile Include="..\..\Src\Bedside_Monitor.c" />
+    <ClCompile Include="..\..\Src\BT815-unified.c" />
+    <ClCompile Include="..\..\Src\BT817-unified.c" />
     <ClCompile Include="..\..\Src\Data_Simulate.c" />
     <ClCompile Include="..\..\Src\Graph_Bargraph.c" />
     <ClCompile Include="..\..\Src\Graph_L1.c" />
@@ -168,10 +170,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <!-- LCD: EVE_DISPLAY_WXGA-->
+      <!-- EVE chip: EVE_GRAPHICS_BT817 or EVE_GRAPHICS_BT81* -->
       <!-- FT4222: EVE_PLATFORM_FT4222 -->
       <!-- MPSSE: EVE_PLATFORM_MPSSE -->
-      <!-- EMU: EVE_PLATFORM_BT8XXEMU -->
-      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_MPSSE;EVE_DISPLAY_WXGA;</PreprocessorDefinitions>
+      <!-- EMU: EVE_PLATFORM_BT8XXEMU - not yet supported in BT820-->
+      <PreprocessorDefinitions>$(UppercaseConfiguration);$(Platform);%(PreprocessorDefinitions);EVE_GRAPHICS_BT817;EVE_PLATFORM_BT8XXEMU;EVE_DISPLAY_WXGA;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)BT81x\\application;$(ProjectDir)BT81x\\eve_hal;$(ProjectDir)BT81x\\eve_hal\\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>
