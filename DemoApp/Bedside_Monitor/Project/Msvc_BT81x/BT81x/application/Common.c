@@ -819,10 +819,10 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,
 
 		Display_End(phost);
 
-		Gesture_Renew(phost);
-		if (Gesture_Get()->tagReleased == tag_y) {
+		utils_gestureRenew(phost);
+		if (utils_gestureGet()->tagReleased == tag_y) {
 			return true;
-		} else if (Gesture_Get()->tagReleased == tag_n) {
+		} else if (utils_gestureGet()->tagReleased == tag_n) {
 			return false;
 		}
 	} while (true);

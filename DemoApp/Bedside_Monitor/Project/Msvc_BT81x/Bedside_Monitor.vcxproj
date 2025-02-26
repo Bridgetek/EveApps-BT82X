@@ -24,6 +24,7 @@
     <ClCompile Include="..\..\Src\BT815-unified.c" />
     <ClCompile Include="..\..\Src\BT817-unified.c" />
     <ClCompile Include="..\..\Src\Data_Simulate.c" />
+    <ClCompile Include="..\..\Src\Datetime_adjustment.c" />
     <ClCompile Include="..\..\Src\Graph_Bargraph.c" />
     <ClCompile Include="..\..\Src\Graph_L1.c" />
     <ClCompile Include="..\..\Src\Graph_L1_rotate.c" />

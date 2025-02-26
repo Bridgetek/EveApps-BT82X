@@ -114,17 +114,31 @@ typedef struct
 // Function to calculate and return FPS without float/double
 int getFPS();
 
-// Function to format the date as "dd-mm-yyyy"
+// Function to format the date 
 char* dd_mm_yyyy();
+char* dd_mmm_yyyy();
+char* dd_month_yyyy();
 
 // Function to format the time as "hh:mm"
 char* hh_mm();
+char* hh_mm_ss();
+char* hh_mm_ss_ms();
 
 // Function to calculate and return the formatted date-time string
 char* dd_mm_yyyy_hh_m_ss_ms();
 
 // Function to initialize date-time
 void init_datetime(int dd, int mm, int yyyy, int hh, int m, int ss, int ms);
+
+
+uint32_t get_dd();
+uint32_t get_mm();
+uint32_t get_yyyy();
+uint32_t get_hh();
+uint32_t get_mt();
+uint32_t get_ss();
+uint32_t get_ms();
+void dateime_adjustment(EVE_HalContext* phost);
 
 // Function to generate a random number within a given range
 int app_random(int range);

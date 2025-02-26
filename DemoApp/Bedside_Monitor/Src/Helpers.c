@@ -1,4 +1,9 @@
-﻿#include "Helpers.h"
+﻿#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#include "Helpers.h"
+#include "Common.h"
 
 // Function to calculate and return FPS without float/double
 int getFPS()
@@ -32,6 +37,9 @@ int8_t istouch(EVE_HalContext *phost)
 // Static variables to store initial date-time
 static int init_dd = 0, init_mm = 0, init_yyyy = 0;
 static int init_hh = 0, init_m = 0, init_ss = 0, init_ms = 0;
+static int current_dd = 0, current_mm = 0, current_yyyy = 0;
+static int current_hh = 0, current_m = 0;
+static int current_ss = 0, current_ms = 0;
 
 #define MILLIS_PER_SECOND 1000
 #define SECONDS_PER_MINUTE 60
@@ -39,9 +47,7 @@ static int init_hh = 0, init_m = 0, init_ss = 0, init_ms = 0;
 #define MILLIS_PER_DAY (24 * 60 * 60 * 1000)
 
 // Function to format the date as "dd-mm-yyyy"
-char* dd_mm_yyyy() {
-	static char dateString[12]; // Buffer for "dd-mm-yyyy"
-	static int current_dd = 0, current_mm = 0, current_yyyy = 0;
+static void dd_mm_yyyy_preset() {
 	unsigned long elapsed_millis = EVE_millis();
 	int elapsed_days = elapsed_millis / MILLIS_PER_DAY;
 
@@ -74,34 +80,89 @@ char* dd_mm_yyyy() {
 			}
 		}
 	}
+}
 
+char* dd_mm_yyyy() {
+	dd_mm_yyyy_preset();
+	static char dateString[12]; // Buffer for "dd-mm-yyyy"
 	snprintf(dateString, sizeof(dateString), "%02d-%02d-%04d", current_dd, current_mm, current_yyyy);
 	return dateString;
 }
 
-// Function to format the time as "hh:mm"
-char* hh_mm() {
-	static char timeString[6]; // Buffer for "hh:mm"
-	static int current_hh = 0, current_m = 0;
+char* dd_mmm_yyyy() {
+	dd_mm_yyyy_preset();  
+
+	static char dateString[12]; // Buffer for "dd-mmm-yyyy"
+	const char* month3_str[] = {
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	};
+
+	if (current_mm < 1 || current_mm > 12) {
+		return "Invalid Date"; 
+	}
+
+	snprintf(dateString, sizeof(dateString), "%02d-%s-%04d", current_dd, month3_str[current_mm - 1], current_yyyy);
+	return dateString;
+}
+
+char* dd_month_yyyy() {
+	dd_mm_yyyy_preset();
+
+	static char dateString[20]; // Buffer for "dd-Month-yyyy"
+	const char* months_str[] = {
+		"January", "February", "March", "April", "May", "June",
+		"July", "August", "September", "October", "November", "December"
+	};
+
+	if (current_mm < 1 || current_mm > 12) {
+		return "Invalid Date"; 
+	}
+
+	snprintf(dateString, sizeof(dateString), "%02d-%s-%04d", current_dd, months_str[current_mm - 1], current_yyyy);
+	return dateString;
+}
+
+static void hh_mm_preset() {
+// Function to format the time
+	// Calculate total elapsed time
 	unsigned long elapsed_millis = EVE_millis();
-	unsigned long total_seconds = init_ss + (init_ms + elapsed_millis) / MILLIS_PER_SECOND;
+	unsigned long total_ms = init_ms + elapsed_millis;
+	unsigned long total_seconds = init_ss + total_ms / MILLIS_PER_SECOND;
 	int total_minutes = init_m + total_seconds / SECONDS_PER_MINUTE;
 
 	current_hh = init_hh + total_minutes / MINUTES_PER_HOUR;
 	current_m = total_minutes % MINUTES_PER_HOUR;
+	current_ss = total_seconds % SECONDS_PER_MINUTE; // Remaining seconds
+	current_ms = total_ms % MILLIS_PER_SECOND; // Remaining milliseconds
 
 	if (current_hh >= 24) {
 		current_hh %= 24;
 	}
+}
 
+char* hh_mm() {
+	hh_mm_preset();
+	static char timeString[6]; // Buffer for "hh:mm"
 	snprintf(timeString, sizeof(timeString), "%02d:%02d", current_hh, current_m);
+	return timeString;
+}
+char* hh_mm_ss() {
+	hh_mm_preset();
+	static char timeString[9]; // Buffer for "hh:mm:ss"
+	snprintf(timeString, sizeof(timeString), "%02d:%02d:%02d", current_hh, current_m, current_ss);
+	return timeString;
+}
+char* hh_mm_ss_ms() {
+	hh_mm_preset();
+	static char timeString[12]; // Buffer for "hh:mm:ss:ms"
+	snprintf(timeString, sizeof(timeString), "%02d:%02d:%02d:%02d", current_hh, current_m, current_ss, current_ms);
 	return timeString;
 }
 
 // Function to calculate and return the formatted date-time string
 char* dd_mm_yyyy_hh_m_ss_ms() {
 	static char fullDateTimeString[30]; // Buffer for "dd-mm-yyyy hh:mm:ss:ms"
-	static int current_ss = 0, current_ms = 0;
 
 	// Calculate total elapsed time
 	unsigned long elapsed_millis = EVE_millis();
@@ -130,7 +191,41 @@ void init_datetime(int dd, int mm, int yyyy, int hh, int m, int ss, int ms) {
 	init_m = m;
 	init_ss = ss;
 	init_ms = ms;
+
+	current_dd = dd; current_mm = mm; current_yyyy = yyyy;
+	current_hh = hh; current_m = m;
+	current_ss = ss; current_ms = ms;
 }
+
+uint32_t get_dd() {
+	return current_dd;
+}
+
+uint32_t get_mm() {
+	return current_mm;
+}
+
+uint32_t get_yyyy() {
+	return current_yyyy;
+}
+
+uint32_t get_hh() {
+	return current_hh;
+}
+
+uint32_t get_mt() {
+	return current_m;
+}
+
+uint32_t get_ss() {
+	return current_ss;
+}
+
+uint32_t get_ms() {
+	return current_ms;
+}
+
+
 
 int app_random(int range)
 {

@@ -1,0 +1,5 @@
+for /L %%i in (1,1,70) do (
+    eab_tools font -f extended -i arial.ttf -o ./ -s %%i -x "C:/Users/Public/Documents/EVE Asset Builder/tools/astcenc.exe" -E ASTC -g -b 4x4 -e thorough -d 4096 -u Demo_texts_en.txt 
+)
+
+eab_tools font -f extended -i ARIALNB.TTF -o ./ -s 88 -x "C:/Users/Public/Documents/EVE Asset Builder/tools/astcenc.exe" -E ASTC -g -b 4x4 -e thorough -d 4096 -u Demo_texts_en_0-9.txt 

@@ -158,6 +158,9 @@
     <ClCompile Include="..\..\Src\BT817-unified.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\Datetime_adjustment.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!--# filter header list-->

@@ -1,11 +1,10 @@
-﻿#if 1
-/**
+﻿/**
  * @file Bedside_Monitor.c
  * @brief A bedside monitoring demo application
  *
  * @author Bridgetek
  *
- * @date 2024
+ * @date 2025
  *
  * MIT License
  *
@@ -25,230 +24,16 @@ void SAMAPP_Bedside_Monitor();
 #define SAMAPP_DELAY EVE_sleep(2000);
 #define SCANOUT_FORMAT RGB8
 
-// mapping file data
-static const uint32_t arial_1_ASTC_glyph             []= {4096     , 5824  };
-static const uint32_t arial_1_ASTC_xfont             []= {9920     , 176   };
-static const uint32_t arial_1_ASTC_xfont_padding     []= {10096    , 16    };
-static const uint32_t arial_2_ASTC_glyph             []= {10112    , 5824  };
-static const uint32_t arial_2_ASTC_xfont             []= {15936    , 176   };
-static const uint32_t arial_2_ASTC_xfont_padding     []= {16112    , 16    };
-static const uint32_t arial_3_ASTC_glyph             []= {16128    , 5824  };
-static const uint32_t arial_3_ASTC_xfont             []= {21952    , 176   };
-static const uint32_t arial_3_ASTC_xfont_padding     []= {22128    , 16    };
-static const uint32_t arial_4_ASTC_glyph             []= {22144    , 5824  };
-static const uint32_t arial_4_ASTC_xfont             []= {27968    , 176   };
-static const uint32_t arial_4_ASTC_xfont_padding     []= {28144    , 16    };
-static const uint32_t arial_5_ASTC_glyph             []= {28160    , 5824  };
-static const uint32_t arial_5_ASTC_xfont             []= {33984    , 176   };
-static const uint32_t arial_5_ASTC_xfont_padding     []= {34160    , 16    };
-static const uint32_t arial_6_ASTC_glyph             []= {34176    , 5824  };
-static const uint32_t arial_6_ASTC_xfont             []= {40000    , 176   };
-static const uint32_t arial_6_ASTC_xfont_padding     []= {40176    , 16    };
-static const uint32_t arial_7_ASTC_glyph             []= {40192    , 5824  };
-static const uint32_t arial_7_ASTC_xfont             []= {46016    , 176   };
-static const uint32_t arial_7_ASTC_xfont_padding     []= {46192    , 16    };
-static const uint32_t arial_8_ASTC_glyph             []= {46208    , 17472 };
-static const uint32_t arial_8_ASTC_xfont             []= {63680    , 176   };
-static const uint32_t arial_8_ASTC_xfont_padding     []= {63856    , 16    };
-static const uint32_t arial_9_ASTC_glyph             []= {63872    , 17472 };
-static const uint32_t arial_9_ASTC_xfont             []= {81344    , 176   };
-static const uint32_t arial_9_ASTC_xfont_padding     []= {81520    , 16    };
-static const uint32_t arial_10_ASTC_glyph            []= {81536    , 17472 };
-static const uint32_t arial_10_ASTC_xfont            []= {99008    , 176   };
-static const uint32_t arial_10_ASTC_xfont_padding    []= {99184    , 16    };
-static const uint32_t arial_11_ASTC_glyph            []= {99200    , 17472 };
-static const uint32_t arial_11_ASTC_xfont            []= {116672   , 176   };
-static const uint32_t arial_11_ASTC_xfont_padding    []= {116848   , 16    };
-static const uint32_t arial_12_ASTC_glyph            []= {116864   , 17472 };
-static const uint32_t arial_12_ASTC_xfont            []= {134336   , 176   };
-static const uint32_t arial_12_ASTC_xfont_padding    []= {134512   , 16    };
-static const uint32_t arial_13_ASTC_glyph            []= {134528   , 23296 };
-static const uint32_t arial_13_ASTC_xfont            []= {157824   , 176   };
-static const uint32_t arial_13_ASTC_xfont_padding    []= {158000   , 16    };
-static const uint32_t arial_14_ASTC_glyph            []= {158016   , 23296 };
-static const uint32_t arial_14_ASTC_xfont            []= {181312   , 176   };
-static const uint32_t arial_14_ASTC_xfont_padding    []= {181488   , 16    };
-static const uint32_t arial_15_ASTC_glyph            []= {181504   , 23296 };
-static const uint32_t arial_15_ASTC_xfont            []= {204800   , 176   };
-static const uint32_t arial_15_ASTC_xfont_padding    []= {204976   , 16    };
-static const uint32_t arial_16_ASTC_glyph            []= {204992   , 23296 };
-static const uint32_t arial_16_ASTC_xfont            []= {228288   , 176   };
-static const uint32_t arial_16_ASTC_xfont_padding    []= {228464   , 16    };
-static const uint32_t arial_17_ASTC_glyph            []= {228480   , 23296 };
-static const uint32_t arial_17_ASTC_xfont            []= {251776   , 176   };
-static const uint32_t arial_17_ASTC_xfont_padding    []= {251952   , 16    };
-static const uint32_t arial_18_ASTC_glyph            []= {251968   , 58240 };
-static const uint32_t arial_18_ASTC_xfont            []= {310208   , 176   };
-static const uint32_t arial_18_ASTC_xfont_padding    []= {310384   , 16    };
-static const uint32_t arial_19_ASTC_glyph            []= {310400   , 58240 };
-static const uint32_t arial_19_ASTC_xfont            []= {368640   , 176   };
-static const uint32_t arial_19_ASTC_xfont_padding    []= {368816   , 16    };
-static const uint32_t arial_20_ASTC_glyph            []= {368832   , 58240 };
-static const uint32_t arial_20_ASTC_xfont            []= {427072   , 176   };
-static const uint32_t arial_20_ASTC_xfont_padding    []= {427248   , 16    };
-static const uint32_t arial_21_ASTC_glyph            []= {427264   , 58240 };
-static const uint32_t arial_21_ASTC_xfont            []= {485504   , 176   };
-static const uint32_t arial_21_ASTC_xfont_padding    []= {485680   , 16    };
-static const uint32_t arial_22_ASTC_glyph            []= {485696   , 58240 };
-static const uint32_t arial_22_ASTC_xfont            []= {543936   , 176   };
-static const uint32_t arial_22_ASTC_xfont_padding    []= {544112   , 16    };
-static const uint32_t arial_23_ASTC_glyph            []= {544128   , 52416 };
-static const uint32_t arial_23_ASTC_xfont            []= {596544   , 176   };
-static const uint32_t arial_23_ASTC_xfont_padding    []= {596720   , 16    };
-static const uint32_t arial_24_ASTC_glyph            []= {596736   , 52416 };
-static const uint32_t arial_24_ASTC_xfont            []= {649152   , 176   };
-static const uint32_t arial_24_ASTC_xfont_padding    []= {649328   , 16    };
-static const uint32_t arial_25_ASTC_glyph            []= {649344   , 52416 };
-static const uint32_t arial_25_ASTC_xfont            []= {701760   , 176   };
-static const uint32_t arial_25_ASTC_xfont_padding    []= {701936   , 16    };
-static const uint32_t arial_26_ASTC_glyph            []= {701952   , 69888 };
-static const uint32_t arial_26_ASTC_xfont            []= {771840   , 176   };
-static const uint32_t arial_26_ASTC_xfont_padding    []= {772016   , 16    };
-static const uint32_t arial_27_ASTC_glyph            []= {772032   , 81536 };
-static const uint32_t arial_27_ASTC_xfont            []= {853568   , 176   };
-static const uint32_t arial_27_ASTC_xfont_padding    []= {853744   , 16    };
-static const uint32_t arial_28_ASTC_glyph            []= {853760   , 81536 };
-static const uint32_t arial_28_ASTC_xfont            []= {935296   , 176   };
-static const uint32_t arial_28_ASTC_xfont_padding    []= {935472   , 16    };
-static const uint32_t arial_29_ASTC_glyph            []= {935488   , 81536 };
-static const uint32_t arial_29_ASTC_xfont            []= {1017024  , 176   };
-static const uint32_t arial_29_ASTC_xfont_padding    []= {1017200  , 16    };
-static const uint32_t arial_30_ASTC_glyph            []= {1017216  , 81536 };
-static const uint32_t arial_30_ASTC_xfont            []= {1098752  , 176   };
-static const uint32_t arial_30_ASTC_xfont_padding    []= {1098928  , 16    };
-static const uint32_t arial_31_ASTC_glyph            []= {1098944  , 81536 };
-static const uint32_t arial_31_ASTC_xfont            []= {1180480  , 176   };
-static const uint32_t arial_31_ASTC_xfont_padding    []= {1180656  , 16    };
-static const uint32_t arial_32_ASTC_glyph            []= {1180672  , 93184 };
-static const uint32_t arial_32_ASTC_xfont            []= {1273856  , 176   };
-static const uint32_t arial_32_ASTC_xfont_padding    []= {1274032  , 16    };
-static const uint32_t arial_33_ASTC_glyph            []= {1274048  , 93184 };
-static const uint32_t arial_33_ASTC_xfont            []= {1367232  , 176   };
-static const uint32_t arial_33_ASTC_xfont_padding    []= {1367408  , 16    };
-static const uint32_t arial_34_ASTC_glyph            []= {1367424  , 93184 };
-static const uint32_t arial_34_ASTC_xfont            []= {1460608  , 176   };
-static const uint32_t arial_34_ASTC_xfont_padding    []= {1460784  , 16    };
-static const uint32_t arial_35_ASTC_glyph            []= {1460800  , 104832};
-static const uint32_t arial_35_ASTC_xfont            []= {1565632  , 176   };
-static const uint32_t arial_35_ASTC_xfont_padding    []= {1565808  , 16    };
-static const uint32_t arial_36_ASTC_glyph            []= {1565824  , 157248};
-static const uint32_t arial_36_ASTC_xfont            []= {1723072  , 176   };
-static const uint32_t arial_36_ASTC_xfont_padding    []= {1723248  , 16    };
-static const uint32_t arial_37_ASTC_glyph            []= {1723264  , 157248};
-static const uint32_t arial_37_ASTC_xfont            []= {1880512  , 176   };
-static const uint32_t arial_37_ASTC_xfont_padding    []= {1880688  , 16    };
-static const uint32_t arial_38_ASTC_glyph            []= {1880704  , 157248};
-static const uint32_t arial_38_ASTC_xfont            []= {2037952  , 176   };
-static const uint32_t arial_38_ASTC_xfont_padding    []= {2038128  , 16    };
-static const uint32_t arial_39_ASTC_glyph            []= {2038144  , 157248};
-static const uint32_t arial_39_ASTC_xfont            []= {2195392  , 176   };
-static const uint32_t arial_39_ASTC_xfont_padding    []= {2195568  , 16    };
-static const uint32_t arial_40_ASTC_glyph            []= {2195584  , 145600};
-static const uint32_t arial_40_ASTC_xfont            []= {2341184  , 176   };
-static const uint32_t arial_40_ASTC_xfont_padding    []= {2341360  , 16    };
-static const uint32_t arial_41_ASTC_glyph            []= {2341376  , 145600};
-static const uint32_t arial_41_ASTC_xfont            []= {2486976  , 176   };
-static const uint32_t arial_41_ASTC_xfont_padding    []= {2487152  , 16    };
-static const uint32_t arial_42_ASTC_glyph            []= {2487168  , 145600};
-static const uint32_t arial_42_ASTC_xfont            []= {2632768  , 176   };
-static const uint32_t arial_42_ASTC_xfont_padding    []= {2632944  , 16    };
-static const uint32_t arial_43_ASTC_glyph            []= {2632960  , 174720};
-static const uint32_t arial_43_ASTC_xfont            []= {2807680  , 176   };
-static const uint32_t arial_43_ASTC_xfont_padding    []= {2807856  , 16    };
-static const uint32_t arial_44_ASTC_glyph            []= {2807872  , 192192};
-static const uint32_t arial_44_ASTC_xfont            []= {3000064  , 176   };
-static const uint32_t arial_44_ASTC_xfont_padding    []= {3000240  , 16    };
-static const uint32_t arial_45_ASTC_glyph            []= {3000256  , 192192};
-static const uint32_t arial_45_ASTC_xfont            []= {3192448  , 176   };
-static const uint32_t arial_45_ASTC_xfont_padding    []= {3192624  , 16    };
-static const uint32_t arial_46_ASTC_glyph            []= {3192640  , 192192};
-static const uint32_t arial_46_ASTC_xfont            []= {3384832  , 176   };
-static const uint32_t arial_46_ASTC_xfont_padding    []= {3385008  , 16    };
-static const uint32_t arial_47_ASTC_glyph            []= {3385024  , 192192};
-static const uint32_t arial_47_ASTC_xfont            []= {3577216  , 176   };
-static const uint32_t arial_47_ASTC_xfont_padding    []= {3577392  , 16    };
-static const uint32_t arial_48_ASTC_glyph            []= {3577408  , 209664};
-static const uint32_t arial_48_ASTC_xfont            []= {3787072  , 176   };
-static const uint32_t arial_48_ASTC_xfont_padding    []= {3787248  , 16    };
-static const uint32_t arial_49_ASTC_glyph            []= {3787264  , 209664};
-static const uint32_t arial_49_ASTC_xfont            []= {3996928  , 176   };
-static const uint32_t arial_49_ASTC_xfont_padding    []= {3997104  , 16    };
-static const uint32_t arial_50_ASTC_glyph            []= {3997120  , 209664};
-static const uint32_t arial_50_ASTC_xfont            []= {4206784  , 176   };
-static const uint32_t arial_50_ASTC_xfont_padding    []= {4206960  , 16    };
-static const uint32_t arial_51_ASTC_glyph            []= {4206976  , 209664};
-static const uint32_t arial_51_ASTC_xfont            []= {4416640  , 176   };
-static const uint32_t arial_51_ASTC_xfont_padding    []= {4416816  , 16    };
-static const uint32_t arial_52_ASTC_glyph            []= {4416832  , 227136};
-static const uint32_t arial_52_ASTC_xfont            []= {4643968  , 176   };
-static const uint32_t arial_52_ASTC_xfont_padding    []= {4644144  , 16    };
-static const uint32_t arial_53_ASTC_glyph            []= {4644160  , 302848};
-static const uint32_t arial_53_ASTC_xfont            []= {4947008  , 176   };
-static const uint32_t arial_53_ASTC_xfont_padding    []= {4947184  , 16    };
-static const uint32_t arial_54_ASTC_glyph            []= {4947200  , 302848};
-static const uint32_t arial_54_ASTC_xfont            []= {5250048  , 176   };
-static const uint32_t arial_54_ASTC_xfont_padding    []= {5250224  , 16    };
-static const uint32_t arial_55_ASTC_glyph            []= {5250240  , 302848};
-static const uint32_t arial_55_ASTC_xfont            []= {5553088  , 176   };
-static const uint32_t arial_55_ASTC_xfont_padding    []= {5553264  , 16    };
-static const uint32_t arial_56_ASTC_glyph            []= {5553280  , 302848};
-static const uint32_t arial_56_ASTC_xfont            []= {5856128  , 176   };
-static const uint32_t arial_56_ASTC_xfont_padding    []= {5856304  , 16    };
-static const uint32_t arial_57_ASTC_glyph            []= {5856320  , 285376};
-static const uint32_t arial_57_ASTC_xfont            []= {6141696  , 176   };
-static const uint32_t arial_57_ASTC_xfont_padding    []= {6141872  , 16    };
-static const uint32_t arial_58_ASTC_glyph            []= {6141888  , 285376};
-static const uint32_t arial_58_ASTC_xfont            []= {6427264  , 176   };
-static const uint32_t arial_58_ASTC_xfont_padding    []= {6427440  , 16    };
-static const uint32_t arial_59_ASTC_glyph            []= {6427456  , 285376};
-static const uint32_t arial_59_ASTC_xfont            []= {6712832  , 176   };
-static const uint32_t arial_59_ASTC_xfont_padding    []= {6713008  , 16    };
-static const uint32_t arial_60_ASTC_glyph            []= {6713024  , 326144};
-static const uint32_t arial_60_ASTC_xfont            []= {7039168  , 176   };
-static const uint32_t arial_60_ASTC_xfont_padding    []= {7039344  , 16    };
-static const uint32_t arial_61_ASTC_glyph            []= {7039360  , 349440};
-static const uint32_t arial_61_ASTC_xfont            []= {7388800  , 176   };
-static const uint32_t arial_61_ASTC_xfont_padding    []= {7388976  , 16    };
-static const uint32_t arial_62_ASTC_glyph            []= {7388992  , 349440};
-static const uint32_t arial_62_ASTC_xfont            []= {7738432  , 176   };
-static const uint32_t arial_62_ASTC_xfont_padding    []= {7738608  , 16    };
-static const uint32_t arial_63_ASTC_glyph            []= {7738624  , 349440};
-static const uint32_t arial_63_ASTC_xfont            []= {8088064  , 176   };
-static const uint32_t arial_63_ASTC_xfont_padding    []= {8088240  , 16    };
-static const uint32_t arial_64_ASTC_glyph            []= {8088256  , 349440};
-static const uint32_t arial_64_ASTC_xfont            []= {8437696  , 176   };
-static const uint32_t arial_64_ASTC_xfont_padding    []= {8437872  , 16    };
-static const uint32_t arial_65_ASTC_glyph            []= {8437888  , 372736};
-static const uint32_t arial_65_ASTC_xfont            []= {8810624  , 176   };
-static const uint32_t arial_65_ASTC_xfont_padding    []= {8810800  , 16    };
-static const uint32_t arial_66_ASTC_glyph            []= {8810816  , 372736};
-static const uint32_t arial_66_ASTC_xfont            []= {9183552  , 176   };
-static const uint32_t arial_66_ASTC_xfont_padding    []= {9183728  , 16    };
-static const uint32_t arial_67_ASTC_glyph            []= {9183744  , 372736};
-static const uint32_t arial_67_ASTC_xfont            []= {9556480  , 176   };
-static const uint32_t arial_67_ASTC_xfont_padding    []= {9556656  , 16    };
-static const uint32_t arial_68_ASTC_glyph            []= {9556672  , 396032};
-static const uint32_t arial_68_ASTC_xfont            []= {9952704  , 176   };
-static const uint32_t arial_68_ASTC_xfont_padding    []= {9952880  , 16    };
-static const uint32_t arial_69_ASTC_glyph            []= {9952896  , 495040};
-static const uint32_t arial_69_ASTC_xfont            []= {10447936 , 176   };
-static const uint32_t arial_69_ASTC_xfont_padding    []= {10448112 , 16    };
-static const uint32_t arial_70_ASTC_glyph            []= {10448128 , 495040};
-static const uint32_t arial_70_ASTC_xfont            []= {10943168 , 176   };
-static const uint32_t arial_70_ASTC_xfont_padding    []= {10943344 , 16    };
-static const uint32_t arialbd_70_ASTC_glyph          []= {10943360 , 495040};
-static const uint32_t arialbd_70_ASTC_xfont          []= {11438400 , 176   };
-static const uint32_t arialbd_70_ASTC_xfont_padding  []= {11438576 , 16    };
-static const uint32_t ARIALNB_77_ASTC_glyph          []= {11438592 , 419328};
-static const uint32_t ARIALNB_77_ASTC_xfont          []= {11857920 , 176   };
-static const uint32_t ARIALNB_77_ASTC_xfont_padding  []= {11858096 , 16    };
-static const uint32_t ARIALNB_85_ASTC_glyph          []= {11858112 , 495040};
-static const uint32_t ARIALNB_85_ASTC_xfont          []= {12353152 , 176   };
-static const uint32_t ARIALNB_85_ASTC_xfont_padding  []= {12353328 , 16    };
-static const uint32_t ARIALNB_88_ASTC_glyph          []= {12361920 , 66560 };
-static const uint32_t ARIALNB_88_ASTC_xfont          []= {12428480 , 176   };
-static const uint32_t ARIALNB_88_ASTC_xfont_padding  []= {12428656 , 16    };
-
+// flash.map content
+static const uint32_t arial_25_ASTC_glyph           []={ 649344   , 52416 };
+static const uint32_t arial_25_ASTC_xfont           []={ 701760   , 176   };
+static const uint32_t arial_25_ASTC_xfont_padding   []={ 701936   , 16    };
+static const uint32_t arial_38_ASTC_glyph           []={ 1880704  , 157248};
+static const uint32_t arial_38_ASTC_xfont           []={ 2037952  , 176   };
+static const uint32_t arial_38_ASTC_xfont_padding   []={ 2038128  , 16    };
+static const uint32_t ARIALNB_88_ASTC_glyph         []={ 10943360 , 66560 };
+static const uint32_t ARIALNB_88_ASTC_xfont         []={ 11009920 , 176   };
+static const uint32_t ARIALNB_88_ASTC_xfont_padding []={ 11010096 , 16    };
 
 #define F_ADDR 0
 #define F_SIZE 1
@@ -269,8 +54,8 @@ app_font font0 = { .xfont = &ARIALNB_88_ASTC_xfont };
 app_font font1 = { .xfont = &arial_38_ASTC_xfont };
 app_font font2 = { .xfont = &arial_25_ASTC_xfont };
 app_font* fonts[] = {&font0, &font1, &font2 };
-uint32_t zoom_in[] = { 0, 12428672,784 }; // structure: address on ramg (set later), address on flash, size
-uint32_t zoom_out[] = { 0, 12429504,784 };
+uint32_t zoom_in[] = { 0, 11010112 , 784 + 48}; // structure: address on ramg (set later), address on flash, size
+uint32_t zoom_out[] = { 0, 11010944 , 784 + 48};
 
 int main(int argc, char* argv[])
 {
@@ -280,12 +65,12 @@ int main(int argc, char* argv[])
 	LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
 #endif
 
+	EVE_Util_clearScreen(s_pHalContext);
+
 	// read and store calibration setting
 #if !defined(BT8XXEMU_PLATFORM) && !defined(BT82X_ENABLE) && GET_CALIBRATION == 1
 	Calibration_New(s_pHalContext);
-#endif
-
-	EVE_Util_clearScreen(s_pHalContext);
+#endif 
 
 #if !defined(BT8XXEMU_PLATFORM)
 	uint32_t sent = Flash_Init(s_pHalContext, TEST_DIR "ew2025_bedside_monitor_bt81x.bin", "ew2025_bedside_monitor_bt81x.bin", 0);
@@ -298,8 +83,6 @@ int main(int argc, char* argv[])
 
 	while (TRUE)
 	{
-		// WelcomeScreen(s_pHalContext, info);
-
 		SAMAPP_Bedside_Monitor();
 
 		EVE_Util_clearScreen(s_pHalContext);
@@ -318,13 +101,23 @@ int main(int argc, char* argv[])
 }
 
 /// The demo area //////////////////////////////////////////////////////////////////////////////////////
-void load_app_assets(uint32_t ramg_offset) {
+#define MONTH_MODE_DIGIT 0
+#define MONTH_MODE_STR3 1
+#define MONTH_MODE_STRS 2
+uint8_t month_mode = MONTH_MODE_DIGIT;
 
+#define TIME_MODE_HH_MM 0
+#define TIME_MODE_HH_MM_SS 1
+#define TIME_MODE_HH_MM_SS_MS 2
+uint8_t time_mode = TIME_MODE_HH_MM;
+
+void load_app_assets(uint32_t ramg_offset) {
 	// font addr calculation
 	const uint8_t font_handler_start = 5;
+	uint32_t num_font = sizeof(fonts) / sizeof(app_font*);
 
 	// prepare the font
-	for (int i = 0; i < sizeof(fonts) / sizeof(app_font*); i++) {
+	for (int i = 0; i < num_font; i++) {
 		app_font* f = fonts[i];
 
 		f->flash_addr = f->xfont[F_ADDR];
@@ -353,7 +146,6 @@ void load_app_assets(uint32_t ramg_offset) {
 	// cahcing the font, only BT817/8, BT82x incompatible
 	ramg_offset += zoom_in[2] + zoom_out[2];
 	uint32_t ramg_remain = RAM_G_SIZE - ramg_offset;
-	uint32_t num_font = sizeof(fonts) / sizeof(app_font*);
 	uint32_t cache_size_per_font = max(16*1024, ALIGN_UP_TO_N(ramg_remain / num_font, 4));
 	for (int i = 0; i < num_font; i++) {
 		app_font* f = fonts[i];
@@ -363,23 +155,6 @@ void load_app_assets(uint32_t ramg_offset) {
 		EVE_CoCmd_fontCache(s_pHalContext, f->handler, f->cache_addr, f->cache_size);
 		ramg_offset = f->cache_addr + cache_size_per_font;
 	}
-
-	// test font
-#if 0
-	for (int i = 0; i < sizeof(fonts) / sizeof(app_font*); i++) {
-		app_font* f = fonts[i];
-		Gpu_CoCmd_Dlstart(s_pHalContext);
-		App_WrCoCmd_Buffer(s_pHalContext, CLEAR_COLOR_RGB(0, 0, 0));
-		App_WrCoCmd_Buffer(s_pHalContext, CLEAR(1, 1, 1));
-		App_WrCoCmd_Buffer(s_pHalContext, COLOR_RGB(255, 255, 255));
-		Gpu_CoCmd_Text(s_pHalContext, 50, 50, f->handler, 0, u8"ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789! @#$%^&*()-_=+`~[{]};:'\"\\ | , <> / ? abcdefghijklmnopqrstuvwxyz");
-		App_WrCoCmd_Buffer(s_pHalContext, DISPLAY());
-		Gpu_CoCmd_Swap(s_pHalContext);
-		App_Flush_Co_Buffer(s_pHalContext);
-		Gpu_Hal_WaitCmdfifo_empty(s_pHalContext);
-		EVE_sleep(200);
-	}
-#endif
 }
 
 void draw_app_window(app_box app_window)
@@ -395,31 +170,6 @@ void draw_app_window(app_box app_window)
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));
 	EVE_DRAW_AT(0, 0);
 	EVE_DRAW_AT(s_pHalContext->Width, s_pHalContext->Height);
-	return;
-
-	// Camera border
-	// start draw a small rectangle with alpha value 255
-	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(0, 0, 0, 1));
-	EVE_Cmd_wr32(s_pHalContext, BLEND_FUNC(ZERO, ZERO));
-	EVE_Cmd_wr32(s_pHalContext, COLOR_A(0));
-	EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));
-	EVE_DRAW_AT(bx + border, by + border);
-	EVE_DRAW_AT(bx + bw - border, by + bh - border);
-
-	// finally draw the bigger rECTANGE he desired rgb valu);
-	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(border_color[0], border_color[1], border_color[2]));
-	EVE_Cmd_wr32(s_pHalContext, COLOR_A(255));
-	EVE_Cmd_wr32(s_pHalContext, COLOR_MASK(1, 1, 1, 1));
-	EVE_Cmd_wr32(s_pHalContext, BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-	EVE_Cmd_wr32(s_pHalContext, TAG(30));
-	EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));
-	EVE_DRAW_AT(bx, by);
-	EVE_DRAW_AT(bx + bw, by + bh);
-	EVE_Cmd_wr32(s_pHalContext, END());
-	EVE_Cmd_wr32(s_pHalContext, BLEND_FUNC(SRC_ALPHA, ONE_MINUS_SRC_ALPHA));
-
-	EVE_CoCmd_number(s_pHalContext, app_window.x_mid, app_window.y - 30, 30, OPT_CENTERX, app_window.w);
-	EVE_CoCmd_number(s_pHalContext, app_window.x - 40, app_window.y_mid, 30, OPT_CENTERX, app_window.h);
 }
 
 #define ENABLE_SCREENSHOT_CAPTURE 0
@@ -475,6 +225,7 @@ char* btnStartTxt = 0;
 uint8_t btnStartState = BTN_START_INACTIVE;
 uint32_t grid_bytes = 0;
 uint32_t graph_size_ramg = 0;
+uint8_t is_datetime_setting_active = 0;
 
 void process_event() {
 #if defined(BT82X_ENABLE)
@@ -485,7 +236,7 @@ void process_event() {
 	return; // disable touch on bargraph
 #endif
 
-	Gesture_Touch_t* ges = Gesture_Renew(s_pHalContext);
+	Gesture_Touch_t* ges = utils_gestureRenew(s_pHalContext);
 	if (ges->tagReleased == TAG_ZOOM_DOWN) {
 		g_graph_zoom_lv--;
 		g_graph_zoom_lv = max(g_graph_zoom_lv, 1);
@@ -507,7 +258,19 @@ void process_event() {
 			btnStartTxt = btnStartTxtInActive;
 		}
 	}
+	else if (ges->tagPressed1 == TAG_MONTH_STR) {
+		month_mode++;
+		month_mode = month_mode % 3; // set 0 when reached max
+	}
+	else if (ges->tagPressed1 == TAG_TIME_STR) {
+		time_mode++;
+		time_mode = time_mode % 3; // set 0 when reached max
+	}
 
+	if (ges->distanceX > 300) { // 300 pixels
+		is_datetime_setting_active = 1;
+		dateime_adjustment(s_pHalContext);
+	}
 }
 
 void draw_grid_by_cocmd(int32_t x, int32_t y, int32_t w, int32_t h, int32_t cell_w, int32_t cell_h) {
@@ -564,6 +327,13 @@ void SAMAPP_Bedside_Monitor()
 	g_graph_zoom_lv = 1; // disable touch on bargraph
 #endif
 
+	// register big font 32 33 34
+	Display_Start(s_pHalContext);
+	EVE_CoCmd_romFont(s_pHalContext, FONT_32, 32);
+	EVE_CoCmd_romFont(s_pHalContext, FONT_33, 33);
+	EVE_CoCmd_romFont(s_pHalContext, FONT_34, 34);
+	Display_End(s_pHalContext);
+
 	btnStartTxt = btnStartTxtInActive;
 
 	app_box lcd_size = { 0, 0, s_pHalContext->Width, s_pHalContext->Height, s_pHalContext->Width, s_pHalContext->Height };
@@ -599,6 +369,7 @@ void SAMAPP_Bedside_Monitor()
 	app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
 
 	init_datetime(11, 12, 2024, 9, 11, 0, 0);
+	dateime_adjustment(s_pHalContext); // set date and time at initialize
 
 	int time_start_ms = 0;
 	int val_hr = 66;
@@ -607,22 +378,21 @@ void SAMAPP_Bedside_Monitor()
 	int val_sys = 156;
 	int val_dias = 93;
 
-#define FONT_32 2 // note: BT81x maximum handler is 31
-#define FONT_33 3
-#define FONT_34 4
 	static int screenshot_counter = 0;
 
 	graph_size_ramg = GRAPH_INIT(&box_graph_ecg, &box_graph_pth, &box_graph_co2);
 	load_app_assets(graph_size_ramg);
-
+	
 	while (1)
 	{
-		process_event();
 		Display_Start(s_pHalContext);
+		EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(EVE_VERTEX_FORMAT));
+
+		process_event();
+
 #if defined(BT82X_ENABLE)
 		EVE_CoCmd_sync(s_pHalContext);
 #endif
-		EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(EVE_VERTEX_FORMAT));
 
 		draw_app_window(app_window);
 
@@ -678,7 +448,6 @@ void SAMAPP_Bedside_Monitor()
 		// right menu NIBP
 		DRAW_BOX_BORDER(box_right4, 0x000000, border, 0xffffff);
 
-
 		//buttons
 		int x = box_menu_top.x;
 		int y = box_menu_top.y_mid;
@@ -716,11 +485,6 @@ void SAMAPP_Bedside_Monitor()
 		EVE_CoCmd_text(s_pHalContext, app_window.x + 10, app_window.y_end - 40, 30, OPT_FORMAT, "fps = %d", getFPS());
 #endif
 
-		// register big font 32 33 34
-		EVE_CoCmd_romFont(s_pHalContext, FONT_32, 32);
-		EVE_CoCmd_romFont(s_pHalContext, FONT_33, 33);
-		EVE_CoCmd_romFont(s_pHalContext, FONT_34, 34);
-
 		x = box_menu_top.x;
 		y = box_menu_top.y_mid;
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
@@ -733,26 +497,49 @@ void SAMAPP_Bedside_Monitor()
 #else
 		EVE_CoCmd_text(s_pHalContext, x + 5, y, FONT_32, OPT_CENTERY, "BED");
 		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "no 5");
-		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm());
-		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy());
+		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_TIME_STR));
+		if (time_mode == TIME_MODE_HH_MM) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm());
+		}else if (time_mode == TIME_MODE_HH_MM_SS) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm_ss());
+		}else if (time_mode == TIME_MODE_HH_MM_SS_MS) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm_ss_ms());
+		}
+
+		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_MONTH_STR));
+		if (month_mode == MONTH_MODE_DIGIT) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mm_yyyy());
+		}else if (month_mode == MONTH_MODE_STR3) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_mmm_yyyy());
+		}
+		else if(month_mode == MONTH_MODE_STRS) {
+			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, 31, OPT_CENTER, dd_month_yyyy());
+		}
 #endif
 
 		// zoom level control
-		app_box zoombox= INIT_APP_BOX(box_menu_top.x + btn_w * 4 + btn_margin * 3, box_menu_bottom.y_mid, 100, 30);
-		EVE_Cmd_wr32(s_pHalContext, LINE_WIDTH(18*16));
-		EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES));
-		EVE_DRAW_AT(zoombox.x, zoombox.y);
-		EVE_DRAW_AT(zoombox.x_end, zoombox.y);
+		// app_box zoombox= INIT_APP_BOX(box_menu_top.x + btn_w * 4 + btn_margin * 3, box_menu_bottom.y_mid, 100, 30); // bottom side
+		app_box zoombox= INIT_APP_BOX(box_menu_top.x_end+ (app_window.x_end - box_menu_top.x_end) /2 - 50, box_menu_top.y_mid, 100, 30); // top right side
+
+		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		EVE_Cmd_wr32(s_pHalContext, TAG(0));
+		EVE_CoCmd_button(s_pHalContext, zoombox.x - zoombox.w / 4, zoombox.y - zoombox.h*3/4, zoombox.w*3/2, zoombox.h*3/2, 28, 0, "");
+
+		//EVE_Cmd_wr32(s_pHalContext, LINE_WIDTH(18*16));
+		// EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES));
+		// EVE_DRAW_AT(zoombox.x, zoombox.y);
+		// EVE_DRAW_AT(zoombox.x_end, zoombox.y);
 		EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_DOWN));
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
 		EVE_DRAW_AT(zoombox.x - zoombox.w / 9, zoombox.y- zoombox.h/3);
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_UP));
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
 		EVE_DRAW_AT(zoombox.x_end - zoombox.w / 9, zoombox.y - zoombox.h / 3);
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		//EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
 		EVE_CoCmd_text(s_pHalContext, zoombox.x_mid, zoombox.y_mid - zoombox.h / 3, font2.handler, OPT_FORMAT | OPT_CENTER, "%d", g_graph_zoom_lv);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_A(0));
@@ -787,6 +574,7 @@ void SAMAPP_Bedside_Monitor()
 			time_start_ms = time_end_ms;
 		}
 
+		EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 0));
 		// Heart rate
 		EVE_CoCmd_text(s_pHalContext, box_right1.x + 5, box_right1.y + 5, font2.handler, 0, "HR");
@@ -826,4 +614,3 @@ void SAMAPP_Bedside_Monitor()
 	}
 	return 0;
 };
-#endif

@@ -32,9 +32,15 @@ extern int g_graph_zoom_lv;
 #define TAG_ZOOM_UP 1
 #define TAG_ZOOM_DOWN 2
 #define TAG_START_STOP 3
+#define TAG_MONTH_STR 4
+#define TAG_TIME_STR 5
 
 #define BTN_START_ACTIVE 0
 #define BTN_START_INACTIVE 1
+
+#define FONT_32 2 // note: BT81x maximum handler is 31
+#define FONT_33 3
+#define FONT_34 4
 
 extern uint8_t btnStartState;
 extern uint32_t grid_bytes;
