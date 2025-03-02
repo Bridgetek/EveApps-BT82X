@@ -25,6 +25,7 @@ typedef struct Gesture_Touch
 	uint32_t tagPressed;
 	uint32_t tagPressed1;
 	uint32_t tagReleased;
+	uint32_t tagVelocity;
 	uint32_t trackValLine;
 	uint32_t trackValCircle;
 	uint32_t longTapMilisecond;
@@ -56,5 +57,6 @@ typedef struct Gesture_Touch
 
 Gesture_Touch_t* utils_gestureRenew(EVE_HalContext* phost);
 Gesture_Touch_t* utils_gestureGet();
+void stopVelocity();
 
 #endif /* GESTURE_H_ */

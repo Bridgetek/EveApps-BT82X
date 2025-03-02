@@ -8,9 +8,6 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{5f9f3603-966d-4559-a3ff-41a5ebd6e93a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{0795fa58-8447-4dc7-bc7a-5c2353a25619}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{07a1764e-8ac0-463e-86a8-5edc2b2bf934}</UniqueIdentifier>
     </Filter>
@@ -22,6 +19,9 @@
     </Filter>
     <Filter Include="Common\eve_hal\Hdr">
       <UniqueIdentifier>{4047e9cb-b4bc-48db-9d3f-49528ac12d01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Header Files">
+      <UniqueIdentifier>{0795fa58-8447-4dc7-bc7a-5c2353a25619}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,10 +165,10 @@
   <ItemGroup>
     <!--# filter header list-->
     <ClInclude Include="..\..\Hdr\Bedside_Monitor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Hdr\Helpers.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BT81x\eve_hal\Hdr\bt8xxemu.h">
       <Filter>Common\eve_hal\Hdr</Filter>
@@ -312,7 +312,7 @@
       <Filter>Common\application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Hdr\signals_arrays.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

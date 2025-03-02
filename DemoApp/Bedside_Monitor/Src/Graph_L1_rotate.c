@@ -4,9 +4,9 @@
 extern EVE_HalContext s_halContext;
 extern EVE_HalContext* s_pHalContext;
 
-int new_data_heartbeat(int** data, int* data_size);
-int new_data_pleth(int** data, int* data_size);
-int new_data_co2(int** data, int* data_size);
+int32_t new_data_heartbeat(int** data, int* data_size);
+int32_t new_data_pleth(int** data, int* data_size);
+int32_t new_data_co2(int** data, int* data_size);
 
 #define GRAPH_BIT_PER_PIXEL 1 // l1 1 bit per pixel
 #define GRAPH_BIT_PER_LINE (GRAPH_BIT_PER_PIXEL * GRAPH_W) // bbp * width
@@ -16,22 +16,23 @@ int new_data_co2(int** data, int* data_size);
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
 
 typedef struct {
-	int handler;
-	int bitmap_rp; // bitmap read pointer, use buffer 0 and 1
-	int bitmap_wp; // bitmap write pointer, use buffer 1 and 2
-	int bitmap_wplb; // bitmap write pointer loopback, use buffer 0
-	int buffer0, buffer1, buffer2; // 3 buffer on ramg
-	int buffer2_end; // end addreff of buffer 2
-	int x, y, w, h;
+	int32_t handler;
+	int32_t bitmap_rp; // bitmap read pointer, use buffer 0 and 1
+	int32_t bitmap_wp; // bitmap write pointer, use buffer 1 and 2
+	int32_t bitmap_wplb; // bitmap write pointer loopback, use buffer 0
+	int32_t buffer0, buffer1, buffer2; // 3 buffer on ramg
+	int32_t loopback_addr;
+	int32_t buffer2_end; // end addreff of buffer 2
+	int32_t x, y, w, h;
 	uint32_t rgba;
-	int x_graph_last;
+	int32_t x_graph_last;
 }app_graph_t;
 
 static app_graph_t graph_heartbeat;
 static app_graph_t graph_pleth;
 static app_graph_t graph_co2;
 
-static void draw_pixel(SIGNALS_DATA_TYPE* buffer, int x, int y, uint32_t rgba)
+static void draw_pixel(SIGNALS_DATA_TYPE* buffer, int32_t x, int32_t y, uint32_t rgba)
 {
 	if (y > GRAPH_H * 2) {
 		goto err;
@@ -46,41 +47,29 @@ static void draw_pixel(SIGNALS_DATA_TYPE* buffer, int x, int y, uint32_t rgba)
 	}
 
 	// set pixel color on/off
-	int pixel_nth = x + y * GRAPH_W;
-	int byte_index = pixel_nth / 8;    // byte nth
-	int bit_index = 7 - pixel_nth % 8;    // bit nth
+	int32_t pixel_nth = x + y * GRAPH_W;
+	int32_t byte_index = pixel_nth / 8;    // byte nth
+	int32_t bit_index = 7 - pixel_nth % 8;    // bit nth
 
 	if(byte_index >= GRAPH_BYTE_PER_LINE * g_graph_zoom_lv) {
 		goto err;
 	}
 	
 	buffer[byte_index] |= (1 << bit_index);
+	return;
 
 err:
 	//printf("Skip a pixel at (%d, %d)\n", x, y);
 	return;
 }
 
-static void bresenham_linex(char* buffer, int x1, int y1, int x2, int y2, uint32_t rgba)
+static void bresenham_line(SIGNALS_DATA_TYPE* buffer, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t rgba)
 {
-	int sx = (x2 > x1) ? 1 : -1;
-	int sy = (y2 > y1) ? 1 : -1;
-	int dx = abs(x2 - x1);
-	int dy = abs(y2 - y1);
-	while (dx-- > -1)
-	{
-		draw_pixel(buffer, x1, y1, rgba);
-		x1 += sx;
-	}
-}
-
-static void bresenham_line(SIGNALS_DATA_TYPE* buffer, int x1, int y1, int x2, int y2, uint32_t rgba)
-{
-	int dx = abs(x2 - x1);
-	int dy = abs(y2 - y1);
-	int sx = (x2 > x1) ? 1 : -1;
-	int sy = (y2 > y1) ? 1 : -1;
-	int err = dx - dy;
+	int32_t dx = abs(x2 - x1);
+	int32_t dy = abs(y2 - y1);
+	int32_t sx = (x2 > x1) ? 1 : -1;
+	int32_t sy = (y2 > y1) ? 1 : -1;
+	int32_t err = dx - dy;
 
 	while (1)
 	{
@@ -92,7 +81,7 @@ static void bresenham_line(SIGNALS_DATA_TYPE* buffer, int x1, int y1, int x2, in
 			break;
 		}
 
-		int e2 = 2 * err;
+		int32_t e2 = 2 * err;
 
 		// Adjust error and coordinates
 		if (e2 > -dy) {
@@ -108,7 +97,7 @@ static void bresenham_line(SIGNALS_DATA_TYPE* buffer, int x1, int y1, int x2, in
 
 
 // Function to normalize sensor data to fit within the graph range
-static int normalize_to_graph(app_graph_t* graph, int sensor_value, int sensor_min, int sensor_max) {
+static int32_t normalize_to_graph(app_graph_t* graph, int32_t sensor_value, int32_t sensor_min, int32_t sensor_max) {
 #define graph_max graph->h
 #define graph_min 1
 
@@ -128,10 +117,10 @@ static int normalize_to_graph(app_graph_t* graph, int sensor_value, int sensor_m
 	return graph_max - (graph_max - graph_min) * (sensor_max - sensor_value) / (sensor_max - sensor_min);
 }
 
-static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count) {
+static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int32_t line_count) {
 	uint8_t buffer_1line[GRAPH_BYTE_PER_LINE * GRAPH_ZOOM_LV_MAX] = { {0} };
 	uint32_t addr = graph->bitmap_wp;
-	for (int i = 0; i < line_count; i++) {
+	for (int32_t i = 0; i < line_count; i++) {
 		memset(buffer_1line, 0, sizeof(buffer_1line));
 		SIGNALS_DATA_TYPE x = lines[i] & 0xFF;
 		x = normalize_to_graph(graph, x, 0, 255);
@@ -143,12 +132,12 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 }
 
 static void graph_display(app_graph_t* graph) {
-	int bformat = L1;
-	int lw = max(graph->w, GRAPH_W);
-	int lh = max(graph->w, GRAPH_W);
+	int32_t bformat = L1;
+	int32_t lw = max(graph->w, GRAPH_W);
+	int32_t lh = max(graph->w, GRAPH_W);
 #define MAX_ANGLE 360
 #define MAX_CIRCLE_UNIT 65536
-	int rotation_angle = -90;
+	int32_t rotation_angle = -90;
 
 	// display bitmap
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
@@ -163,78 +152,80 @@ static void graph_display(app_graph_t* graph) {
 	EVE_CoCmd_setMatrix(s_pHalContext);
 
 	// coloring
-	int r = (graph->rgba >> 24) & 0xFF;  // Extract Red (most significant byte)
-	int g = (graph->rgba >> 16) & 0xFF;  // Extract Green
-	int b = (graph->rgba >> 8) & 0xFF;   // Extract Blue
-	int a = graph->rgba & 0xFF;          // Extract Alpha (least significant byte)
+	int32_t r = (graph->rgba >> 24) & 0xFF;  // Extract Red (most significant byte)
+	int32_t g = (graph->rgba >> 16) & 0xFF;  // Extract Green
+	int32_t b = (graph->rgba >> 8) & 0xFF;   // Extract Blue
+	int32_t a = graph->rgba & 0xFF;          // Extract Alpha (least significant byte)
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(r, g, b));
 
 	// vertex
 	EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-	int x = graph->x;
-	int y = graph->y - (GRAPH_W - graph->h);
+	int32_t x = graph->x;
+	int32_t y = graph->y - (GRAPH_W - graph->h);
 	EVE_DRAW_AT(x, y);
 	EVE_Cmd_wr32(s_pHalContext, RESTORE_CONTEXT());
 }
 
-static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_count)
+static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int32_t line_count)
 {
+	line_count = min(line_count, graph->w);
+
 	// write data to ramg
-	while (line_count > 0 && btnStartState == BTN_START_INACTIVE)
+	while (btnStartState == BTN_START_INACTIVE)
 	{
-		int line_count_graph = line_count * g_graph_zoom_lv;
-		int bytes_count_graph = line_count_graph * GRAPH_BYTE_PER_LINE;
+		int32_t bytes_count = line_count * g_graph_zoom_lv * GRAPH_BYTE_PER_LINE;
 
-		// Calculate how much data can be written continuously to the buffer
-		int contiguous_space = graph->buffer2_end - graph->bitmap_wp;
-		int bytes_to_write = (bytes_count_graph < contiguous_space) ? bytes_count_graph : contiguous_space;
-		int line_to_write = bytes_to_write / GRAPH_BYTE_PER_LINE;   //(line_count_graph < contiguous_space) ? line_count_graph : contiguous_space;
-
-		// if data size >= buffer2, write to buffer0, and set rp with gap
-		if (graph->bitmap_wp + bytes_to_write >= graph->buffer2_end)
+		// if data size >= buffer2, write to buffer0
+		if (graph->bitmap_wp + bytes_count >= graph->buffer2_end)
 		{
-			int buffer2_gap = graph->bitmap_wp + bytes_to_write - graph->buffer2_end;
 			graph->bitmap_wp = graph->bitmap_wplb;
-			graph_append(graph, lines, line_to_write / g_graph_zoom_lv);
-
-			graph->bitmap_rp = graph->buffer0 + buffer2_gap;
+			graph_append(graph, lines, line_count );
 			graph->bitmap_wplb = graph->buffer0;
-			continue;
+			graph->bitmap_wp += bytes_count;
+			graph->bitmap_rp = graph->bitmap_wp - GRAPH_BYTE_PER_BUFFER;
+			break;
 		}
 
-		graph_append(graph, lines, line_to_write / g_graph_zoom_lv);
+		graph_append(graph, lines, line_count);
 
-		if (graph->bitmap_wp + bytes_to_write >= graph->buffer2)
-		{ // loopback
-			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, bytes_to_write);
-			graph->bitmap_wplb += bytes_to_write;
+		// loopback
+		if (graph->bitmap_wp + bytes_count > graph->loopback_addr)
+		{ 
+			EVE_CoCmd_memCpy(s_pHalContext, graph->bitmap_wplb, graph->bitmap_wp, bytes_count);
+			graph->bitmap_wplb += bytes_count;
 		}
 
 		// increase write pointer
-		graph->bitmap_rp += bytes_to_write;
-		graph->bitmap_wp += bytes_to_write;
-		lines += line_to_write / g_graph_zoom_lv;
-		line_count -= line_to_write / g_graph_zoom_lv;
+		graph->bitmap_rp += bytes_count;
+		graph->bitmap_wp += bytes_count;
+		break;
 	}
 
 	graph_display(graph);
 }
 
 uint32_t graph_l1_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2) {
-	//      <-------- read pointer -------->x<- when write pointer reached here, start loopback to buffer 0
-	//      -------------------------------------------------         
-	//      |   buffer 0    |   buffer 1    |   buffer 2    |         
-	//      -------------------------------------------------         
-	//                      <-------- write pointer -------->
+	//      ramg: <-------- read pointer -------->lb<- when write pointer reached here, start loopback to buffer 0
+	//      ramg: -------------------------------------------------         
+	//      ramg: |   buffer 0    |   buffer 1    |   buffer 2    |
+	//      ramg: -------------------------------------------------         
+	//      ramg:                 <-------- write pointer -------->
+
+	memset(&graph_heartbeat, 0, sizeof(app_graph_t));
+	memset(&graph_pleth, 0, sizeof(app_graph_t));
+	memset(&graph_co2, 0, sizeof(app_graph_t));
+
 	app_graph_t* graphs[] = { &graph_heartbeat , &graph_pleth , &graph_co2 };
 	app_box* boxs[] = { box_heartbeat , box_pleth , box_co2 };
-	int colors[] = { 0x00ff0000, 0x00ffff00, 0xffff0000 };
+	int32_t colors[] = { 0x00ff0000, 0x00ffff00, 0xffff0000 };
 
-	for (int i = 0; i < 3; i++) {
+	for (int32_t i = 0; i < 3; i++) {
 		app_graph_t* gh = graphs[i];
 		gh->buffer0 = i * GRAPH_BUFFER_SIZE; // loopback buffer
 		gh->buffer1 = gh->buffer0 + GRAPH_BYTE_PER_BUFFER;
 		gh->buffer2 = gh->buffer1 + GRAPH_BYTE_PER_BUFFER;
+
+		gh->loopback_addr = gh->buffer2;
 		gh->buffer2_end = gh->buffer2 + GRAPH_BYTE_PER_BUFFER;
 
 		gh->bitmap_rp = gh->buffer0;  // display from buffer 0 and continue to buffer 1
@@ -255,13 +246,13 @@ void graph_l1_rotate_draw() {
 	SIGNALS_DATA_TYPE* data_heartbeat;
 	SIGNALS_DATA_TYPE* data_pleth;
 	SIGNALS_DATA_TYPE* data_co2;
-	int data_heartbeat_size = 0;
-	int data_pleth_size = 0;
-	int data_co2_size = 0;
+	int32_t data_heartbeat_size = 0;
+	int32_t data_pleth_size = 0;
+	int32_t data_co2_size = 0;
 
-	int x1 = new_data_heartbeat(&data_heartbeat, &data_heartbeat_size);
-	int x2 = new_data_pleth(&data_pleth, &data_pleth_size);
-	int x3 = new_data_co2(&data_co2, &data_co2_size);
+	int32_t x1 = new_data_heartbeat(&data_heartbeat, &data_heartbeat_size);
+	int32_t x2 = new_data_pleth(&data_pleth, &data_pleth_size);
+	int32_t x3 = new_data_co2(&data_co2, &data_co2_size);
 
 	graph_append_and_display(&graph_heartbeat, data_heartbeat, data_heartbeat_size);
 	graph_append_and_display(&graph_pleth, data_pleth, data_pleth_size);

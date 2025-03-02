@@ -46,9 +46,6 @@
 #define ft_schar8_t signed char
 #define ft_uchar8_t unsigned char
 
-//typedef unsigned int uint32_t;
-//typedef unsigned short int16_t;
-
 #define ft_int8_t int8_t
 #define ft_uint8_t uint8_t
 #define ft_int16_t int16_t

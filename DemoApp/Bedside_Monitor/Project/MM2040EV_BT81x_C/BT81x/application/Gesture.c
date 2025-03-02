@@ -60,6 +60,7 @@ static int Getvelocity_X() {
 			}
 			else {
 				distance = sGesture.touchX - lastTouchX;
+				sGesture.tagVelocity = sGesture.tagPressed;
 			}
 			if (abs(distance) > sMinMove) { // this is a swipe
 				sGesture.isSwipeX = 1;
@@ -126,6 +127,7 @@ static int Getvelocity_Y() {
 			}
 			else {
 				distance = sGesture.touchY - lastTouchY;
+				sGesture.tagVelocity = sGesture.tagPressed;
 			}
 			if (abs(distance) > sMinMove) { // this is a swipe
 				sGesture.isSwipeY = 1;
@@ -160,6 +162,15 @@ static int Getvelocity_Y() {
 
 	dragprev = sGesture.touchY;
 	return velocityY;
+}
+
+void stopVelocity() {
+	sGesture.velocityX = 0;
+	sGesture.velocityX_total = 0;
+	sGesture.velocityY = 0;
+	sGesture.velocityY_total = 0;
+	sGesture.isSwipeY = 0;
+	sGesture.isSwipeX = 0;
 }
 
 /**

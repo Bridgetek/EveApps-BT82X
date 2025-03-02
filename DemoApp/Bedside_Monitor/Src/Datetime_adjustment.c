@@ -10,6 +10,7 @@ extern EVE_HalContext* s_pHalContext;
 // Day (1-31)
 static uint32_t dd_list[] = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+};int xx[]={
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
 };
@@ -95,67 +96,177 @@ int find_right_neighbors(uint32_t arr[], size_t size, int index, int n) {
     return count; // Return the number of valid right neighbors
 }
 
-int32_t draw_selection(EVE_HalContext* phost, uint32_t* arr, uint32_t arr_count, int32_t y_offset, app_box drawing_frame, int32_t tag_val) {
-    int ret = arr[0];
+typedef struct {
+    uint32_t* array;
+    uint32_t array_count;
+    int32_t index;
+    int32_t y_offset;
+    int32_t frame_x, frame_y, frame_w, frame_h;
+    int32_t item_h;
+    int32_t tag_val;
+    uint8_t* title;
+    int32_t velocity;
+    int32_t* font_list;
+    int32_t num_active_item;
+    int rebound;
+}scrolling_vertical_array_t;
 
-    int32_t x = drawing_frame.x + drawing_frame.w / 2;
-    int32_t y = drawing_frame.y + drawing_frame.h / 2 + y_offset;
-    int32_t font[] = { 30, 31, FONT_33, 31, 30 };
+int32_t index_max_min(int index, int32_t arr_count, int32_t display_count) {
+    int32_t index_max = (arr_count - (display_count + 1) / 2);
+    int32_t index_min = -display_count / 2;
+    index = max(index, index_min);
+    index = min(index, index_max);
+    return index;
 
-    int i = 0;
-    while (y < drawing_frame.y - drawing_frame.h) {
-        i++;
-        y += drawing_frame.h;
+}
+// return the selected index
+int32_t scrollable_list(scrolling_vertical_array_t *sc) {
+    Gesture_Touch_t* ges = utils_gestureGet(s_pHalContext);
+    
+    int32_t dragY = 0;
+    int32_t item_start = 0; // 0 to -item_num / 2
+    int32_t item_end = 0; // 0 to item_num / 2
+
+    int32_t ret_index = 0;
+
+    if (ges->tagPressed== sc->tag_val) {
+        dragY = ges->distanceY;
     }
-    //int font_start = 5 - min(5, (arr_count - i +1));
-    int font_start = 0;
-    font_start += max(0, (y - drawing_frame.y)) / drawing_frame.h;
 
-    EVE_Cmd_wr32(phost, SCISSOR_XY(drawing_frame.x, drawing_frame.y));
-    EVE_Cmd_wr32(phost, SCISSOR_SIZE(drawing_frame.w, drawing_frame.h * 5));
-    EVE_Cmd_wr32(phost, COLOR_RGB(0, 0, 0));
-    for (; i < arr_count; i++) {
-        if (font_start == 2) {
-            EVE_Cmd_wr32(phost, COLOR_RGB(0, 0, 255));
-            ret = arr[i];
-        }
-        EVE_CoCmd_text(phost, x, y, font[font_start], OPT_FORMAT | OPT_CENTER, "%d", arr[i]);
-        if (font_start == 2) {
-            EVE_Cmd_wr32(phost, COLOR_RGB(0, 0, 0));
-        }
-        y += drawing_frame.h;
-        if (y >= drawing_frame.y + drawing_frame.h*6) {
-            break;
-        }
-        if (y >= drawing_frame.y + drawing_frame.h && font_start < 4) {
-            font_start++;
-        }
+    else if (ges->tagReleased == sc->tag_val) {
+        sc->y_offset += ges->distanceY;
+        sc->index -= sc->y_offset / sc->item_h;
+        sc->y_offset = sc->y_offset % sc->item_h;
+
+        int32_t index_max = (sc->array_count - (sc->num_active_item + 1) / 2);
+        int32_t index_min = -sc->num_active_item / 2;
+        sc->index = max(sc->index, index_min);
+        sc->index = min(sc->index, index_max);
+    }
+
+    else if (ges->velocityY != 0 && ges->tagVelocity == sc->tag_val) {
+        sc->velocity = ges->velocityY;
+        stopVelocity();
     }
     
-    // transparent drawing_frame
-    EVE_Cmd_wr32(phost, COLOR_A(110));
-    EVE_Cmd_wr32(phost, COLOR_RGB(0, 0, 0));
-    EVE_Cmd_wr32(phost, TAG(tag_val));
-    DRAW_RECT(drawing_frame.x, drawing_frame.y, drawing_frame.w, drawing_frame.h * 5);
+    if (sc->velocity != 0) {
+        const int32_t change_level = 35;
+        const int32_t speed_level = 6;
+        int32_t change = sc->velocity / change_level;
 
-    return ret;
+        sc->y_offset -= change;
+        sc->velocity = sc->velocity * 9 / 10;
+
+        sc->index -= sc->y_offset / sc->item_h;
+        sc->y_offset = sc->y_offset % sc->item_h;
+
+        
+        int32_t index_max = (sc->array_count - (sc->num_active_item + 1) / 2);
+        int32_t index_min = -sc->num_active_item / 2;
+        sc->index = index_max_min(sc->index, sc->array_count, sc->num_active_item);
+
+        if (abs(sc->velocity) < 2)
+            sc->velocity = 0;
+         else
+            sc->velocity = sc->velocity * speed_level / 10;
+
+        if (sc->index == index_min) {
+            sc->velocity = 0;
+            sc->y_offset = 0;// sc->item_h - 1;
+        }
+        else if (sc->index == index_max) {
+            sc->velocity = 0;
+            sc->y_offset = 0;// -(sc->item_h - 1);
+        }
+    }
+    else{ // stopped scoling, adjustment to center
+        if (sc->y_offset > 0) {
+            sc->y_offset--;
+        }
+        else if (sc->y_offset < 0) {
+            sc->y_offset++;
+        }
+
+#define ENABLE_INCREASE_INDEX 0
+#if ENABLE_INCREASE_INDEX
+        if (sc->y_offset > 0) {
+            if (sc->y_offset < sc->item_h / 2) {
+                sc->y_offset--;
+            }
+            else if (sc->y_offset > sc->item_h / 2) {
+                sc->y_offset++;
+                if (sc->y_offset == sc->item_h) {
+                    sc->y_offset = 0;
+                    sc->index--;
+                    sc->index = index_max_min(sc->index, sc->array_count, sc->num_active_item);
+                }
+            }
+        }
+        else if (sc->y_offset < 0) {
+            if (sc->y_offset > -sc->item_h / 2) {
+                sc->y_offset++;
+            }
+            else if (sc->y_offset < 0 && sc->y_offset < -sc->item_h / 2) {
+                sc->y_offset--;
+                if (sc->y_offset == -sc->item_h) {
+                    sc->y_offset = 0;
+                    sc->index++;
+                    sc->index = index_max_min(sc->index, sc->array_count, sc->num_active_item);
+                }
+            }
+        }
+#endif
+    }
+
+    int32_t drag_index = -dragY / sc->item_h;
+    int32_t drag_y = dragY % sc->item_h;
+
+    // draw the title
+    EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+    EVE_CoCmd_text(s_pHalContext, sc->frame_x + sc->frame_w / 2, sc->frame_y - 30, 28, OPT_CENTERX, sc->title);
+
+    EVE_Cmd_wr32(s_pHalContext, SCISSOR_XY(sc->frame_x, sc->frame_y));
+    EVE_Cmd_wr32(s_pHalContext, SCISSOR_SIZE(sc->frame_w, sc->item_h * sc->num_active_item));
+    int32_t text_x = sc->frame_x + sc->frame_w / 2;
+    for (int i = 0; i < sc->num_active_item+1; i++) {
+        int arr_index = i + sc->index + drag_index;
+        int text_y = drag_y + sc->y_offset + sc->frame_y + sc->item_h * i;
+        if (arr_index >= 0 && arr_index < sc->array_count) {
+            EVE_CoCmd_text(s_pHalContext, text_x, text_y, sc->font_list[i], OPT_FORMAT | OPT_CENTERX, "%d", sc->array[arr_index]);
+            if (i == sc->num_active_item / 2) {
+                ret_index = arr_index;
+            }
+        }
+    }
+
+    // transparent drawing_frame
+    EVE_Cmd_wr32(s_pHalContext, COLOR_A(110));
+    EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+    EVE_Cmd_wr32(s_pHalContext, TAG(sc->tag_val));
+    DRAW_RECT(sc->frame_x, sc->frame_y, sc->frame_w, sc->frame_h);
+    EVE_Cmd_wr32(s_pHalContext, COLOR_A(255));
+
+    EVE_Cmd_wr32(s_pHalContext, SCISSOR_XY(0, 0));
+    EVE_Cmd_wr32(s_pHalContext, SCISSOR_SIZE(2048, 2048));
+
+    return sc->array[ret_index];
 }
 
 void dateime_adjustment(EVE_HalContext* phost) {
-	uint32_t dd= get_dd();
-	uint32_t mm= get_mm();
-	uint32_t yy= get_yyyy();
-	uint32_t hh= get_hh();
-	uint32_t mt= get_mt();
-	uint32_t ss= get_ss();
-	uint32_t ms= get_ms();
+    uint32_t dd = get_dd();
+    uint32_t mm = get_mm();
+    uint32_t yy = get_yyyy();
+    uint32_t hh = get_hh();
+    uint32_t mt = get_mt();
+    uint32_t ss = get_ss();
+    uint32_t ms = get_ms();
 
-#define dd_text "Date"
-#define mm_text "Month"
-#define yy_text "year"
-#define hh_text "Hour"
-#define mt_text "Minute"
-#define ss_text "Second"
+    const uint8_t dd_text[]  = "Date"  ;
+    const uint8_t mm_text[]  = "Month" ;
+    const uint8_t yy_text[]  = "year"  ;
+    const uint8_t hh_text[]  = "Hour"  ;
+    const uint8_t mt_text[]  = "Minute";
+    const uint8_t ss_text[]  = "Second";
 
     int dd_count = sizeof(dd_list) / sizeof(uint32_t);
     int mm_count = sizeof(mm_list) / sizeof(uint32_t);
@@ -173,11 +284,11 @@ void dateime_adjustment(EVE_HalContext* phost) {
     const int32_t tag_btn_ok = 7;
     const int32_t tag_btn_cancel = 8;
 
-    app_box box_datetime = INIT_APP_BOX(phost->Width/2 - phost->Width * 2 / 6, phost->Height/2 - phost->Height * 2 / 6, phost->Width*2/3, phost->Height * 2/3 );
+    app_box box_datetime = INIT_APP_BOX(phost->Width / 2 - phost->Width * 2 / 6, phost->Height / 2 - phost->Height * 2 / 6, phost->Width * 2 / 3, phost->Height * 2 / 3);
 
     int h = 50, w = 100;
-    int x = phost->Width/2 - (200 + w*5)/2; // x center screen
-    int y = phost->Height/2 - h*5/2; // y center screen
+    int x = phost->Width / 2 - (200 + w * 5) / 2; // x center screen
+    int y = phost->Height / 2 - h * 5 / 2; // y center screen
     app_box yy_frame = INIT_APP_BOX(x, y, 200, h);
     app_box mm_frame = INIT_APP_BOX(yy_frame.x_end + 1, y, w, h);
     app_box dd_frame = INIT_APP_BOX(mm_frame.x_end + 1, y, w, h);
@@ -185,71 +296,112 @@ void dateime_adjustment(EVE_HalContext* phost) {
     app_box mt_frame = INIT_APP_BOX(hh_frame.x_end + 1, y, w, h);
     app_box ss_frame = INIT_APP_BOX(mt_frame.x_end + 1, y, w, h);
 
-    const int32_t velocicty_div = 50;
-    int32_t tag_selected = 0;
+    int32_t fonts[] = { 30, 30, FONT_32, 30, 30, 30 };
 
-    int32_t dd_y_offset=0, dd_y_swift = 0, dd_y_scroll = 0, dd_y_fineturn = 1, dd_y_init=0;
-    int32_t mm_y_offset=0, mm_y_swift = 0, mm_y_scroll = 0, mm_y_fineturn = 1, mm_y_init=0;
-    int32_t yy_y_offset=0, yy_y_swift = 0, yy_y_scroll = 0, yy_y_fineturn = 1, yy_y_init=0;
-    int32_t hh_y_offset=0, hh_y_swift = 0, hh_y_scroll = 0, hh_y_fineturn = 1, hh_y_init=0;
-    int32_t mt_y_offset=0, mt_y_swift = 0, mt_y_scroll = 0, mt_y_fineturn = 1, mt_y_init=0;
-    int32_t ss_y_offset=0, ss_y_swift = 0, ss_y_scroll = 0, ss_y_fineturn = 1, ss_y_init=0;
+    scrolling_vertical_array_t yy_scroller;
+    yy_scroller.array = yy_list;
+    yy_scroller.array_count = yy_count;
+    yy_scroller.num_active_item = 5;
+    yy_scroller.item_h = yy_frame.h;
+    yy_scroller.frame_x = yy_frame.x;
+    yy_scroller.frame_y = yy_frame.y;
+    yy_scroller.frame_w = yy_frame.w;
+    yy_scroller.frame_h = yy_scroller.num_active_item * yy_scroller.item_h;
+    yy_scroller.y_offset = 0;
+    yy_scroller.index = find_index(yy_list, yy_count, yy);
+    yy_scroller.tag_val = yy_tag;
+    yy_scroller.title = yy_text;
+    yy_scroller.velocity = 0;
+    yy_scroller.font_list = fonts;
+    yy_scroller.index = index_max_min(yy_scroller.index, yy_scroller.array_count, yy_scroller.num_active_item);
 
-    int i = 0;
-    i = 0; while(dd_list[i+2] != dd){i++; dd_y_offset -=h ;}
-    i = 0; while(mm_list[i+2] != mm){i++; mm_y_offset -=h ;}
-    i = 0; while(yy_list[i+2] != yy){i++; yy_y_offset -=h ;}
-    i = 0; while(hh_list[i+2] != hh){i++; hh_y_offset -=h ;}
-    i = 0; while(mt_list[i+2] != mt){i++; mt_y_offset -=h ;}
-    i = 0; while(ss_list[i+2] != ss){i++; ss_y_offset -=h ;}
+    scrolling_vertical_array_t mm_scroller;
+    mm_scroller.array = mm_list;
+    mm_scroller.array_count = mm_count;
+    mm_scroller.num_active_item = 5;
+    mm_scroller.item_h = mm_frame.h;
+    mm_scroller.frame_x = mm_frame.x;
+    mm_scroller.frame_y = mm_frame.y;
+    mm_scroller.frame_w = mm_frame.w;
+    mm_scroller.frame_h = mm_scroller.num_active_item * mm_scroller.item_h;
+    mm_scroller.y_offset = 0;
+    mm_scroller.index = find_index(mm_list, mm_count, mm);
+    mm_scroller.tag_val = mm_tag;
+    mm_scroller.title = mm_text;
+    mm_scroller.velocity = 0;
+    mm_scroller.font_list = fonts;
+    mm_scroller.index = index_max_min(mm_scroller.index, mm_scroller.array_count, mm_scroller.num_active_item);
+
+    scrolling_vertical_array_t dd_scroller;
+    dd_scroller.array = dd_list;
+    dd_scroller.array_count = dd_count;
+    dd_scroller.num_active_item = 5;
+    dd_scroller.item_h = dd_frame.h;
+    dd_scroller.frame_x = dd_frame.x;
+    dd_scroller.frame_y = dd_frame.y;
+    dd_scroller.frame_w = dd_frame.w;
+    dd_scroller.frame_h = dd_scroller.num_active_item * dd_scroller.item_h;
+    dd_scroller.y_offset = 0;
+    dd_scroller.index = find_index(dd_list, dd_count, dd);
+    dd_scroller.tag_val = dd_tag;
+    dd_scroller.title = dd_text;
+    dd_scroller.velocity = 0;
+    dd_scroller.font_list = fonts;
+    dd_scroller.index = index_max_min(dd_scroller.index, dd_scroller.array_count, dd_scroller.num_active_item);
+
+    scrolling_vertical_array_t hh_scroller;
+    hh_scroller.array = hh_list;
+    hh_scroller.array_count = hh_count;
+    hh_scroller.num_active_item = 5;
+    hh_scroller.item_h = hh_frame.h;
+    hh_scroller.frame_x = hh_frame.x;
+    hh_scroller.frame_y = hh_frame.y;
+    hh_scroller.frame_w = hh_frame.w;
+    hh_scroller.frame_h = hh_scroller.num_active_item * hh_scroller.item_h;
+    hh_scroller.y_offset = 0;
+    hh_scroller.index = find_index(hh_list, hh_count, hh);
+    hh_scroller.tag_val = hh_tag;
+    hh_scroller.title = hh_text;
+    hh_scroller.velocity = 0;
+    hh_scroller.font_list = fonts;
+    hh_scroller.index = index_max_min(hh_scroller.index, hh_scroller.array_count, hh_scroller.num_active_item);
+
+    scrolling_vertical_array_t mt_scroller;
+    mt_scroller.array = mt_list;
+    mt_scroller.array_count = mt_count;
+    mt_scroller.num_active_item = 5;
+    mt_scroller.item_h = mt_frame.h;
+    mt_scroller.frame_x = mt_frame.x;
+    mt_scroller.frame_y = mt_frame.y;
+    mt_scroller.frame_w = mt_frame.w;
+    mt_scroller.frame_h = mt_scroller.num_active_item * mt_scroller.item_h;
+    mt_scroller.y_offset = 0;
+    mt_scroller.index = find_index(mt_list, mt_count, mt);
+    mt_scroller.tag_val = mt_tag;
+    mt_scroller.title = mt_text;
+    mt_scroller.velocity = 0;
+    mt_scroller.font_list = fonts;
+    mt_scroller.index = index_max_min(mt_scroller.index, mt_scroller.array_count, mt_scroller.num_active_item);
+
+    scrolling_vertical_array_t ss_scroller;
+    ss_scroller.array = ss_list;
+    ss_scroller.array_count = ss_count;
+    ss_scroller.num_active_item = 5;
+    ss_scroller.item_h = ss_frame.h;
+    ss_scroller.frame_x = ss_frame.x;
+    ss_scroller.frame_y = ss_frame.y;
+    ss_scroller.frame_w = ss_frame.w;
+    ss_scroller.frame_h = ss_scroller.num_active_item * ss_scroller.item_h;
+    ss_scroller.y_offset = 0;
+    ss_scroller.index = find_index(ss_list, ss_count, ss);
+    ss_scroller.tag_val = ss_tag;
+    ss_scroller.title = ss_text;
+    ss_scroller.velocity = 0;
+    ss_scroller.font_list = fonts;
+    ss_scroller.index = index_max_min(ss_scroller.index, ss_scroller.array_count, ss_scroller.num_active_item);
 
     while (1) {
-        Display_Start(phost);
-        EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(EVE_VERTEX_FORMAT));
-
-        Gesture_Touch_t* ges = utils_gestureRenew(phost);
-        if(ges->tagPressed >= dd_tag && ges->tagPressed <= ss_tag) {
-            if (tag_selected == dd_tag) { dd_y_offset -= dd_y_fineturn * (dd_y_offset % dd_frame.h); }
-            if (tag_selected == mm_tag) { mm_y_offset -= mm_y_fineturn * (mm_y_offset % mm_frame.h); }
-            if (tag_selected == yy_tag) { yy_y_offset -= yy_y_fineturn * (yy_y_offset % yy_frame.h); }
-            if (tag_selected == hh_tag) { hh_y_offset -= hh_y_fineturn * (hh_y_offset % hh_frame.h); }
-            if (tag_selected == mt_tag) { mt_y_offset -= mt_y_fineturn * (mt_y_offset % mt_frame.h); }
-            if (tag_selected == ss_tag) { ss_y_offset -= ss_y_fineturn * (ss_y_offset % ss_frame.h);}
-            tag_selected = ges->tagPressed;
-        }
-
-        // swift distance
-        if (ges->tagPressed == dd_tag) { dd_y_swift = ges->distanceY; }
-        if (ges->tagPressed == mm_tag) { mm_y_swift = ges->distanceY; }
-        if (ges->tagPressed == yy_tag) { yy_y_swift = ges->distanceY; }
-        if (ges->tagPressed == hh_tag) { hh_y_swift = ges->distanceY; }
-        if (ges->tagPressed == mt_tag) { mt_y_swift = ges->distanceY; }
-        if (ges->tagPressed == ss_tag) { ss_y_swift = ges->distanceY;}
-        if (ges->tagReleased == dd_tag) {dd_y_offset += dd_y_swift;dd_y_swift = 0;}
-        if (ges->tagReleased == mm_tag) {mm_y_offset += mm_y_swift;mm_y_swift = 0;}
-        if (ges->tagReleased == yy_tag) {yy_y_offset += yy_y_swift;yy_y_swift = 0;}
-        if (ges->tagReleased == hh_tag) {hh_y_offset += hh_y_swift;hh_y_swift = 0;}
-        if (ges->tagReleased == mt_tag) {mt_y_offset += mt_y_swift;mt_y_swift = 0;}
-        if (ges->tagReleased == ss_tag) {ss_y_offset += ss_y_swift;ss_y_swift = 0;}
-
-        // scroll distance
-        if (ges->velocityY != 0) { // scrolling, also set fineturn=-1 or 1
-            if (tag_selected == dd_tag) {dd_y_scroll = -ges->velocityY_total / velocicty_div;dd_y_fineturn = 1 | (ges->velocityY >> 31);}
-            if (tag_selected == mm_tag) {mm_y_scroll = -ges->velocityY_total / velocicty_div;mm_y_fineturn = 1 | (ges->velocityY >> 31);}
-            if (tag_selected == yy_tag) {yy_y_scroll = -ges->velocityY_total / velocicty_div;yy_y_fineturn = 1 | (ges->velocityY >> 31);}
-            if (tag_selected == hh_tag) {hh_y_scroll = -ges->velocityY_total / velocicty_div;hh_y_fineturn = 1 | (ges->velocityY >> 31);}
-            if (tag_selected == mt_tag) {mt_y_scroll = -ges->velocityY_total / velocicty_div;mt_y_fineturn = 1 | (ges->velocityY >> 31);}
-            if (tag_selected == ss_tag) {ss_y_scroll = -ges->velocityY_total / velocicty_div;ss_y_fineturn = 1 | (ges->velocityY >> 31);}
-        }
-        else { // scrolling fineturn
-            dd_y_offset += dd_y_scroll;dd_y_scroll = 0;int dd_y_remain = dd_y_offset % dd_frame.h;if (dd_y_remain != 0) {dd_y_offset -= dd_y_fineturn;}
-            mm_y_offset += mm_y_scroll;mm_y_scroll = 0;int mm_y_remain = mm_y_offset % mm_frame.h;if (mm_y_remain != 0) {mm_y_offset -= mm_y_fineturn;}
-            yy_y_offset += yy_y_scroll;yy_y_scroll = 0;int yy_y_remain = yy_y_offset % yy_frame.h;if (yy_y_remain != 0) {yy_y_offset -= yy_y_fineturn;}
-            hh_y_offset += hh_y_scroll;hh_y_scroll = 0;int hh_y_remain = hh_y_offset % hh_frame.h;if (hh_y_remain != 0) {hh_y_offset -= hh_y_fineturn;}
-            mt_y_offset += mt_y_scroll;mt_y_scroll = 0;int mt_y_remain = mt_y_offset % mt_frame.h;if (mt_y_remain != 0) {mt_y_offset -= mt_y_fineturn;}
-            ss_y_offset += ss_y_scroll;ss_y_scroll = 0;int ss_y_remain = ss_y_offset % ss_frame.h;if (ss_y_remain != 0) {ss_y_offset -= ss_y_fineturn;}
-        }
-
+        Gesture_Touch_t* ges = utils_gestureRenew(s_pHalContext);
         if (ges->tagReleased == tag_btn_ok) {
             init_datetime(dd, mm, yy, hh, mt, ss, 0);
             return;
@@ -258,47 +410,37 @@ void dateime_adjustment(EVE_HalContext* phost) {
             return;
         }
 
-        DRAW_BOX_BORDER(box_datetime, 0x00FFFFFF, 2, 0x00000000 );
+        Display_Start(s_pHalContext);
+        EVE_Cmd_wr32(s_pHalContext, VERTEX_FORMAT(EVE_VERTEX_FORMAT));
+
+        DRAW_BOX_BORDER(box_datetime, 0x00FFFFFF, 2, 0x00000000);
         EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-        EVE_CoCmd_text(phost, box_datetime.x + box_datetime.w / 2, box_datetime.y + 30, 31, OPT_CENTERX, "Select the date time");
-        EVE_CoCmd_text(phost, dd_frame.x + dd_frame.w / 2, dd_frame.y - 30, 28, OPT_CENTERX, dd_text);
-        EVE_CoCmd_text(phost, mm_frame.x + mm_frame.w / 2, mm_frame.y - 30, 28, OPT_CENTERX, mm_text);
-        EVE_CoCmd_text(phost, yy_frame.x + yy_frame.w / 2, yy_frame.y - 30, 28, OPT_CENTERX, yy_text);
-        EVE_CoCmd_text(phost, hh_frame.x + hh_frame.w / 2, hh_frame.y - 30, 28, OPT_CENTERX, hh_text);
-        EVE_CoCmd_text(phost, mt_frame.x + mt_frame.w / 2, mt_frame.y - 30, 28, OPT_CENTERX, mt_text);
-        EVE_CoCmd_text(phost, ss_frame.x + ss_frame.w / 2, ss_frame.y - 30, 28, OPT_CENTERX, ss_text);
-        
+        EVE_CoCmd_text(s_pHalContext, box_datetime.x + box_datetime.w / 2, box_datetime.y + 30, 31, OPT_CENTERX, "Select the date time");
+
         int btn_w = 100, btn_distance = 20;
         int btn_x = (box_datetime.x + box_datetime.w / 2) - (btn_w * 2 + btn_distance) / 2; // x start of the 2 buttons center screen
         int btn_y = ss_frame.y + ss_frame.h * 5 + 10;
         EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
         EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
         EVE_Cmd_wr32(s_pHalContext, TAG(tag_btn_ok));
-        EVE_CoCmd_button(phost, btn_x, btn_y, btn_w, 30, 28, 0, "Ok");
+        EVE_CoCmd_button(s_pHalContext, btn_x, btn_y, btn_w, 30, 28, 0, "Ok");
         EVE_Cmd_wr32(s_pHalContext, TAG(tag_btn_cancel));
-        EVE_CoCmd_button(phost, btn_x + btn_w + btn_distance, btn_y, btn_w, 30, 28, 0, "Cancel");
+        EVE_CoCmd_button(s_pHalContext, btn_x + btn_w + btn_distance, btn_y, btn_w, 30, 28, 0, "Cancel");
         EVE_Cmd_wr32(s_pHalContext, TAG(tag_btn_cancel));
-        EVE_CoCmd_button(phost, box_datetime.x + 5, box_datetime.y + 5, 80, 30, 28, 0, "Back");
+        EVE_CoCmd_button(s_pHalContext, box_datetime.x + 5, box_datetime.y + 5, 80, 30, 28, 0, "Back");
 
-        // fix boundary
-        dd_y_offset = max(min(dd_y_offset + dd_y_swift + dd_y_scroll, dd_frame.h * 2), -dd_frame.h * (dd_count - 3)) - dd_y_swift - dd_y_scroll; // 3 is number of items when scoll to end
-        mm_y_offset = max(min(mm_y_offset + mm_y_swift + mm_y_scroll, mm_frame.h * 2), -mm_frame.h * (mm_count - 3)) - mm_y_swift - mm_y_scroll;
-        yy_y_offset = max(min(yy_y_offset + yy_y_swift + yy_y_scroll, yy_frame.h * 2), -yy_frame.h * (yy_count - 3)) - yy_y_swift - yy_y_scroll;
-        hh_y_offset = max(min(hh_y_offset + hh_y_swift + hh_y_scroll, hh_frame.h * 2), -hh_frame.h * (hh_count - 3)) - hh_y_swift - hh_y_scroll;
-        mt_y_offset = max(min(mt_y_offset + mt_y_swift + mt_y_scroll, mt_frame.h * 2), -mt_frame.h * (mt_count - 3)) - mt_y_swift - mt_y_scroll;
-        ss_y_offset = max(min(ss_y_offset + ss_y_swift + ss_y_scroll, ss_frame.h * 2), -ss_frame.h * (ss_count - 3)) - ss_y_swift - ss_y_scroll;
+        yy=scrollable_list(&yy_scroller);
+        mm=scrollable_list(&mm_scroller);
+        dd=scrollable_list(&dd_scroller);
         
-        dd = draw_selection(phost, dd_list, dd_count, dd_y_offset + dd_y_swift + dd_y_scroll, dd_frame, dd_tag);
-        mm = draw_selection(phost, mm_list, mm_count, mm_y_offset + mm_y_swift + mm_y_scroll, mm_frame, mm_tag);
-        yy = draw_selection(phost, yy_list, yy_count, yy_y_offset + yy_y_swift + yy_y_scroll, yy_frame, yy_tag);
-        hh = draw_selection(phost, hh_list, hh_count, hh_y_offset + hh_y_swift + hh_y_scroll, hh_frame, hh_tag);
-        mt = draw_selection(phost, mt_list, mt_count, mt_y_offset + mt_y_swift + mt_y_scroll, mt_frame, mt_tag);
-        ss = draw_selection(phost, ss_list, ss_count, ss_y_offset + ss_y_swift + ss_y_scroll, ss_frame, ss_tag);
+        hh=scrollable_list(&hh_scroller);
+        mt=scrollable_list(&mt_scroller);
+        ss=scrollable_list(&ss_scroller);
 
         // reset scissor
-        EVE_Cmd_wr32(phost, SCISSOR_XY(0, 0));
-        EVE_Cmd_wr32(phost, SCISSOR_SIZE(2048, 2048));
+        EVE_Cmd_wr32(s_pHalContext, SCISSOR_XY(0, 0));
+        EVE_Cmd_wr32(s_pHalContext, SCISSOR_SIZE(2048, 2048));
 
-        Display_End(phost);
+        Display_End(s_pHalContext);
     }
 }

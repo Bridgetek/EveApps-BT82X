@@ -1,7 +1,7 @@
 {
   "eab version": "2.11.0",
   "input name": [
-    "bt815.blob",
+    "bt817.blob",
     "arial_1_ASTC.glyph",
     "arial_1_ASTC.xfont",
     "arial_2_ASTC.glyph",
@@ -154,7 +154,7 @@
   "compressed": "no",
   "assets": [
     {
-      "asset name": "bt815.blob",
+      "asset name": "bt817.blob",
       "id": 0,
       "offset": 0,
       "size": 4096,

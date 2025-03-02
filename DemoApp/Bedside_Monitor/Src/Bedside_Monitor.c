@@ -51,13 +51,12 @@ typedef struct {
 }app_font;
 
 app_font font0 = { .xfont = &ARIALNB_88_ASTC_xfont };
-app_font font1 = { .xfont = &arial_38_ASTC_xfont };
 app_font font2 = { .xfont = &arial_25_ASTC_xfont };
-app_font* fonts[] = {&font0, &font1, &font2 };
+app_font* fonts[] = { &font0, &font2 };
 uint32_t zoom_in[] = { 0, 11010112 , 784 + 48}; // structure: address on ramg (set later), address on flash, size
 uint32_t zoom_out[] = { 0, 11010944 , 784 + 48};
 
-int main(int argc, char* argv[])
+int32_t main(int32_t argc, char* argv[])
 {
 	s_pHalContext = &s_halContext;
 	Gpu_Init(s_pHalContext);
@@ -75,6 +74,7 @@ int main(int argc, char* argv[])
 #if !defined(BT8XXEMU_PLATFORM)
 	uint32_t sent = Flash_Init(s_pHalContext, TEST_DIR "ew2025_bedside_monitor_bt81x.bin", "ew2025_bedside_monitor_bt81x.bin", 0);
 #endif
+	FlashHelper_SwitchFullMode(s_pHalContext);
 
 	char* info[] = { "EVE Sample Application",
 					"This sample demonstrate a Beside Monitoring",
@@ -112,12 +112,13 @@ uint8_t month_mode = MONTH_MODE_DIGIT;
 uint8_t time_mode = TIME_MODE_HH_MM;
 
 void load_app_assets(uint32_t ramg_offset) {
+
 	// font addr calculation
-	const uint8_t font_handler_start = 5;
+	const uint8_t font_handler_start = 9;
 	uint32_t num_font = sizeof(fonts) / sizeof(app_font*);
 
 	// prepare the font
-	for (int i = 0; i < num_font; i++) {
+	for (int32_t i = 0; i < num_font; i++) {
 		app_font* f = fonts[i];
 
 		f->flash_addr = f->xfont[F_ADDR];
@@ -128,13 +129,10 @@ void load_app_assets(uint32_t ramg_offset) {
 		ramg_offset = f->xfont_addr + f->xfont_size;
 	
 		// prepare font handler
-		Gpu_CoCmd_Dlstart(s_pHalContext);
-		App_WrCoCmd_Buffer(s_pHalContext, CLEAR(1, 1, 1));
+		Display_Start(s_pHalContext);
 		EVE_CoCmd_flashRead(s_pHalContext, f->xfont_addr, f->flash_addr, f->flash_size);
-		Gpu_CoCmd_SetFont2(s_pHalContext, f->handler, f->xfont_addr, 0);
-		Gpu_CoCmd_Swap(s_pHalContext);
-		App_Flush_Co_Buffer(s_pHalContext);
-		Gpu_Hal_WaitCmdfifo_empty(s_pHalContext);
+		EVE_CoCmd_setFont2(s_pHalContext, f->handler, f->xfont_addr, 0);
+		Display_End(s_pHalContext);
 	}
 
 	// zoom icon
@@ -143,27 +141,43 @@ void load_app_assets(uint32_t ramg_offset) {
 	EVE_CoCmd_flashRead(s_pHalContext, zoom_in[0], zoom_in[1], zoom_in[2]);
 	EVE_CoCmd_flashRead(s_pHalContext, zoom_out[0], zoom_out[1], zoom_out[2]);
 
-	// cahcing the font, only BT817/8, BT82x incompatible
+#define ENABLE_FONT_CACHE 1
+#if ENABLE_FONT_CACHE
+	// caching the font, only BT817/8, BT82x incompatible
 	ramg_offset += zoom_in[2] + zoom_out[2];
 	uint32_t ramg_remain = RAM_G_SIZE - ramg_offset;
-	uint32_t cache_size_per_font = max(16*1024, ALIGN_UP_TO_N(ramg_remain / num_font, 4));
-	for (int i = 0; i < num_font; i++) {
+	uint32_t cache_size_per_font = ramg_remain / num_font;
+	for (int32_t i = 0; i < num_font; i++) {
 		app_font* f = fonts[i];
 		
-		f->cache_addr = ALIGN_UP_TO_N(ramg_offset, 64);
-		f->cache_size = cache_size_per_font;
+		uint32_t cache_size = min(cache_size_per_font, RAM_G_SIZE - ramg_offset);
+		if (cache_size < 16 * 1024) {
+			printf("Warning: RAMG free < 16Kb\n");
+			break;
+		}
+		if (ramg_offset > RAM_G_SIZE) {
+			printf("Warning: RAMG full\n");
+			break;
+		}
+		
+		f->cache_addr = ALIGN_UP_TO_N(ramg_offset, 64); // 64-byte aligned.
+		f->cache_size = ALIGN_UP_TO_N(cache_size, 4); // 4 byte aligned. Must be at least 16 Kbytes.
+
+		Display_Start(s_pHalContext);
 		EVE_CoCmd_fontCache(s_pHalContext, f->handler, f->cache_addr, f->cache_size);
-		ramg_offset = f->cache_addr + cache_size_per_font;
+		Display_End(s_pHalContext);
+		ramg_offset = f->cache_addr + f->cache_size;
 	}
+#endif
 }
 
 void draw_app_window(app_box app_window)
 {
-	int border = 5;
-	int bx = app_window.x;
-	int by = app_window.y;
-	int bw = app_window.w + border;
-	int bh = app_window.h + border;
+	int32_t border = 5;
+	int32_t bx = app_window.x;
+	int32_t by = app_window.y;
+	int32_t bw = app_window.w + border;
+	int32_t bh = app_window.h + border;
 	char border_color[3] = { 134, 134, 134 };
 
 	EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
@@ -207,7 +221,7 @@ void draw_app_window(app_box app_window)
 uint32_t GRAPH_INIT(app_box* box_heartbeat, app_box* box_pleth, app_box* box_co2);
 void GRAPH_DRAW();
 
-int g_graph_zoom_lv = 3;
+int32_t g_graph_zoom_lv = 3;
 
 app_box box_menu_top;
 app_box box_ecg;
@@ -270,6 +284,9 @@ void process_event() {
 	if (ges->distanceX > 300) { // 300 pixels
 		is_datetime_setting_active = 1;
 		dateime_adjustment(s_pHalContext);
+		//reset graph
+		graph_size_ramg = GRAPH_INIT(&box_graph_ecg, &box_graph_pth, &box_graph_co2);
+		load_app_assets(graph_size_ramg);
 	}
 }
 
@@ -312,12 +329,12 @@ void draw_grid_by_cocmd(int32_t x, int32_t y, int32_t w, int32_t h, int32_t cell
 }
 
 void draw_grid_box(app_box box_graph) {
-	int x = box_graph.x;
-	int y = box_graph.y;
-	int w = box_graph.w;
-	int h = box_graph.h;
-	int cell_w = 15;
-	int cell_h = 15;
+	int32_t x = box_graph.x;
+	int32_t y = box_graph.y;
+	int32_t w = box_graph.w;
+	int32_t h = box_graph.h;
+	int32_t cell_w = 15;
+	int32_t cell_h = 15;
 	draw_grid_by_cocmd(x, y, w, h, cell_w, cell_h);
 }
 
@@ -338,7 +355,7 @@ void SAMAPP_Bedside_Monitor()
 
 	app_box lcd_size = { 0, 0, s_pHalContext->Width, s_pHalContext->Height, s_pHalContext->Width, s_pHalContext->Height };
 	app_box app_window = INIT_APP_BOX((s_pHalContext->Width - WINDOW_W) / 2, (s_pHalContext->Height - WINDOW_H) / 2, WINDOW_W, WINDOW_H);
-	int graph_start = app_window.x + 35;
+	int32_t graph_start = app_window.x + 35;
 
 	box_menu_top = INIT_APP_BOX(app_window.x, app_window.y, app_window.w * 80 / 100, app_window.h * 8 / 100);
 	box_ecg = INIT_APP_BOX(graph_start, box_menu_top.y_end, box_menu_top.w, app_window.h * 28 / 100);
@@ -346,22 +363,22 @@ void SAMAPP_Bedside_Monitor()
 	box_co2 = INIT_APP_BOX(graph_start, box_pth.y_end, box_menu_top.w, box_ecg.h);
 	box_menu_bottom = INIT_APP_BOX(app_window.x, box_co2.y_end, box_menu_top.w, box_menu_top.h);
 
-	int graph_margin_t = box_ecg.h / 4;
-	int graph_margin_l = box_ecg.w / 40;
-	int graph_margin_r = 5;
-	int graph_margin_b = box_ecg.h / 10;
-	int graph_margin_w = graph_margin_l + graph_margin_r + graph_start;
-	int graph_margin_h = graph_margin_t + graph_margin_b;
+	int32_t graph_margin_t = box_ecg.h / 4;
+	int32_t graph_margin_l = box_ecg.w / 40;
+	int32_t graph_margin_r = 5;
+	int32_t graph_margin_b = box_ecg.h / 10;
+	int32_t graph_margin_w = graph_margin_l + graph_margin_r + graph_start;
+	int32_t graph_margin_h = graph_margin_t + graph_margin_b;
 
 	box_graph_ecg = INIT_APP_BOX(box_ecg.x + graph_margin_l, box_ecg.y + graph_margin_t, box_ecg.w - graph_margin_w, box_ecg.h - graph_margin_h);
 	box_graph_pth = INIT_APP_BOX(box_pth.x + graph_margin_l, box_pth.y + graph_margin_t, box_pth.w - graph_margin_w, box_pth.h - graph_margin_h);
 	box_graph_co2 = INIT_APP_BOX(box_co2.x + graph_margin_l, box_co2.y + graph_margin_t, box_co2.w - graph_margin_w, box_co2.h - graph_margin_h);
 
-	int x = box_menu_top.x_end;
-	int w = app_window.w - box_menu_top.w;
-	int h = (app_window.h - box_menu_top.h - box_menu_bottom.h) / 4;
-	int y = box_menu_top.y_end;
-	int border = 2;
+	int32_t x = box_menu_top.x_end;
+	int32_t w = app_window.w - box_menu_top.w;
+	int32_t h = (app_window.h - box_menu_top.h - box_menu_bottom.h) / 4;
+	int32_t y = box_menu_top.y_end;
+	int32_t border = 2;
 
 	app_box box_right1 = INIT_APP_BOX(x, y + h * 0+1, w, h);
 	app_box box_right2 = INIT_APP_BOX(x, y + h * 1, w, h);
@@ -371,14 +388,14 @@ void SAMAPP_Bedside_Monitor()
 	init_datetime(11, 12, 2024, 9, 11, 0, 0);
 	dateime_adjustment(s_pHalContext); // set date and time at initialize
 
-	int time_start_ms = 0;
-	int val_hr = 66;
-	int val_spo2 = 96;
-	int val_co2 = 22;
-	int val_sys = 156;
-	int val_dias = 93;
+	int32_t time_start_ms = 0;
+	int32_t val_hr = 66;
+	int32_t val_spo2 = 96;
+	int32_t val_co2 = 22;
+	int32_t val_sys = 156;
+	int32_t val_dias = 93;
 
-	static int screenshot_counter = 0;
+	static int32_t screenshot_counter = 0;
 
 	graph_size_ramg = GRAPH_INIT(&box_graph_ecg, &box_graph_pth, &box_graph_co2);
 	load_app_assets(graph_size_ramg);
@@ -407,14 +424,15 @@ void SAMAPP_Bedside_Monitor()
 
 		GRAPH_DRAW();
 
+#define COLOR_CODE_WINDOW_BAR COLOR_RGB(0, 120, 215)
 		// Top menu box
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(43, 132, 135));
+		EVE_Cmd_wr32(s_pHalContext, COLOR_CODE_WINDOW_BAR);
 		DRAW_BOX(box_menu_top);
 		// Bottom menu box
 		DRAW_BOX(box_menu_bottom);
 
-		int graph_border = 3;
-		int brace_y = box_ecg.h / 7, brace_w = 5, brace_h = box_ecg.h * 4 / 5;
+		int32_t graph_border = 3;
+		int32_t brace_y = box_ecg.h / 7, brace_w = 5, brace_h = box_ecg.h * 4 / 5;
 
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		// Graph ECG braces outside
@@ -432,12 +450,11 @@ void SAMAPP_Bedside_Monitor()
 		// Graph co2 braces inside
 		DRAW_RECT(box_co2.x + graph_border, box_co2.y + brace_y + border, brace_w, brace_h - border * 2);
 
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(43, 132, 135));
+		EVE_Cmd_wr32(s_pHalContext, COLOR_CODE_WINDOW_BAR);
 		// right menu top
 		DRAW_RECT(box_menu_top.x_end, box_menu_top.y, 1280 - box_menu_top.w, box_menu_top.h);
 		// right menu bottom
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(249, 254, 143));
-		DRAW_RECT(box_menu_bottom.x_end, box_menu_bottom.y, 1280 - box_menu_bottom.w, box_menu_bottom.h);
+		DRAW_RECT_BORDER(box_menu_bottom.x_end, box_menu_bottom.y, 1280 - box_menu_bottom.w, box_menu_bottom.h, 0x0078d7, border, 0xffffff);
 
 		// right menu HR
 		DRAW_BOX_BORDER(box_right1, 0x000000, border, 0xffffff);
@@ -449,33 +466,32 @@ void SAMAPP_Bedside_Monitor()
 		DRAW_BOX_BORDER(box_right4, 0x000000, border, 0xffffff);
 
 		//buttons
-		int x = box_menu_top.x;
-		int y = box_menu_top.y_mid;
-		int btn_w = 180;
-		int btn_h = 50;
-		int btn_margin = 50;
-
-		// Record button
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(33, 33, 33));
-		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
-		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + btn_w * 1, box_menu_bottom.y + 7, btn_w, btn_h, 30, OPT_FLAT, "RECORD");
+		int32_t x = box_menu_top.x;
+		int32_t y = box_menu_top.y_mid;
+		int32_t btn_w = 180;
+		int32_t btn_h = 50;
+		int32_t btn_margin = 50;
 
 		// Stop button
-		if (btnStartState == BTN_START_ACTIVE) {
-			EVE_CoCmd_fgColor(s_pHalContext, 0xF3B475);
-		}
+		if (btnStartState == BTN_START_INACTIVE) {
+			EVE_CoCmd_fgColor(s_pHalContext, 0x0078D4);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		}else {
+			EVE_CoCmd_fgColor(s_pHalContext, 0xC2C2C2);
+			EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(53, 53, 53));
+		}
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_START_STOP));
 		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + btn_w * 2 + btn_margin, box_menu_bottom.y + 7, btn_w, btn_h, 30, 0, btnStartTxt);
 		EVE_Cmd_wr32(s_pHalContext, TAG(0));
+		if (btnStartState != BTN_START_ACTIVE) {
+			EVE_CoCmd_fgColor(s_pHalContext, 0xC2C2C2);
+		}
 
-		// NIBP button
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(33, 33, 33));
-		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
+		// Record/NIBP/EXIT button
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(97, 97, 97));
+		EVE_CoCmd_fgColor(s_pHalContext, 0xC2C2C2);
+		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + btn_w * 1, box_menu_bottom.y + 7, btn_w, btn_h, 30, OPT_FLAT, "RECORD");
 		EVE_CoCmd_button(s_pHalContext, box_menu_top.x + btn_w * 3 + btn_margin * 2, box_menu_bottom.y + 7, btn_w, btn_h, 30, OPT_FLAT, "NIBP");
-		
-		// EXIT button
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(33, 33, 33));
 		EVE_CoCmd_button(s_pHalContext, box_right4.x + (box_right4.w/2 - btn_w/2), box_menu_bottom.y + 7, btn_w, btn_h, 30, OPT_FLAT, "EXIT");
 
 #define ENABLE_SHOW_FPS 0
@@ -489,14 +505,14 @@ void SAMAPP_Bedside_Monitor()
 		y = box_menu_top.y_mid;
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 #define ENABLE_FONT_CUSTOM 0
-#if ENABLE_FONT_CUSTOM
-		EVE_CoCmd_text(s_pHalContext, x + 5, y, font1.handler, OPT_CENTERY, "BED");
-		EVE_CoCmd_text(s_pHalContext, x + 155, y, font1.handler, OPT_CENTERY, "no 5");
+#if ENABLE_FONT_CUSTOM 
+		EVE_CoCmd_text(s_pHalContext, x + 5, y, font1.handler, OPT_CENTERY, "Bed");
+		EVE_CoCmd_text(s_pHalContext, x + 155, y, font1.handler, OPT_CENTERY, "No. 5");
 		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, font1.handler, OPT_CENTERY | OPT_RIGHTX, hh_mm());
 		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, font1.handler, OPT_CENTER, dd_mm_yyyy());
 #else
-		EVE_CoCmd_text(s_pHalContext, x + 5, y, FONT_32, OPT_CENTERY, "BED");
-		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "no 5");
+		EVE_CoCmd_text(s_pHalContext, x + 5, y, FONT_32, OPT_CENTERY, "Bed");
+		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "No. 5");
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_TIME_STR));
 		if (time_mode == TIME_MODE_HH_MM) {
 			EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, 31, OPT_CENTERY | OPT_RIGHTX, hh_mm());
@@ -518,35 +534,31 @@ void SAMAPP_Bedside_Monitor()
 #endif
 
 		// zoom level control
-		// app_box zoombox= INIT_APP_BOX(box_menu_top.x + btn_w * 4 + btn_margin * 3, box_menu_bottom.y_mid, 100, 30); // bottom side
-		app_box zoombox= INIT_APP_BOX(box_menu_top.x_end+ (app_window.x_end - box_menu_top.x_end) /2 - 50, box_menu_top.y_mid, 100, 30); // top right side
-
-		EVE_CoCmd_fgColor(s_pHalContext, 0x144344);
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
+		btn_w = 120;
+		btn_h = 40;
+		x = box_menu_top.x_end + (app_window.x_end - box_menu_top.x_end) / 2 - btn_w / 2;
+		y = box_menu_top.y_mid - btn_h / 2;
+		int zoom_icon_wh = 28;
+		int zoom_icon_padding = 5;
+		app_box zoombox= INIT_APP_BOX(x, y, btn_w, btn_h); // top right side
 		EVE_Cmd_wr32(s_pHalContext, TAG(0));
-		EVE_CoCmd_button(s_pHalContext, zoombox.x - zoombox.w / 4, zoombox.y - zoombox.h*3/4, zoombox.w*3/2, zoombox.h*3/2, 28, 0, "");
-
-		//EVE_Cmd_wr32(s_pHalContext, LINE_WIDTH(18*16));
-		// EVE_Cmd_wr32(s_pHalContext, BEGIN(LINES));
-		// EVE_DRAW_AT(zoombox.x, zoombox.y);
-		// EVE_DRAW_AT(zoombox.x_end, zoombox.y);
+		EVE_CoCmd_button(s_pHalContext, zoombox.x, zoombox.y, zoombox.w, zoombox.h, 28, 0, "");
 		EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
-		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_DOWN));
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out[0], COMPRESSED_RGBA_ASTC_4x4_KHR, zoom_icon_wh, zoom_icon_wh);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-		EVE_DRAW_AT(zoombox.x - zoombox.w / 9, zoombox.y- zoombox.h/3);
-		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_UP));
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in[0], COMPRESSED_RGBA_ASTC_4x4_KHR, 28, 28);
+		EVE_DRAW_AT(zoombox.x + zoom_icon_padding, zoombox.y_mid - zoom_icon_wh/2); // 14 is zoom icon height / 2
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in[0], COMPRESSED_RGBA_ASTC_4x4_KHR, zoom_icon_wh, zoom_icon_wh);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
-		EVE_DRAW_AT(zoombox.x_end - zoombox.w / 9, zoombox.y - zoombox.h / 3);
-		//EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_CoCmd_text(s_pHalContext, zoombox.x_mid, zoombox.y_mid - zoombox.h / 3, font2.handler, OPT_FORMAT | OPT_CENTER, "%d", g_graph_zoom_lv);
+		EVE_DRAW_AT(zoombox.x_end - zoom_icon_wh - zoom_icon_padding, zoombox.y_mid - zoom_icon_wh / 2);
+		EVE_CoCmd_text(s_pHalContext, zoombox.x_mid, zoombox.y_mid, font2.handler, OPT_FORMAT | OPT_CENTER, "%d", g_graph_zoom_lv);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_A(0));
+		// transparent touch circle
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_DOWN));
-		DRAW_CIRCLE(zoombox.x, zoombox.y, 40);
+		DRAW_CIRCLE(zoombox.x + zoom_icon_wh /2+ zoom_icon_padding, zoombox.y_mid, 40);
 		EVE_Cmd_wr32(s_pHalContext, TAG(TAG_ZOOM_UP));
-		DRAW_CIRCLE(zoombox.x_end, zoombox.y, 40);
+		DRAW_CIRCLE(zoombox.x_end - zoom_icon_padding, zoombox.y_mid, 40);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_A(255));
 
 		// Graph title text information
@@ -556,8 +568,8 @@ void SAMAPP_Bedside_Monitor()
 		EVE_CoCmd_text(s_pHalContext, box_co2.x + box_co2.w / 100, box_co2.y + box_co2.h / 10, font2.handler, 0, "CO2");
 
 		// create random data change
-		int time_end_ms = EVE_millis();
-		int duration = time_end_ms - time_start_ms;
+		int32_t time_end_ms = EVE_millis();
+		int32_t duration = time_end_ms - time_start_ms;
 		if (duration > (200 + app_random(100) - 50))
 		{
 			if (app_random(10) % 9 == 0)

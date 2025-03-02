@@ -442,7 +442,7 @@ bool Calibration_Show(EVE_HalContext* phost)
 	EVE_CoDl_colorRgb(phost, 0xff, 0xff, 0xff);
 
 	EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
-	result = EVE_CoCmd_calibrate(phost, 0);
+	 result = EVE_CoCmd_calibrate(phost);
 	EVE_Cmd_waitFlush(phost);
 
 	eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
@@ -594,13 +594,13 @@ uint32_t Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
 	if (!isSDcardDetected()) {
 		hintScreen(phost,
 				"Program the correct flash image to ensure EvChargePoint boots up successfully");
-		return;
+		 return 0;
 	} else {
 		/// if SD card is detected, show a dialog on the screen with two options: Yes or No?
 		if (!Show_Diaglog_YesNo(phost, "Flash programming",
 				"Program the flash with the file in " _WHERE "?")) {
 			/// If No, proceeds to boot up
-			return;
+			 return 0;
 		}
 
 		/// If YES, Program the flash with the file in SD card

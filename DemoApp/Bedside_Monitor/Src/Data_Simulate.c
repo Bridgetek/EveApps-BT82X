@@ -156,9 +156,6 @@ int new_data_co2(SIGNALS_DATA_TYPE** data, int* data_size)
 	if (time_start_ms == 0)
 	{
 		time_start_ms = EVE_millis();
-		for (int i = 0; i < sample_total; i++) {
-			// sample_buffer[i] = sample_buffer[i] * multipler / dividor;
-		}
 	}
 
 	int num_samples = read_time_simulate(sample_per_second, time_start_ms);

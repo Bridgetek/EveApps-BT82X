@@ -29,10 +29,10 @@
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));                                                                \
 		EVE_DRAW_AT(x, y);                                                                                        \
 		EVE_DRAW_AT(x + w, y + h);                                                                                \
-		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB((color) & 0xFF, ((color) >> 8) & 0xFF, ((color) >> 16) & 0xFF));    \
+		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(((color) >> 16) & 0xFF, ((color) >> 8) & 0xFF, ((color) & 0xFF)));  \
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(RECTS));                                                                \
 		EVE_DRAW_AT(x + border, y + border);                                                                      \
-		EVE_DRAW_AT(x + w - boder * 2, y + h - boder * 2);                                                        \
+		EVE_DRAW_AT(x + w - border * 2, y + h - border * 2);                                                      \
 	}
 #define DRAW_BOX(box)                              \
 	{                                              \

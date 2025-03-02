@@ -26,7 +26,7 @@
 #define MSG printf
 #define SIGNALS_DATA_TYPE unsigned char 
 
-extern int g_graph_zoom_lv;
+extern int32_t g_graph_zoom_lv;
 #define GRAPH_ZOOM_LV_MAX 8
 
 #define TAG_ZOOM_UP 1
