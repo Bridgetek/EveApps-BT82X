@@ -10,7 +10,6 @@ extern EVE_HalContext* s_pHalContext;
 // Day (1-31)
 static uint32_t dd_list[] = {
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-};int xx[]={
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
 };
@@ -313,7 +312,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     yy_scroller.title = yy_text;
     yy_scroller.velocity = 0;
     yy_scroller.font_list = fonts;
-    yy_scroller.index = index_max_min(yy_scroller.index, yy_scroller.array_count, yy_scroller.num_active_item);
+    yy_scroller.index = index_max_min(yy_scroller.index - yy_scroller.num_active_item / 2, yy_scroller.array_count, yy_scroller.num_active_item);
 
     scrolling_vertical_array_t mm_scroller;
     mm_scroller.array = mm_list;
@@ -330,7 +329,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     mm_scroller.title = mm_text;
     mm_scroller.velocity = 0;
     mm_scroller.font_list = fonts;
-    mm_scroller.index = index_max_min(mm_scroller.index, mm_scroller.array_count, mm_scroller.num_active_item);
+    mm_scroller.index = index_max_min(mm_scroller.index - mm_scroller.num_active_item / 2, mm_scroller.array_count, mm_scroller.num_active_item);
 
     scrolling_vertical_array_t dd_scroller;
     dd_scroller.array = dd_list;
@@ -347,7 +346,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     dd_scroller.title = dd_text;
     dd_scroller.velocity = 0;
     dd_scroller.font_list = fonts;
-    dd_scroller.index = index_max_min(dd_scroller.index, dd_scroller.array_count, dd_scroller.num_active_item);
+    dd_scroller.index = index_max_min(dd_scroller.index - dd_scroller.num_active_item / 2, dd_scroller.array_count, dd_scroller.num_active_item);
 
     scrolling_vertical_array_t hh_scroller;
     hh_scroller.array = hh_list;
@@ -364,7 +363,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     hh_scroller.title = hh_text;
     hh_scroller.velocity = 0;
     hh_scroller.font_list = fonts;
-    hh_scroller.index = index_max_min(hh_scroller.index, hh_scroller.array_count, hh_scroller.num_active_item);
+    hh_scroller.index = index_max_min(hh_scroller.index - hh_scroller.num_active_item / 2, hh_scroller.array_count, hh_scroller.num_active_item);
 
     scrolling_vertical_array_t mt_scroller;
     mt_scroller.array = mt_list;
@@ -381,7 +380,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     mt_scroller.title = mt_text;
     mt_scroller.velocity = 0;
     mt_scroller.font_list = fonts;
-    mt_scroller.index = index_max_min(mt_scroller.index, mt_scroller.array_count, mt_scroller.num_active_item);
+    mt_scroller.index = index_max_min(mt_scroller.index - mt_scroller.num_active_item / 2, mt_scroller.array_count, mt_scroller.num_active_item);
 
     scrolling_vertical_array_t ss_scroller;
     ss_scroller.array = ss_list;
@@ -398,7 +397,7 @@ void dateime_adjustment(EVE_HalContext* phost) {
     ss_scroller.title = ss_text;
     ss_scroller.velocity = 0;
     ss_scroller.font_list = fonts;
-    ss_scroller.index = index_max_min(ss_scroller.index, ss_scroller.array_count, ss_scroller.num_active_item);
+    ss_scroller.index = index_max_min(ss_scroller.index - ss_scroller.num_active_item / 2, ss_scroller.array_count, ss_scroller.num_active_item);
 
     while (1) {
         Gesture_Touch_t* ges = utils_gestureRenew(s_pHalContext);
