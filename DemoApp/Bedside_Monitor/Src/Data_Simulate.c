@@ -24,16 +24,6 @@ int read_time_simulate(int sample_rate, int time_start_ms)
  */
 int new_data_heartbeat(SIGNALS_DATA_TYPE** data, int *data_size)
 {
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	static int ecg_data_test[] = {
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2,															  // P-wave (small bump)
-		0, 2, 4, 6, 8, 6, 4, 2, 0,																  // PR segment (flat)
-		0, 0, 0, 0, 0,																			  // QRS complex (sharp spike)
-		2, 4, 8, 20, 40, 70, 30, 10, 5, 2,														  // ST segment (flat)
-		2, 2, 2, 2, 2, 2, 2,																	  // T-wave (broad bump)
-		2, 4, 6, 10, 14, 16, 14, 10, 6, 4, 2,													  // Baseline (flat)
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // end
-	};
 	int data_duration = 10 * 60; // unit: second
 	int dividor = 2;
 	int multipler = 3;
@@ -77,21 +67,6 @@ int new_data_heartbeat(SIGNALS_DATA_TYPE** data, int *data_size)
  */
 int new_data_pleth(SIGNALS_DATA_TYPE** data, int* data_size)
 {
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	static int pleth_data[] = {
-		0, 6, 12, 18, 30, 42, 60, 78, 102, 126,			     // Cycle 1 - Inhalation
-		150, 174, 192, 210, 228, 240, 252, 264, 270, 276,    // Cycle 1 - Continued Inhalation
-		282, 288, 285, 282, 288, 285, 276, 270, 264, 252,    // Cycle 1 - Peak
-		// 240, 228, 210, 192, 174, 160, 140, 120, 130, 110, // Cycle 1 - Exhalation with fluctuations
-		// 90, 100, 85, 75, 95, 65, 50, 42, 30, 35,		     // Cycle 1 - Continued Exhalation with fluctuations
-		240, 228, 210, 192, 174, 160, 140, 130, 120, 110,    // Cycle 1 - Exhalation no fluctuations
-		100, 85, 75, 65, 50, 42, 35, 30,         		     // Cycle 1 - Continued Exhalation no fluctuations
-		20, 15, 12, 10, 8, 6, 9, 12, 18, 30,			     // Cycle 1 - Trough
-		42, 70, 100, 120, 140, 160, 180, 200, 210, 220,	     // Cycle 2 - Inhalation
-		225, 230, 235, 240, 238, 236, 240, 235, 225, 210,    // Cycle 2 - Peak and decline
-		195, 180, 165, 150, 130, 110, 90, 70, 50, 30,	     // Cycle 2 - Faster Exhalation
-		20, 10, 5, 0, 0, 0, 0, 0, 0, 0					     // Cycle 2 - End
-	};
 	int data_duration = 10*60; // unit: second
 	int dividor = 2;
 	int multipler = 1;
@@ -134,15 +109,6 @@ int new_data_pleth(SIGNALS_DATA_TYPE** data, int* data_size)
  */
 int new_data_co2(SIGNALS_DATA_TYPE** data, int* data_size)
 {
-	// Simulated sinus rhythm data (adjusted to resemble the waveform)
-	static int co2_data_test[] = {												  // 1 second sample
-							30, 45, 60, 75, 90, 105, 120, 135, 150, 165,	  //
-							180, 195, 210, 225, 240, 255, 255, 255, 255, 255, //
-							255, 255, 255, 255, 255, 240, 225, 210, 195, 180, //
-							165, 150, 135, 120, 105, 90, 75, 60, 45, 30,	  //
-							15, 10, 5, 0, 0, 0, 0, 0, 0, 0,					  //
-							0, 0, 0, 0, 0, 5, 10, 15, 15 };
-
 	int data_duration = 10 * 60; // unit: second
 	int dividor = 2;
 	int multipler = 1;

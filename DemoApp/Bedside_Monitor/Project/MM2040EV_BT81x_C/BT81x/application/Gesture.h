@@ -52,6 +52,8 @@
 	 int distance_scroll_X;
 	 int distance_scroll_Y;
  
+	 uint8_t velocityStopRequest;
+ 
 	 Gesture_Finger_t finger[MAX_FINGER];
  } Gesture_Touch_t;
  

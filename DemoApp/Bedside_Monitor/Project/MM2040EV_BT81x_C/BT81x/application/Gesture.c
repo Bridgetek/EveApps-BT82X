@@ -75,6 +75,10 @@ static int Getvelocity_X() {
 
 	if (sGesture.isSwipeX == 1) {
 		velocityX = (dragprev - sGesture.touchX) << speed_level;
+		sGesture.velocityStopRequest = 0;
+	}
+	else if (sGesture.velocityStopRequest) {
+		velocityX = 0;
 	}
 	else if (!sGesture.isTouch) { // no touch
 		int change = MAX(1, abs(velocityX) >> change_level);
@@ -142,6 +146,10 @@ static int Getvelocity_Y() {
 
 	if (sGesture.isSwipeY == 1) {
 		velocityY = (dragprev - sGesture.touchY) << speed_level;
+		sGesture.velocityStopRequest = 0;
+	}
+	else if (sGesture.velocityStopRequest) {
+		velocityY = 0;
 	}
 	else if (!sGesture.isTouch) { // no touch
 		int change = MAX(1, abs(velocityY) >> change_level);
@@ -171,6 +179,7 @@ void stopVelocity() {
 	sGesture.velocityY_total = 0;
 	sGesture.isSwipeY = 0;
 	sGesture.isSwipeX = 0;
+	sGesture.velocityStopRequest = 1;
 }
 
 /**

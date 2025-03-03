@@ -150,16 +150,14 @@ int32_t scrollable_list(scrolling_vertical_array_t *sc) {
     
     if (sc->velocity != 0) {
         const int32_t change_level = 35;
-        const int32_t speed_level = 6;
+        const int32_t speed_level = 9;
         int32_t change = sc->velocity / change_level;
 
         sc->y_offset -= change;
-        sc->velocity = sc->velocity * 9 / 10;
 
         sc->index -= sc->y_offset / sc->item_h;
         sc->y_offset = sc->y_offset % sc->item_h;
 
-        
         int32_t index_max = (sc->array_count - (sc->num_active_item + 1) / 2);
         int32_t index_min = -sc->num_active_item / 2;
         sc->index = index_max_min(sc->index, sc->array_count, sc->num_active_item);
@@ -169,25 +167,17 @@ int32_t scrollable_list(scrolling_vertical_array_t *sc) {
          else
             sc->velocity = sc->velocity * speed_level / 10;
 
+        // move velocity to item boundary
         if (sc->index == index_min) {
-            sc->velocity = 0;
-            sc->y_offset = 0;// sc->item_h - 1;
+            sc->velocity = (sc->velocity < -sc->item_h) ? -sc->item_h : sc->velocity;
         }
         else if (sc->index == index_max) {
-            sc->velocity = 0;
-            sc->y_offset = 0;// -(sc->item_h - 1);
+            sc->velocity = (sc->velocity > sc->item_h) ? sc->item_h : sc->velocity;
         }
     }
     else{ // stopped scoling, adjustment to center
-        if (sc->y_offset > 0) {
-            sc->y_offset--;
-        }
-        else if (sc->y_offset < 0) {
-            sc->y_offset++;
-        }
-
-#define ENABLE_INCREASE_INDEX 0
-#if ENABLE_INCREASE_INDEX
+#define ENABLE_INDEX_ADJUSTMENT_AFTER_SCROLLING 0
+#if ENABLE_INDEX_ADJUSTMENT_AFTER_SCROLLING
         if (sc->y_offset > 0) {
             if (sc->y_offset < sc->item_h / 2) {
                 sc->y_offset--;
@@ -213,6 +203,13 @@ int32_t scrollable_list(scrolling_vertical_array_t *sc) {
                     sc->index = index_max_min(sc->index, sc->array_count, sc->num_active_item);
                 }
             }
+        }
+#else
+        if (sc->y_offset > 0) {
+            sc->y_offset--;
+        }
+        else if (sc->y_offset < 0) {
+            sc->y_offset++;
         }
 #endif
     }

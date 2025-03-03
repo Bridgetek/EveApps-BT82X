@@ -9,9 +9,9 @@ int32_t new_data_pleth(int** data, int* data_size);
 int32_t new_data_co2(int** data, int* data_size);
 
 #define GRAPH_BIT_PER_PIXEL 1 // l1 1 bit per pixel
-#define GRAPH_BIT_PER_LINE (GRAPH_BIT_PER_PIXEL * GRAPH_W) // bbp * width
-#define GRAPH_BYTE_PER_LINE (GRAPH_BIT_PER_LINE / BIT_PER_CHAR)
-#define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR))
+#define GRAPH_BIT_PER_LINE (GRAPH_BIT_PER_PIXEL * GRAPH_W) // bbp * width // 160
+#define GRAPH_BYTE_PER_LINE (GRAPH_BIT_PER_LINE / BIT_PER_CHAR) // 160 / 8
+#define GRAPH_BYTE_PER_BUFFER (GRAPH_H * (GRAPH_BIT_PER_LINE / BIT_PER_CHAR)) // 160 / 8 * 1000 
 #define GRAPH_BUFFER_NUM 3 // display from buffer 1, append to buffer 2, loopback to buffer 0
 #define GRAPH_BUFFER_SIZE (GRAPH_BYTE_PER_BUFFER * GRAPH_BUFFER_NUM)
 
@@ -59,7 +59,7 @@ static void draw_pixel(SIGNALS_DATA_TYPE* buffer, int32_t x, int32_t y, uint32_t
 	return;
 
 err:
-	//printf("Skip a pixel at (%d, %d)\n", x, y);
+	printf("Skip a pixel at (%d, %d)\n", x, y);
 	return;
 }
 
@@ -168,7 +168,10 @@ static void graph_display(app_graph_t* graph) {
 
 static void graph_append_and_display(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int32_t line_count)
 {
-	line_count = min(line_count, graph->w);
+	// skip overflow lines
+	if (line_count > min(line_count, graph->w / g_graph_zoom_lv)) {
+		return;
+	}
 
 	// write data to ramg
 	while (btnStartState == BTN_START_INACTIVE)
