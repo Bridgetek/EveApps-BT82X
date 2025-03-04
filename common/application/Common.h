@@ -75,10 +75,10 @@
 
 #define DDR_FRAMEBUFFER_STARTADDR (72 << 20) /**< from 72M(size : 9M) */
 
-#define MODE_PICTURE        1 /**< 1 */
-#define MODE_DIRECTVIDEO    2 /**< 2 */
-#define MODE_VIDEO          3 /**< 3 */
-#define MODE_LVDSRX         4 /**< 4 */
+#define TESTCASE_PICTURE        1 /**< 1 */
+#define TESTCASE_DIRECTVIDEO    2 /**< 2 */
+#define TESTCASE_VIDEO          3 /**< 3 */
+#define TESTCASE_LVDSRX         4 /**< 4 */
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -86,9 +86,12 @@ void Gpu_Init(EVE_HalContext *phost);
 void Gpu_Release(EVE_HalContext *phost);
 int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value);
 
-bool EVE_Calibrate(EVE_HalContext *phost);
-void Calibration_Restore(EVE_HalContext *phost);
-void Calibration_Save(EVE_HalContext *phost);
+void Calibration_Restore(EVE_HalContext* phost);
+void Calibration_Save(EVE_HalContext* phost);
+bool Calibration_Init(EVE_HalContext* phost, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f);
+bool Calibration_New(EVE_HalContext* phost);
+bool Calibration_Show(EVE_HalContext* phost);
+
 void Display_Start(EVE_HalContext *phost);
 void Display_StartColor(EVE_HalContext* phost, uint8_t* bgColor, uint8_t* textColor);
 void Display_End(EVE_HalContext *phost);
@@ -99,5 +102,7 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext *phost, const uint8_t* title, const ui
 void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
 void Flash_Init(EVE_HalContext *phost, const uint8_t *filePath, const uint8_t *fileName);
 void WelcomeScreen(EVE_HalContext *phost, char *info[]);
-void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode);
+void fadeout(EVE_HalContext *phost);
+void fadein(EVE_HalContext *phost);
+void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t testcase);
 #endif /* COMMON_H_ */

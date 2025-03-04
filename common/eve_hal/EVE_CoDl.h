@@ -155,7 +155,7 @@ inline static void EVE_CoDl_clearColorArgb_ex(EVE_HalContext *phost, uint32_t c)
  * @param phost Pointer to Hal context
  * @param s
  */
-inline static void EVE_CoDl_tag(EVE_HalContext *phost, uint32_t s)
+inline static void EVE_CoDl_tag(EVE_HalContext *phost, uint8_t s)
 {
 	EVE_CoCmd_dl(phost, TAG(s));
 }
@@ -337,7 +337,7 @@ static inline void EVE_CoDl_clearStencil(EVE_HalContext *phost, uint8_t s)
  * @param phost Pointer to Hal context
  * @param s
  */
-static inline void EVE_CoDl_clearTag(EVE_HalContext *phost, uint32_t s)
+static inline void EVE_CoDl_clearTag(EVE_HalContext *phost, uint8_t s)
 {
 	EVE_CoCmd_dl(phost, CLEAR_TAG(s));
 }
