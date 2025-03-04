@@ -36,7 +36,7 @@ int8_t istouch(EVE_HalContext *phost)
 
 // Static variables to store initial date-time
 static int init_dd = 0, init_mm = 0, init_yyyy = 0;
-static int init_hh = 0, init_m = 0, init_ss = 0, init_ms = 0;
+static int init_hh = 0, init_m = 0, init_ss = 0, init_ms = 0, init_eve_millis = 0;
 static int current_dd = 0, current_mm = 0, current_yyyy = 0;
 static int current_hh = 0, current_m = 0;
 static int current_ss = 0, current_ms = 0;
@@ -48,7 +48,7 @@ static int current_ss = 0, current_ms = 0;
 
 // Function to format the date as "dd-mm-yyyy"
 static void dd_mm_yyyy_preset() {
-	unsigned long elapsed_millis = EVE_millis();
+	unsigned long elapsed_millis = EVE_millis() - init_eve_millis;
 	int elapsed_days = elapsed_millis / MILLIS_PER_DAY;
 
 	// Recalculate date if it hasn't been updated yet
@@ -126,7 +126,7 @@ char* dd_month_yyyy() {
 static void hh_mm_preset() {
 // Function to format the time
 	// Calculate total elapsed time
-	unsigned long elapsed_millis = EVE_millis();
+	unsigned long elapsed_millis = EVE_millis()- init_eve_millis;
 	unsigned long total_ms = init_ms + elapsed_millis;
 	unsigned long total_seconds = init_ss + total_ms / MILLIS_PER_SECOND;
 	int total_minutes = init_m + total_seconds / SECONDS_PER_MINUTE;
@@ -165,7 +165,7 @@ char* dd_mm_yyyy_hh_m_ss_ms() {
 	static char fullDateTimeString[30]; // Buffer for "dd-mm-yyyy hh:mm:ss:ms"
 
 	// Calculate total elapsed time
-	unsigned long elapsed_millis = EVE_millis();
+	unsigned long elapsed_millis = EVE_millis()- init_eve_millis;
 	unsigned long total_ms = init_ms + elapsed_millis;
 	unsigned long total_seconds = init_ss + total_ms / MILLIS_PER_SECOND;
 
@@ -195,6 +195,8 @@ void init_datetime(int dd, int mm, int yyyy, int hh, int m, int ss, int ms) {
 	current_dd = dd; current_mm = mm; current_yyyy = yyyy;
 	current_hh = hh; current_m = m;
 	current_ss = ss; current_ms = ms;
+
+	init_eve_millis = EVE_millis();
 }
 
 uint32_t get_dd() {
@@ -224,8 +226,6 @@ uint32_t get_ss() {
 uint32_t get_ms() {
 	return current_ms;
 }
-
-
 
 int app_random(int range)
 {
