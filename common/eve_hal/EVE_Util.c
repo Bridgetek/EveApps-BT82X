@@ -376,7 +376,7 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		boot_cfg.audio = 1;
 		boot_cfg.watchdog = 1;
 		boot_cfg.source = 0;
-		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg); // REG_BOOT_CONTROL settings: DDR(0) touch(1) AUD(1) WD(0) reserved source(0)
+		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg);
 		ddr_type.speed = 0; //1333
 		ddr_type.type = 1;
 		ddr_type.size = EVE_DDR_SIZE;

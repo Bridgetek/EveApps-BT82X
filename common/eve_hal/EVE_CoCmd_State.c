@@ -125,7 +125,7 @@ void EVE_CoCmd_fillWidth(EVE_HalContext *phost, uint32_t s)
 
 bool EVE_CoCmd_bitmapTransform(EVE_HalContext *phost, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t tx0, int32_t ty0, int32_t tx1, int32_t ty1, int32_t tx2, int32_t ty2, uint16_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_BITMAP_TRANSFORM, 0))

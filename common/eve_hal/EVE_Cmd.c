@@ -365,9 +365,9 @@ bool EVE_Cmd_wr32(EVE_HalContext *phost, uint32_t value)
  * 
  * @param phost Pointer to Hal context
  * @param bytes Number of bytes to move
- * @return uint16_t Previous write pointer
+ * @return uint32_t Previous write pointer
  */
-uint16_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes)
+uint32_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes)
 {
 	uint32_t wp;
 	uint32_t prevWp;

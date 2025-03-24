@@ -165,7 +165,7 @@ uint32_t EVE_CoCmd_flashAttach(EVE_HalContext *phost)
 
 uint32_t EVE_CoCmd_flashFast(EVE_HalContext *phost, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 	uint32_t flashStatus;
 
 	if (!EVE_Cmd_waitFlush(phost))
@@ -311,7 +311,7 @@ void EVE_CoCmd_runAnim(EVE_HalContext *phost, uint32_t waitmask, uint32_t play)
 
 bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_MEMCRC, 0))
@@ -337,7 +337,7 @@ bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_
 
 bool EVE_CoCmd_regRead(EVE_HalContext *phost, uint32_t ptr, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_REGREAD, 0))
@@ -380,7 +380,7 @@ bool EVE_CoCmd_inflate_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_
 
 bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPTR, 0))
@@ -426,7 +426,7 @@ bool EVE_CoCmd_loadImage_progMem(EVE_HalContext *phost, uint32_t dst, eve_progme
 
 bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint32_t *h)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPROPS, 0))
@@ -455,7 +455,7 @@ bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint3
 
 bool EVE_CoCmd_getImage(EVE_HalContext *phost, uint32_t *source, uint32_t *fmt, uint32_t *w, uint32_t *h, uint32_t *palette)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETIMAGE, 0))

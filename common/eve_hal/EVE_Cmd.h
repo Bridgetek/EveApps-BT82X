@@ -109,7 +109,7 @@ bool EVE_Cmd_wr32(EVE_HalContext *phost, uint32_t value);
 
 /* Move the write pointer forward by the specified number of bytes. 
 Returns the previous write pointer */
-uint16_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes);
+uint32_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes);
 
 /** Wait for the command buffer to fully empty. 
 Returns false in case a coprocessor fault occurred */
