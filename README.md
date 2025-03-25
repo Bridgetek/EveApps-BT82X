@@ -55,25 +55,30 @@ Go to property
 
 Change settings (EVE_PLATFORM_FT4222 / EVE_PLATFORM_MPSSE)
 
-![setting](https://github.com/user-attachments/assets/9ea058a0-e7a5-497c-a7da-cb71f9b23cb0)
+![image](https://github.com/user-attachments/assets/9dd29dea-abd3-4a09-a5f6-31b4f318d41a)
 
 press F5 to build and run
 
 #### Way 2: Use Cmake: (Need Cmake 3.19 installed)
 ```sh
 #Launch the Developer Command Prompt for VS
-cd X:\source\EveApps
+cd [path to EveApps]
 mkdir build
 cd build
-cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] ..
+cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] -DEVE_APPS_DISPLAY=[EVE display] -DEVE_APPS_SPI=[EVE SPI] -DCMAKE_BUILD_TYPE=Debug ..
 nmake [Project name]
 
 # EVE_APPS_PLATFORM can be FT4222 or MPSSE
 # [EVE graphics] can be BT820
+# [EVE display] can be WUXGA
+# [EVE SPI] can be EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE
 # [Project name] is the folder name of a subfolder inside SampleApp
+# The artifact [Project name].exe built can be found in build\deploy\[Project name]\executable\1\2
 ```
 
 example: 
-![image](https://github.com/user-attachments/assets/93515ee2-33c7-4b45-9c88-42c2b2949860)
+![image](https://github.com/user-attachments/assets/d1d4b27c-8634-44d4-a0db-1efed9333bd4)
 
-![image](https://github.com/user-attachments/assets/a7d0cc56-bd20-4baa-93d7-84a02bcceb1f)
+![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
+
+
