@@ -44,7 +44,7 @@
 ** MARCOS **
 ***********/
 
-#define RAM_ERR_REPORT_MAX 128
+#define RAM_REPORT_MAX 128
 
 /*************
 ** TYPEDEFS **
@@ -276,7 +276,7 @@ typedef struct EVE_HalContext
 
 #if defined(_DEBUG)
 	bool DebugMessageVisible;
-	uint8_t DebugBackup[RAM_ERR_REPORT_MAX];
+	uint8_t DebugBackup[RAM_REPORT_MAX];
 #endif
 
 	/** @name Status flags */

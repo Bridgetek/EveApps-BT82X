@@ -635,7 +635,7 @@ void debugBackupRamG(EVE_HalContext *phost)
 {
 	if (!phost->DebugMessageVisible)
 	{
-		EVE_Hal_rdMem(phost, phost->DebugBackup, RAM_ERR_REPORT + RAM_ERR_REPORT_MAX - sizeof(phost->DebugBackup), sizeof(phost->DebugBackup));
+		EVE_Hal_rdMem(phost, phost->DebugBackup, RAM_REPORT + RAM_REPORT_MAX - sizeof(phost->DebugBackup), sizeof(phost->DebugBackup));
 		phost->DebugMessageVisible = true;
 	}
 }
@@ -648,7 +648,7 @@ static void debugRestoreRamG(EVE_HalContext *phost)
 {
 	if (phost->DebugMessageVisible)
 	{
-		EVE_Hal_wrMem(phost, RAM_ERR_REPORT + RAM_ERR_REPORT_MAX - sizeof(phost->DebugBackup), phost->DebugBackup, sizeof(phost->DebugBackup));
+		EVE_Hal_wrMem(phost, RAM_REPORT + RAM_REPORT_MAX - sizeof(phost->DebugBackup), phost->DebugBackup, sizeof(phost->DebugBackup));
 		phost->DebugMessageVisible = false;
 	}
 }

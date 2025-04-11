@@ -124,12 +124,6 @@ void EVE_CoCmd_coldStart(EVE_HalContext *phost);
 void EVE_CoCmd_sync(EVE_HalContext *phost);
 
 /**
- * @brief Send CMD_CLEARCACHE
- *
- * @param phost Pointer to Hal context
- */
-void EVE_CoCmd_clearCache(EVE_HalContext *phost);
-/**
  * @brief Send CMD_NOP
  *
  * @param phost Pointer to Hal context

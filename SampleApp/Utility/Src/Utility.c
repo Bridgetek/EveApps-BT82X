@@ -90,7 +90,7 @@ void helperCoprocessorFaultReport()
     uint32_t val = 0;
     if ((EVE_CoCmd_regRead(s_pHalContext, REG_CMD_READ, &val)) && (val == 0x3fff)) //Fault reported
     {
-        EVE_Hal_rdMem(s_pHalContext, DiagMessage, RAM_ERR_REPORT, RAM_ERR_REPORT_MAX);
+        EVE_Hal_rdMem(s_pHalContext, DiagMessage, RAM_REPORT, RAM_REPORT_MAX);
         eve_printf_debug("%s\n", DiagMessage);
         DiagMessage[0] = '\0'; //Reset message
     }

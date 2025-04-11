@@ -410,7 +410,7 @@ static bool checkWait(EVE_HalContext *phost, uint16_t rpOrSpace)
 		{
 			eve_printf_debug("Coprocessor fault\n");
 			debugBackupRamG(phost);
-			EVE_Hal_rdMem(phost, (uint8_t *)err, RAM_ERR_REPORT, RAM_ERR_REPORT_MAX);
+			EVE_Hal_rdMem(phost, (uint8_t *)err, RAM_REPORT, RAM_REPORT_MAX);
 			eve_printf_debug("%s\n", err);
 		}
 #endif

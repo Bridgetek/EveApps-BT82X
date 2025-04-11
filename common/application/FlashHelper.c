@@ -173,19 +173,6 @@ uint8_t FlashHelper_GetState(EVE_HalContext* phost)
 }
 
 /**
- * @brief Clears the graphics system's flash cache. It should be executed after modifying graphics data in flash, otherwise bitmaps from flash may render "stale" data.
- * This command must be executed when the display list is in use, immediately after a CMD SWAP command.
- *
- * @param phost Pointer to Hal context
- * @return ft_void_t
- */
-void FlashHelper_ClearCache(EVE_HalContext* phost)
-{
-	EVE_CoCmd_clearCache(phost);
-	EVE_Cmd_waitFlush(phost);
-}
-
-/**
  * @brief Write data to flash. Constraints:
  * - Destination flash address must be virgin (not used before)
  * - data array must be aligned 256-bit

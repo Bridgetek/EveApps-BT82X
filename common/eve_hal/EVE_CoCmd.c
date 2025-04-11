@@ -257,11 +257,6 @@ void EVE_CoCmd_sync(EVE_HalContext *phost)
 	EVE_CoCmd_d(phost, CMD_SYNC);
 }
 
-void EVE_CoCmd_clearCache(EVE_HalContext *phost)
-{
-	EVE_CoCmd_d(phost, CMD_CLEARCACHE);
-}
-
 void EVE_CoCmd_nop(EVE_HalContext *phost)
 {
 	EVE_CoCmd_d(phost, CMD_NOP);
