@@ -505,7 +505,6 @@
 /**< @name for REG_DLSWAP */
 ///@{
 #define DLSWAP_DONE       0UL
-#define DLSWAP_LINE       1UL
 #define DLSWAP_FRAME      2UL
 ///@}
 
