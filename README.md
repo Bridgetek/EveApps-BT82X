@@ -66,14 +66,17 @@ cd [path to EveApps]
 mkdir build
 cd build
 cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] -DEVE_APPS_DISPLAY=[EVE display] -DEVE_APPS_SPI=[EVE SPI] -DCMAKE_BUILD_TYPE=Debug ..
-nmake [Project name]
+nmake SampleApp_[Project Name]
 
-# EVE_APPS_PLATFORM can be FT4222 or MPSSE
-# [EVE graphics] can be BT820
-# [EVE display] can be WUXGA
-# [EVE SPI] can be EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE
-# [Project name] is the folder name of a subfolder inside SampleApp
-# The artifact [Project name].exe built can be found in build\deploy\[Project name]\executable\1\2
+# EVE_APPS_PLATFORM can be one of : EVE_PLATFORM_FT4222 or EVE_PLATFORM_MPSSE
+# [EVE graphics] must be : EVE_GRAPHICS_BT820
+# [EVE display] must be:  EVE_DISPLAY_WUXGA   (1920x1200 LCD)
+# [EVE SPI] can be one of : EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE  (FT4222 can support Quad/Dual/Single, MPSSE supports single only)
+# [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
+# The output binary [Project Name].exe  can be found in build\[Project Name]
+
+One example is :
+cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
 example: 
