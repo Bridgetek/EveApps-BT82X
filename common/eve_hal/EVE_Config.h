@@ -85,7 +85,7 @@ Additionally, the following support flags are set:
 
 #if defined(EVE_PLATFORM_BT8XXEMU)                                 \
     || defined(EVE_PLATFORM_FT4222) || defined(EVE_PLATFORM_MPSSE) \
-    || defined(EVE_PLATFORM_RP2040)
+    || defined(EVE_PLATFORM_RP2040) || defined(EVE_PLATFORM_MM2040EV)
 #define EVE_PLATFORM_AVAILABLE
 #endif
 
@@ -170,6 +170,13 @@ These may only be set by one of the platform target definitions, and should not 
 #define MSVC_PLATFORM
 #define EVE_HOST EVE_HOST_MPSSE
 
+#elif defined(EVE_PLATFORM_RP2040) || defined(EVE_PLATFORM_MM2040EV)
+#define RP2040_PLATFORM
+#endif
+
+#if defined(RP2040_PLATFORM)
+#define EMBEDDED_PLATFORM
+#define EVE_HOST EVE_HOST_EMBEDDED
 #endif
 
 #define EVE_CONFIG__STR(x) #x
@@ -178,6 +185,7 @@ These may only be set by one of the platform target definitions, and should not 
 
 #if defined(FT4222_PLATFORM)   \
     || defined(MPSSE_PLATFORM)    \
+    || defined(RP2040_PLATFORM)    \
     || defined(BT8XXEMU_PLATFORM)
 #define EVE_PLATFORM_AVAILABLE
 #endif
@@ -264,7 +272,26 @@ typedef char eve_tchar_t;
 #if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
 #define EVE_BUFFER_WRITES
 #endif
+/* Enable FatFS by default on supported platforms */
+#if defined(FT9XX_PLATFORM) || defined(RP2040_PLATFORM)
+#ifndef EVE_ENABLE_FATFS
+#define EVE_ENABLE_FATFS 1
+#endif
+#endif
 
+#ifndef EVE_ENABLE_FATFS
+#define EVE_ENABLE_FATFS 0
+#endif
+
+/* Remove unsupported options */
+#ifdef RP2040_PLATFORM
+#ifdef ENABLE_SPI_QUAD
+#undef ENABLE_SPI_QUAD
+#endif
+#ifdef ENABLE_SPI_DUAL
+#undef ENABLE_SPI_DUAL
+#endif
+#endif
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -280,7 +307,8 @@ typedef char eve_tchar_t;
 #endif
 #if ((defined(FT4222_PLATFORM) ? 1 : 0)   \
     + (defined(MPSSE_PLATFORM) ? 1 : 0)    \
-    + (defined(BT8XXEMU_PLATFORM) ? 1 : 0)) \
+    + (defined(BT8XXEMU_PLATFORM) ? 1 : 0) \
+    + (defined(RP2040_PLATFORM) ? 1 : 0))  \
     > 1
 #pragma message(__FILE__ "(" EVE_CONFIG_STR(__LINE__) "): warning PLATFORM: " \
                                                       "More than one platform has been selected")

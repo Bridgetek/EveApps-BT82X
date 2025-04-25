@@ -29,8 +29,17 @@
  * SOFTWARE.
  */
 
-#include "EVE_Platform.h"
+#include "Platform.h"
+#include "EVE_CoCmd.h"
+
+#include "FileIo.h"
+#include "FileTransfer.h"
+//#include "EVE_FlashHelper.h"
 #include "Common.h"
+
+ /// Alignment						    
+#define __ALIGN_MASK(x,mask)  (((x)+(mask))&~(mask))
+#define ALIGN(x,a)            __ALIGN_MASK(x, a - 1)
 
 #define FREAD_BLOCK           (8 * 1024)
 

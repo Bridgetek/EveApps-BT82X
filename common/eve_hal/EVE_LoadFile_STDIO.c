@@ -31,7 +31,7 @@
 
 #include "EVE_LoadFile.h"
 #include "EVE_Platform.h"
-
+#if !defined(FT9XX_PLATFORM) && !defined(RP2040_PLATFORM)
 #include <stdio.h>
 
 /**
@@ -596,5 +596,5 @@ void EVE_Util_closeFile(EVE_HalContext *phost)
     }
 }
 
-
+#endif
 /* end of file */

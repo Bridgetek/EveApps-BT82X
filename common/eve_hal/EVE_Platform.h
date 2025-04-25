@@ -40,6 +40,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 /* Include all public headers. */
+#include "EVE_Config.h"
 #if defined(_WIN32)
 #include "EVE_Platform_WIN32.h"
 #endif
@@ -51,6 +52,9 @@ extern "C" {
 #endif
 #if defined(MPSSE_PLATFORM)
 #include "EVE_Platform_MPSSE.h"
+#endif
+#if defined(RP2040_PLATFORM)
+#include "EVE_Platform_RP2040.h"
 #endif
 #include "EVE_HalImpl.h"
 #include "EVE_Hal.h"

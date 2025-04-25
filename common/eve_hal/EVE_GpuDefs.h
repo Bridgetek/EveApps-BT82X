@@ -64,7 +64,7 @@
 #define BASE                     0x7f000000
 #define RAM_CMD                  (BASE + 0x0000)
 #define REG_CORE_R2              (BASE + 0x4000)
-#define RAM_REPORT               (BASE + 0x4800)
+#define RAM_REPORT           (BASE + 0x4800)
 #define REG_CORE_R1              (BASE + 0x6000)
 #define RAM_DL                   (BASE + 0x8000)
 

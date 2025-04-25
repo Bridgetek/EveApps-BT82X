@@ -29,6 +29,15 @@ ELSEIF(UNIX)
     # ftd2xx
     # bt8xxemu
   )
+ELSEIF(IS_PLATFORM_RP2040)
+  # Add the standard library to the build
+  TARGET_LINK_LIBRARIES(eve_hal pico_stdlib)
+  
+  # Add any user requested libraries
+  TARGET_LINK_LIBRARIES(eve_hal
+    hardware_spi
+    hardware_timer
+  )
 ENDIF()
 
 IF (WIN32)

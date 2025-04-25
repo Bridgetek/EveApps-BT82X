@@ -47,6 +47,7 @@
 #define EVE_82X_RESET_ACTIVE 0x000268
 #define EVE_82X_RESET_REMOVAL 0x002068
 
+#define EVE_82X_RESET_PULSE 0x000000E7FF
 /**********************
  *      TYPEDEFS
  **********************/

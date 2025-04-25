@@ -1,11 +1,55 @@
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 2.0.0)
+set(toolchainVersion 13_2_Rel1)
+set(picotoolVersion 2.0.0)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 1.5.1)
+set(toolchainVersion 13_2_Rel1)
+set(picotoolVersion 2.0.0)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+set(PICO_BOARD pico CACHE STRING "Board type")
+
 # CMake project ################################################################
 #
-# 1. Build for FT4222 example: Use Deveoper Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_QUAD -DCMAKE_BUILD_TYPE=Debug ..
+# 1. Build for FT9XX example: Edit the FT9XX_TOOLCHAIN location path at first
+#  cd build && cmake  -G "Eclipse CDT4 - Unix Makefiles" -DEVE_APPS_PLATFORM=MM900EV3A -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=Debug "-DFT9XX_TOOLCHAIN=E:\Users\nvtua\AppData\Local\Bridgetek\FT9xx Toolchain\Toolchain" ..
+#  cmake --build ./ 
+#
+# 2. Build for RP2040 example:
+#  set PICO_SDK_PATH=[path-to-pico-sdk]
+#  set PICO_TOOLCHAIN_PATH=[path-to-gnu-arm-toolchain]
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
-# 2. Build for MPSSE example: Use Developer Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_QUAD -DCMAKE_BUILD_TYPE=Debug ..
+# 3. Build for FT4222 example: Use Deveoper Command Promt For VS
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=FT4222 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=Debug ..
+#  nmake SampleApp
+#
+# 4. Build for MPSSE example: Use Developer Command Promt For VS
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=MPSSE -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=Debug ..
+#  nmake SampleApp
+#
+# 5. Build for EMULATOR example: Use Deveoper Command Promt For VS
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EMU -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
 
@@ -45,14 +89,29 @@ IF (NOT Build_Dir_OK)
 ENDIF ()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/") 
 
+# Options ######################################################################
+SET(WITH_EVE_TESTS OFF CACHE BOOL "Build EVE test projects")
+
 # Valid option input ###########################################################
 set(LIST_GRAPHICS EVE_GRAPHICS_BT820
   )
 set(LIST_PLATFORM EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
+                  EVE_PLATFORM_RP2040
   )
 set(LIST_DISPLAY  EVE_DISPLAY_WUXGA
   )
+
+# Set cache ####################################################################
+SET(EVE_APPS_GRAPHICS "DEFAULT" CACHE STRING "Graphics Module")
+SET_PROPERTY(CACHE EVE_APPS_GRAPHICS PROPERTY STRINGS ${LIST_GRAPHICS})
+
+# TODO: Set a better default here automatically when CMake is run with an embedded platform
+SET(EVE_APPS_PLATFORM "DEFAULT" CACHE STRING "Platform Target")
+SET_PROPERTY(CACHE EVE_APPS_PLATFORM PROPERTY STRINGS ${LIST_PLATFORM})
+
+SET(EVE_APPS_DISPLAY "DEFAULT" CACHE STRING "Display Resolution")
+SET_PROPERTY(CACHE EVE_APPS_DISPLAY PROPERTY STRINGS ${LIST_DISPLAY})
 
 # Validate input ###############################################################
 function(give_sugguest value array global_set)
@@ -87,18 +146,32 @@ function(validate_input option_name array)
   MESSAGE(STATUS "Other ${option_name}'s are: ${list_str} \n")
 endfunction()
 
+function(validate_env_rp2040 env env_name)
+    MESSAGE(STATUS "${env_name} is ${env}")
+    
+    if ("${env}" STREQUAL "")
+        MESSAGE(FATAL_ERROR "${env_name} is not set, stop compile!")
+    endif()
+    MESSAGE(STATUS "${env_name} is ${env}")
+endfunction()
+
 validate_input("EVE_APPS_GRAPHICS" LIST_GRAPHICS)
 validate_input("EVE_APPS_PLATFORM" LIST_PLATFORM)
 validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
 
 # Find host platform name ######################################################
-STRING(REGEX MATCH "(EVE_PLATFORM_FT4222|EVE_PLATFORM_MPSSE|EVE_PLATFORM_BT8XXEMU)" IS_PLATFORM_WINDOW   ${EVE_APPS_PLATFORM})
+STRING(REGEX MATCH "(EVE_PLATFORM_RP2040|EVE_PLATFORM_MM2040EV)"       IS_PLATFORM_RP2040   ${EVE_APPS_PLATFORM})
 STRING(REGEX MATCH "EVE_PLATFORM_FT4222"       IS_PLATFORM_FT4222   ${EVE_APPS_PLATFORM})
-STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM}) 
+STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM})
+STRING(REGEX MATCH "EVE_PLATFORM_BT8XXEMU"     IS_PLATFORM_EMULATOR ${EVE_APPS_PLATFORM})  
+SET(IS_PLATFORM_FT9XX    "${IS_PLATFORM_FT9XX}"    CACHE STRING "Platform Target FT9XX   ")
+SET(IS_PLATFORM_RP2040   "${IS_PLATFORM_RP2040}"   CACHE STRING "Platform Target RP2040  ")
 SET(IS_PLATFORM_WINDOW   "${IS_PLATFORM_WINDOW}"   CACHE STRING "Platform Target WINDOW  ")
 SET(IS_PLATFORM_FT4222   "${IS_PLATFORM_FT4222}"   CACHE STRING "Platform Target FT4222  ")
 SET(IS_PLATFORM_MPSSE    "${IS_PLATFORM_MPSSE}"    CACHE STRING "Platform Target MPSSE   ")
 
+mark_as_advanced(IS_PLATFORM_FT9XX   )
+mark_as_advanced(IS_PLATFORM_RP2040  )
 mark_as_advanced(IS_PLATFORM_WINDOW  )
 mark_as_advanced(IS_PLATFORM_FT4222  )
 mark_as_advanced(IS_PLATFORM_MPSSE   )
@@ -111,7 +184,20 @@ IF (CMAKE_BUILD_TYPE STREQUAL "")
 ENDIF ()
 
 # Platform SDk setting #########################################################
-IF(IS_PLATFORM_WINDOW)
+IF(IS_PLATFORM_RP2040)
+  #validate_env_rp2040("$ENV{PICO_SDK_PATH}" "PICO_SDK_PATH")
+  #validate_env_rp2040("$ENV{PICO_TOOLCHAIN_PATH}" "PICO_TOOLCHAIN_PATH")
+
+  # Pull in Pico SDK (must be before project)
+  INCLUDE(pico_sdk_import.cmake)
+  PROJECT("EVE_Apps" C CXX ASM)
+
+  # Initialise the Pico SDK
+  pico_sdk_init()
+
+  INCLUDE_DIRECTORIES(common/application/fatfs/source)
+
+ELSEIF(IS_PLATFORM_WINDOW)
   PROJECT("EVE_Apps" C CXX)
   
   # Strip binary in release mode
@@ -125,11 +211,53 @@ IF(IS_PLATFORM_WINDOW)
   
   IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
     MESSAGE(STATUS "Using 64-bit Windows dependencies")
+    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x64)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x64)
   ELSE()
     MESSAGE(STATUS "Using 32-bit Windows dependencies")
+    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/Simulation/x86)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x86)
   ENDIF()
+  
+ELSEIF(IS_PLATFORM_FT9XX)
+  # TODO: Get this from the env variable if FT9XX_TOOLCHAIN is not set and the env var exists
+  SET(FT9XX_TOOLCHAIN "Bridgetek/FT9xx\ Toolchain2.5.0" CACHE PATH "Location of FT9XX toolchain") #Any space must be prefixed with '\'
+
+  ADD_DEFINITIONS("-D_DEBUG=1")
+  SET(CMAKE_SYSTEM_NAME Generic)
+
+  SET(TOOLCHAIN_INCLUDEPATH "${FT9XX_TOOLCHAIN}/Toolchain/hardware/include")
+  INCLUDE_DIRECTORIES("${TOOLCHAIN_INCLUDEPATH}")
+
+  # Below build flag is copied from FT9XX toolchain
+  set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS}         -Og -O2 -g -c -fvar-tracking -fvar-tracking-assignments -Wall -fmessage-length=0 -ffunction-sections -Wno-unknown-pragmas -MMD -MP")
+  set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   -Og -O2 -g -c -fvar-tracking -fvar-tracking-assignments -Wall -fmessage-length=0 -ffunction-sections -Wno-unknown-pragmas -MMD -MP")
+  set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} -Og -O2 -g -c -fvar-tracking -fvar-tracking-assignments -Wall -fmessage-length=0 -ffunction-sections -Wno-unknown-pragmas -MMD -MP")
+  set(CMAKE_C_FLAGS             "${CMAKE_C_FLAGS}           -Wl,--gc-sections -Wl,--entry=_start")
+  set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     -Wl,--gc-sections -Wl,--entry=_start")
+  set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   -Wl,--gc-sections -Wl,--entry=_start")
+  
+  SET(CMAKE_EXE_LINKER_FLAGS  "")
+
+
+  # Specify the cross compiler
+  SET(CMAKE_C_COMPILER "${FT9XX_TOOLCHAIN}/Toolchain/tools/bin/ft32-elf-gcc.exe")
+  SET(CMAKE_CXX_COMPILER "${FT9XX_TOOLCHAIN}/Toolchain/tools/bin/ft32-elf-g++.exe")
+  SET(CMAKE_MAKE_PROGRAM "${FT9XX_TOOLCHAIN}/External/GnuWin32/bin/make.exe")
+  SET(CMAKE_OBJCOPY      "${FT9XX_TOOLCHAIN}/Toolchain/tools/ft32-elf/bin/objcopy.exe")
+
+  # Where is the target environment
+  SET(CMAKE_FIND_ROOT_PATH  "${FT9XX_TOOLCHAIN}/Toolchain/tools/bin")
+  link_directories("${FT9XX_TOOLCHAIN}/Toolchain/hardware/lib/Debug")
+
+  # Search for programs in the build host directories
+  SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
+  # For libraries and headers in the target directories
+  SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+  SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+  
+  PROJECT("EVE_Apps" C CXX)
 
 ENDIF()
 
@@ -138,10 +266,22 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # For embedded targets, the platforma always needs to be specified, though, since CMake needs to set the proper build options
-add_definitions("-D${EVE_APPS_GRAPHICS}")
-add_definitions("-D${EVE_APPS_PLATFORM}")
-add_definitions("-D${EVE_APPS_DISPLAY}")
-add_definitions("-D${EVE_APPS_SPI}")
+if(NOT EVE_APPS_GRAPHICS STREQUAL "DEFAULT")
+  add_definitions("-D${EVE_APPS_GRAPHICS}")
+endif()
+if(NOT EVE_APPS_PLATFORM STREQUAL "DEFAULT")
+  add_definitions("-D${EVE_APPS_PLATFORM}")
+endif()
+if(NOT EVE_APPS_DISPLAY STREQUAL "DEFAULT")
+  add_definitions("-D${EVE_APPS_DISPLAY}")
+endif()
+
+# Set host platform build flag #################################################
+IF(IS_PLATFORM_FT900)
+  ADD_DEFINITIONS("-D__FT900__")
+ELSEIF(IS_PLATFORM_FT930)
+  ADD_DEFINITIONS("-D__FT930__")
+ENDIF()
 
 # Common setup #################################################################
 ADD_SUBDIRECTORY(common)
@@ -150,5 +290,10 @@ INCLUDE_DIRECTORIES("common/eve_hal/Hdr")
 
 # Project setup ################################################################
 ADD_SUBDIRECTORY(SampleApp)
+ADD_SUBDIRECTORY(Demo_lvgl)
+
+IF (WITH_EVE_TESTS)
+  ADD_SUBDIRECTORY(tests)
+ENDIF()
 
 ################################################################################

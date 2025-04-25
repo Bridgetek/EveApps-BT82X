@@ -82,6 +82,9 @@ void Gpu_Init(EVE_HalContext* phost) {
     EVE_Hal_open(phost, &params);
 
     EVE_Util_bootupConfig(phost);
+#if defined(RP2040_PLATFORM)
+    EVE_Util_loadSdCard(phost);
+#endif
 }
 
 void Gpu_Release(EVE_HalContext* phost) {
@@ -266,7 +269,7 @@ void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath,
 #define _WHERE "PC"
 #endif
 
-#if !defined(BT8XXEMU_PLATFORM)
+#if !defined(BT8XXEMU_PLATFORM) && defined(EVE_FLASH_AVAILABLE)
     {
         /// show a dialog on the screen with two options: Yes or No?
         if (!Show_Diaglog_YesNo(phost, "Flash programming",

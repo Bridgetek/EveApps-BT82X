@@ -42,11 +42,15 @@
 
 #include "EVE_Hal.h"
 #include "EVE_HalImpl.h"
-
+#include "Common.h"
+#include "FileIo.h"
 #include "FileTransfer.h"
 #include "Maths.h"
 #include "FlashHelper.h"
-
+ // Fat32 - 3rd party library to read SDcard from FT9X platform
+#if defined(RP2040_PLATFORM)
+#include "ff.h"
+#endif
 /**********************
  *  EXTERN VARIABLES
  **********************/

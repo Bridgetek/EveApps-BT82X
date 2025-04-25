@@ -39,7 +39,9 @@
 ** INCLUDES **
 *************/
 #include "EVE_GpuTypes.h"
-
+#if EVE_ENABLE_FATFS
+#include "ff.h"
+#endif
 /***********
 ** MARCOS **
 ***********/
@@ -78,6 +80,7 @@ typedef enum EVE_HOST_T
 	EVE_HOST_BT8XXEMU,
 	EVE_HOST_FT4222,
 	EVE_HOST_MPSSE,
+	EVE_HOST_EMBEDDED,
 
 	EVE_HOST_NB
 } EVE_HOST_T;
@@ -177,12 +180,19 @@ typedef struct EVE_HalParameters
 	uint32_t MpsseChannelNo; /**< MPSSE channel number */
 #endif
 
-#if defined(FT4222_PLATFORM)
+
+#if defined(FT4222_PLATFORM) || defined(RP2040_PLATFORM)
 	uint32_t DeviceIdx;
 	uint8_t SpiCsPin; /**< SPI chip select number of FT8XX chip */
 #endif
 
-#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
+#if defined(RP2040_PLATFORM)
+	uint8_t SpiSckPin;
+	uint8_t SpiMosiPin;
+	uint8_t SpiMisoPin;
+#endif
+
+#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM) || defined(RP2040_PLATFORM)
 	uint8_t PowerDownPin; /**< FT8XX power down pin number */
 #endif
 
@@ -228,7 +238,9 @@ typedef struct EVE_HalContext
 	void *SpiHandle;
 	void *GpioHandle; /**< LibFT4222 uses this member to store GPIO handle */
 #endif
-
+#if defined(RP2040_PLATFORM)
+	void* SpiPort; /* SPI port */
+#endif
 #if defined(FT4222_PLATFORM) | defined(MPSSE_PLATFORM)
 	/** Currently configured SPI clock rate. In kHz.
 	May be different from requested the clock rate in parameters */
@@ -239,11 +251,16 @@ typedef struct EVE_HalContext
 #if defined(MPSSE_PLATFORM)
 	uint32_t MpsseChannelNo; /**< MPSSE channel number */
 #endif
-#if defined(FT4222_PLATFORM)
+#if defined(FT4222_PLATFORM) || defined(RP2040_PLATFORM)
 	uint8_t SpiCsPin; /**< SPI chip select number of FT8XX chip */
 #endif
-#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
+#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM) || defined(RP2040_PLATFORM)
 	uint8_t PowerDownPin; /**< FT8XX power down pin number */
+#endif
+#if defined(RP2040_PLATFORM)
+	uint8_t SpiSckPin;
+	uint8_t SpiMosiPin;
+	uint8_t SpiMisoPin;
 #endif
 	///@}
 
@@ -269,7 +286,11 @@ typedef struct EVE_HalContext
 #if defined(EVE_SUPPORT_MEDIAFIFO)
 	uint32_t MediaFifoAddress;
 	uint32_t MediaFifoSize;
-	void *LoadFileHandle;
+#if EVE_ENABLE_FATFS
+	FIL LoadFileObj;
+#else
+	void* LoadFileHandle;
+#endif
 	ptrdiff_t LoadFileRemaining;
 #endif
 	///@}
