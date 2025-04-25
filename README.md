@@ -2,6 +2,7 @@
 
 # EveApps-BT82X-RP2040
 EveApps-BT82X is a collection of applications designed as reference resources for Bridgetek's 5th-generation graphics controller, the BT82X.
+
 EveApps-BT82X-RP2040 branch adds RP2040 interfacing with VM820C.
 
 The collection is divided into two categories: **Sample** and **Demo** applications. Both are written in ANSI C, with complete source code provided.
