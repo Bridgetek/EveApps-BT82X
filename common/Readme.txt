@@ -24,6 +24,7 @@ Platform's specific files are suffixed in the file name, for example:
 - EVE_HalImpl_FT4222.c: Source code specific for FT4222.
 - EVE_HalImpl_MPSSE.c : Source code specific for MPSSE.
 - EVE_HalImpl_WIN32.c : Source code specific for WIN32.
+- EVE_HalImpl_RP2040.c : Source code specific for RP2040.
 
 2. APPLICATION: Contains the most useful and reusable functions for applications.
 This folder can be use as a library for main application. Every functions inside 
