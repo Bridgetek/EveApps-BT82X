@@ -81,7 +81,7 @@ void EVE_Hal_info(EVE_DeviceInfo *deviceInfo, size_t deviceIdx)
 {
 	memset(deviceInfo, 0, sizeof(EVE_DeviceInfo));
 	strcpy_s(deviceInfo->DisplayName, sizeof(deviceInfo->DisplayName), "BT8XX Emulator");
-	sprintf_s(deviceInfo->SerialNumber, sizeof(deviceInfo->SerialNumber), "BT8XXEMU_%i", ++s_EmulatorSerial);
+	snprintf(deviceInfo->SerialNumber, sizeof(deviceInfo->SerialNumber), "BT8XXEMU_%i", ++s_EmulatorSerial);
 	s_EmulatorSerial &= 0xFFFF;
 	deviceInfo->Opened = false; // Emulator can be opened multiple times
 	deviceInfo->Host = EVE_HOST_BT8XXEMU;

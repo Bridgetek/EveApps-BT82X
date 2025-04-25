@@ -644,3 +644,19 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode)
     eve_printf_debug("LVDS_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_STAT));
     eve_printf_debug("LVDS_ERR_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_ERR_STAT));
 }
+#if defined(RP2040_PLATFORM)
+#include <string.h>
+#include <stdio.h>
+void strcat_s(char* dest, size_t dest_size, const char* src) {
+    size_t dest_len = strlen(dest);
+    size_t space_left = dest_size - dest_len - 1; // leave space for null terminator
+
+    if (space_left > 0) {
+        strncat(dest, src, space_left);
+    }
+    else {
+        // Optional: handle error or truncation
+        printf("Buffer full. Cannot append string.\n");
+    }
+}
+#endif

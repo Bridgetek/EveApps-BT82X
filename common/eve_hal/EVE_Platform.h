@@ -111,7 +111,7 @@ extern "C" {
 #endif
 
 #ifndef eve_sprintf
-#define eve_sprintf(str, size, fmt, ...) sprintf_s(str, size, fmt, ##__VA_ARGS__)
+#define eve_sprintf(str, size, fmt, ...) snprintf(str, size, fmt, ##__VA_ARGS__)
 #endif
 
 #if defined(_MSC_VER) && !defined(__clang__)

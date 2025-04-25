@@ -58,6 +58,12 @@
 /**********************
  *      MACROS
  **********************/
+#ifndef FALSE
+#define FALSE false
+#endif
+#ifndef TRUE
+#define TRUE true
+#endif
 /// Alignment
 #define __ALIGN_MASK(x,mask)                (((x)+(mask))&~(mask))
 #define ALIGN(x,a)                          __ALIGN_MASK(x, a - 1)
@@ -104,4 +110,5 @@ void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
 void Flash_Init(EVE_HalContext *phost, const uint8_t *filePath, const uint8_t *fileName);
 void WelcomeScreen(EVE_HalContext *phost, char *info[]);
 void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode);
+void strcat_s(char* dest, size_t dest_size, const char* src);
 #endif /* COMMON_H_ */
