@@ -759,6 +759,7 @@ void SAMAPP_Bitmap_DXT1L2()
  */
 void SAMAPP_Bitmap_DXT1PALETTED()
 {
+#if BT81X_ENABLE // PALETTED565 is no longer supported from BT82x
     uint16_t imgWidth = 320;
     uint16_t imgHeight = 240;
     uint16_t palWidth = imgWidth / 4;
@@ -830,6 +831,7 @@ void SAMAPP_Bitmap_DXT1PALETTED()
 
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
+#endif
 }
 
 /**
@@ -839,6 +841,7 @@ void SAMAPP_Bitmap_DXT1PALETTED()
  */
 void SAMAPP_Bitmap_DXT1L2PALETTED()
 {
+#if BT81X_ENABLE // PALETTED565 is no longer supported from BT82x
     uint16_t imgWidth = 320;
     uint16_t imgHeight = 240;
     uint16_t palWidth = imgWidth / 4;
@@ -906,6 +909,7 @@ void SAMAPP_Bitmap_DXT1L2PALETTED()
 
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
+#endif
 }
 
 /**
@@ -914,6 +918,7 @@ void SAMAPP_Bitmap_DXT1L2PALETTED()
  */
 void SAMAPP_Bitmap_paletted8()
 {
+#if BT81X_ENABLE // PALETTED8 is no longer supported from BT82x
     int32_t pal_mem_addr = 900 * 1024 + DDR_BITMAPS_STARTADDR;
     uint16_t imgW = 802;
     uint16_t imgH = 502;
@@ -951,6 +956,7 @@ void SAMAPP_Bitmap_paletted8()
     EVE_CoDl_end(s_pHalContext);
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
+#endif
 }
 
 /**
@@ -959,6 +965,7 @@ void SAMAPP_Bitmap_paletted8()
  */
 void SAMAPP_Bitmap_paletted4444()
 {
+#if BT81X_ENABLE // PALETTED4444 is no longer supported from BT82x
     int16_t ImgW = 128, ImgH = 128;
     Draw_Text(s_pHalContext, "Example for: Paletted4444 format");
 
@@ -973,6 +980,7 @@ void SAMAPP_Bitmap_paletted4444()
     EVE_CoDl_end(s_pHalContext);
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
+#endif
 }
 
 /**
