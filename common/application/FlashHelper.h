@@ -49,7 +49,6 @@ Flash_Cmd_Status_t FlashHelper_Program(EVE_HalContext *phost, uint32_t dest_flas
 Flash_Cmd_Status_t FlashHelper_Read(EVE_HalContext *phost, uint32_t dest_ram, uint32_t src_flash, uint32_t num, uint8_t *read_data);
 void FlashHelper_Erase(EVE_HalContext *phost);
 uint8_t FlashHelper_GetState(EVE_HalContext *phost);
-void FlashHelper_ClearCache(EVE_HalContext *phost);
 Flash_Cmd_Status_t FlashHelper_Write(EVE_HalContext *phost, uint32_t dest_flash, uint32_t num, const uint8_t *write_data);
 uint32_t FlashHelper_SwitchState(EVE_HalContext *phost, uint8_t nextState);
 uint32_t FlashHelper_SwitchFullMode(EVE_HalContext *phost);

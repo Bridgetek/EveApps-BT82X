@@ -350,37 +350,25 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 
 	const uint32_t expectedChipId = EVE_CHIPID;
 	uint8_t engineStatus;
-	uint32_t chipId = 0;
+	uint32_t chipId;
 	uint8_t id;
 	double syspll;
 	uint32_t freqbyte;
-	EVE_CMD_SYS_PLL_FREQ pll_freq = { 0 };
 	EVE_CMD_SYS_CLK_DIV sys_clk_div = { 0 };
 	EVE_CMD_BOOT_CFG boot_cfg = { 0 };
 	EVE_CMD_BOOT_CFG_EN boot_cfg_en = { 0 };
 	EVE_CMD_DDR_TYPE ddr_type = { 0 };
 	EVE_CMD_GPREG gpreg = { 0 };
 
+	do
+	{
 	/* EVE will be in SPI Single channel after POR */
 	if (!EVE_Hal_powerCycle(phost, true))
 		return false;
 
-	do
-	{
-		uint8_t bb[128];
-
-		EVE_sleep(20);
-		pll_freq.PLL_CKS = 0;
-		pll_freq.PLL_NS = 0xf;
-		EVE_Hal_SPICmd_setpllsp1(phost, pll_freq);
-		syspll = 576000000;
-		freqbyte = (uint32_t)((round(syspll / FREQUENCY) - 1));
-		sys_clk_div.SYSPLL_CPS = 1; // default b'001'
-		sys_clk_div.freq = freqbyte; // system clock: 72MHz or 36MHz
-		EVE_Hal_SPICmd_sysclkdiv(phost, sys_clk_div);
 		boot_cfg_en.boot = 1;
 		boot_cfg_en.DDRtype = 1;
-		boot_cfg_en.GPREG = 1;
+		boot_cfg_en.GPREG = 0;
 		boot_cfg_en.enable = 1;
 		EVE_Hal_SPICmd_bootcfgen(phost, boot_cfg_en);
 		boot_cfg.DDR = 1;
@@ -388,7 +376,7 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		boot_cfg.audio = 1;
 		boot_cfg.watchdog = 1;
 		boot_cfg.source = 0;
-		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg); // REG_BOOT_CONTROL settings: DDR(0) touch(1) AUD(1) WD(0) reserved source(0)
+		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg);
 		ddr_type.speed = 0; //1333
 		ddr_type.type = 1;
 		ddr_type.size = EVE_DDR_SIZE;
@@ -398,29 +386,20 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		boot_cfg_en.GPREG = 0;
 		boot_cfg_en.enable = 0;
 		EVE_Hal_SPICmd_bootcfgen(phost, boot_cfg_en); // enable(0)
-		EVE_Hal_SPICmd_pwr_state(phost, EVE_PWR_STATE_PULSE);
-		// Wait for the reset pulse to clear
-		EVE_sleep(20);
-
-		// Wait for status response
-		EVE_sleep(100);
-		EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, 0);
-		EVE_Hal_transferMem(phost, bb, NULL, 128);
-		EVE_Hal_endTransfer(phost);
-
-		// There must be non-zero data in there, data will be 0xe9,0x22,0x26,0x48...
-		if (bb[0] == 0)
-		{
-			continue;
-		}
+		syspll = 576000000;
+		freqbyte = (uint32_t)((round(syspll / FREQUENCY) - 1));
+		sys_clk_div.SYSPLL_CPS = 1; // default b'001'
+		sys_clk_div.freq = freqbyte; // system clock: 72MHz or 36MHz
+		EVE_Hal_SPICmd_sysclkdiv(phost, sys_clk_div);
+		EVE_Hal_SPICmd_pwr_state(phost, EVE_PWR_STATE_ACTIVE);
+		EVE_sleep(40);
 
 		while (EVE_Hal_rd32(phost, REG_BOOT_STATUS) != 0x522e2e2e) // Polling to indicate EVE is in normal running operation state
 		{
 			EVE_sleep(10);
 			eve_printf_debug("Boot status %x \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
 		}
-		//eve_printf_debug("Boot status %x \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
-
+		eve_printf_debug("Boot status %x \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
 		chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
 		eve_printf_debug("chipID %x \n", chipId);
 
@@ -656,7 +635,7 @@ void debugBackupRamG(EVE_HalContext *phost)
 {
 	if (!phost->DebugMessageVisible)
 	{
-		EVE_Hal_rdMem(phost, phost->DebugBackup, RAM_ERR_REPORT + RAM_ERR_REPORT_MAX - sizeof(phost->DebugBackup), sizeof(phost->DebugBackup));
+		EVE_Hal_rdMem(phost, phost->DebugBackup, RAM_REPORT + RAM_REPORT_MAX - sizeof(phost->DebugBackup), sizeof(phost->DebugBackup));
 		phost->DebugMessageVisible = true;
 	}
 }
@@ -669,7 +648,7 @@ static void debugRestoreRamG(EVE_HalContext *phost)
 {
 	if (phost->DebugMessageVisible)
 	{
-		EVE_Hal_wrMem(phost, RAM_ERR_REPORT + RAM_ERR_REPORT_MAX - sizeof(phost->DebugBackup), phost->DebugBackup, sizeof(phost->DebugBackup));
+		EVE_Hal_wrMem(phost, RAM_REPORT + RAM_REPORT_MAX - sizeof(phost->DebugBackup), phost->DebugBackup, sizeof(phost->DebugBackup));
 		phost->DebugMessageVisible = false;
 	}
 }

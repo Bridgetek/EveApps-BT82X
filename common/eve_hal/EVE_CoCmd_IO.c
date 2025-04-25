@@ -165,7 +165,7 @@ uint32_t EVE_CoCmd_flashAttach(EVE_HalContext *phost)
 
 uint32_t EVE_CoCmd_flashFast(EVE_HalContext *phost, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 	uint32_t flashStatus;
 
 	if (!EVE_Cmd_waitFlush(phost))
@@ -311,7 +311,7 @@ void EVE_CoCmd_runAnim(EVE_HalContext *phost, uint32_t waitmask, uint32_t play)
 
 bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_MEMCRC, 0))
@@ -337,7 +337,7 @@ bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_
 
 bool EVE_CoCmd_regRead(EVE_HalContext *phost, uint32_t ptr, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_REGREAD, 0))
@@ -380,7 +380,7 @@ bool EVE_CoCmd_inflate_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_
 
 bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPTR, 0))
@@ -426,7 +426,7 @@ bool EVE_CoCmd_loadImage_progMem(EVE_HalContext *phost, uint32_t dst, eve_progme
 
 bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint32_t *h)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPROPS, 0))
@@ -455,7 +455,7 @@ bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint3
 
 bool EVE_CoCmd_getImage(EVE_HalContext *phost, uint32_t *source, uint32_t *fmt, uint32_t *w, uint32_t *h, uint32_t *palette)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 
 #if EVE_CMD_HOOKS
 	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETIMAGE, 0))
@@ -497,6 +497,77 @@ uint32_t EVE_CoCmd_fssource(EVE_HalContext *phost, const char *file, uint32_t re
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FSSOURCE);
 	EVE_Cmd_wrString(phost, file, EVE_CMD_STRING_MAX);
+	EVE_Cmd_wr32(phost, 7);
+	EVE_Cmd_endFunc(phost);
+
+	/* Wait for the result */
+	if (!EVE_Cmd_waitFlush(phost))
+		return 0;
+	wp = EVE_Hal_rd32(phost, REG_CMD_WRITE) & EVE_CMD_FIFO_MASK;
+	return EVE_Hal_rd32(phost, RAM_CMD + ((CMDBUF_SIZE - 4) & (wp - 4)));
+}
+
+uint32_t EVE_CoCmd_fsread(EVE_HalContext *phost, uint32_t dst, const char *file, uint32_t result)
+{
+	uint32_t wp;
+
+#if EVE_CMD_HOOKS
+	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSREAD, 0))
+		return 0;
+#endif
+	EVE_Cmd_startFunc(phost);
+	EVE_Cmd_wr32(phost, CMD_FSREAD);
+	EVE_Cmd_wr32(phost, dst);
+	EVE_Cmd_wrString(phost, file, EVE_CMD_STRING_MAX);
+	EVE_Cmd_wr32(phost, 7);
+	EVE_Cmd_endFunc(phost);
+
+	/* Wait for the result */
+	if (!EVE_Cmd_waitFlush(phost))
+		return 0;
+	wp = EVE_Hal_rd32(phost, REG_CMD_WRITE) & EVE_CMD_FIFO_MASK;
+	return EVE_Hal_rd32(phost, RAM_CMD + ((CMDBUF_SIZE - 4) & (wp - 4)));
+}
+
+void EVE_CoCmd_fsoption(EVE_HalContext *phost, uint32_t options)
+{
+	EVE_CoCmd_dd(phost, CMD_FSOPTION, options);
+}
+
+uint32_t EVE_CoCmd_fssize(EVE_HalContext *phost, const char *file, uint32_t size)
+{
+	uint32_t wp;
+
+#if EVE_CMD_HOOKS
+	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSSIZE, 0))
+		return 0;
+#endif
+	EVE_Cmd_startFunc(phost);
+	EVE_Cmd_wr32(phost, CMD_FSSIZE);
+	EVE_Cmd_wrString(phost, file, EVE_CMD_STRING_MAX);
+	EVE_Cmd_wr32(phost, 7);
+	EVE_Cmd_endFunc(phost);
+
+	/* Wait for the result */
+	if (!EVE_Cmd_waitFlush(phost))
+		return 0;
+	wp = EVE_Hal_rd32(phost, REG_CMD_WRITE) & EVE_CMD_FIFO_MASK;
+	return EVE_Hal_rd32(phost, RAM_CMD + ((CMDBUF_SIZE - 4) & (wp - 4)));
+}
+
+uint32_t EVE_CoCmd_fsdir(EVE_HalContext *phost, uint32_t dst, uint32_t num, const char *path, uint32_t result)
+{
+	uint32_t wp;
+
+#if EVE_CMD_HOOKS
+	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSDIR, 0))
+		return 0;
+#endif
+	EVE_Cmd_startFunc(phost);
+	EVE_Cmd_wr32(phost, CMD_FSDIR);
+	EVE_Cmd_wr32(phost, dst);
+	EVE_Cmd_wr32(phost, num);
+	EVE_Cmd_wrString(phost, path, EVE_CMD_STRING_MAX);
 	EVE_Cmd_wr32(phost, 7);
 	EVE_Cmd_endFunc(phost);
 

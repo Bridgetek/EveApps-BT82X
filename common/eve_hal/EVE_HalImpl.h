@@ -92,7 +92,7 @@ void EVE_Hal_flush(EVE_HalContext *phost);
 ///@{
 /** This API sends a SPI command to the phost */
 void EVE_Hal_spiCommand(EVE_HalContext *phost, uint8_t *cmd);
-/** Toggle PD_N pin of FT800 board for a power cycle. Returns false on failure */
+/** Toggle PD_N pin for a power cycle. Returns false on failure */
 bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up);
 /** Switch EVE to different SPI channel mode */
 void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls);

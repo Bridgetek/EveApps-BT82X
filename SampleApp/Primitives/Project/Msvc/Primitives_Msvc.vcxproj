@@ -115,7 +115,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_BT820;EVE_PLATFORM_FT4222;EVE_DISPLAY_WUXGA</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_BT820;EVE_PLATFORM_FT4222;EVE_DISPLAY_WUXGA;EVE_SPI_QUAD</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\common\application;..\..\..\..\common\eve_hal;..\..\..\..\common\eve_hal\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>

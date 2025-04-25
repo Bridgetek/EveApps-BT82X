@@ -112,7 +112,7 @@ bool EVE_Hal_isDevice(EVE_HalContext *phost, size_t deviceIdx)
  */
 bool EVE_HalImpl_defaults(EVE_HalParameters *parameters, size_t deviceIdx)
 {
-	parameters->EmulatorMode = EVE_BT820;
+	parameters->EmulatorMode = EVE_BT817;
 	return true;
 }
 

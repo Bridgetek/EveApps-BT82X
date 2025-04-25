@@ -5,8 +5,6 @@
  * This header is separated and included last 
  * in case of conflicts with other libraries.
  * 
- * Expects BT82X_ENABLE to be defined.
- * 
  * @author Bridgetek
  *
  * @date 2024
@@ -37,8 +35,6 @@
 #ifndef EVE_GPU_DEFS__H
 #define EVE_GPU_DEFS__H
 
-#ifdef BT82X_ENABLE
-
 /* Definitions used for BT820 coprocessor command buffer */
 #define EVE_DL_SIZE                   (16 * 1024UL) /**< 16kB Display List buffer size */
 #define EVE_CMD_FIFO_SIZE             ((16) * 1024UL) /**< 16kB coprocessor FIFO size */
@@ -56,7 +52,6 @@
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
 #define FREQUENCY                72000000UL
-#define POLLING_BYTES            10 /**< For QUAD mode */
 #define READ_TIMOUT              0x10
 
 /**************
@@ -69,12 +64,9 @@
 #define BASE                     0x7f000000
 #define RAM_CMD                  (BASE + 0x0000)
 #define REG_CORE_R2              (BASE + 0x4000)
-#define RAM_ERR_REPORT           (BASE + 0x4800)
+#define RAM_REPORT               (BASE + 0x4800)
 #define REG_CORE_R1              (BASE + 0x6000)
 #define RAM_DL                   (BASE + 0x8000)
-
-#define CMDB_WRITE               (BASE + 0x10000)
-#define RAM_J1CODE               (BASE + 0x20000)
 
 #define REG_LVDSTX               (BASE + 0x800300)
 #define REG_SYS                  (BASE + 0x800400)
@@ -210,13 +202,12 @@
 #define REG_CMD_WRITE            (REG_CORE_R1 + 0x0150)
 #define REG_CMD_DL               (REG_CORE_R1 + 0x0154)
 #define REG_CMDB_SPACE           (REG_CORE_R1 + 0x0594)
-#define REG_CMDB_WRITE           CMDB_WRITE
+#define REG_CMDB_WRITE           (BASE + 0x10000)
 #define CMDBUF_SIZE              0x4000
 ///@}
 
 /** @name Touch Screen Engine Registers */
 ///@{
-#define REG_TOUCH_MODE           (REG_CORE_R1 + 0x0158)
 #define REG_CTOUCH_EXTENDED      (REG_CORE_R1 + 0x015C)
 #define REG_CTOUCH_TOUCH0_XY     (REG_CORE_R1 + 0x0160)
 #define REG_TOUCH_SCREEN_XY      (REG_CORE_R1 + 0x0160)
@@ -258,6 +249,7 @@
 #define REG_LVDSRX_CORE_DEST     (REG_CORE_R1 + 0x067C)
 #define REG_LVDSRX_CORE_FORMAT   (REG_CORE_R1 + 0x0680)
 #define REG_LVDSRX_CORE_DITHER   (REG_CORE_R1 + 0x0684)
+#define REG_LVDSRX_CORE_FRAMES   (REG_CORE_R1 + 0x0698)
 ///@}
 
 /** @name LVDSRX System Register */
@@ -269,12 +261,12 @@
 
 /** @name LVDSTX system registers */
 ///@{
-#define REG_LVDS_EN              (REG_LVDSTX + 0x0000)
-#define REG_LVDS_PLLCFG          (REG_LVDSTX + 0x0004)
-#define REG_LVDS_CTRL_CH0        (REG_LVDSTX + 0x0014)
-#define REG_LVDS_CTRL_CH1        (REG_LVDSTX + 0x0018)
-#define REG_LVDS_STAT            (REG_LVDSTX + 0x001C)
-#define REG_LVDS_ERR_STAT        (REG_LVDSTX + 0x0020)
+#define REG_LVDSTX_EN              (REG_LVDSTX + 0x0000)
+#define REG_LVDSTX_PLLCFG          (REG_LVDSTX + 0x0004)
+#define REG_LVDSTX_CTRL_CH0        (REG_LVDSTX + 0x0014)
+#define REG_LVDSTX_CTRL_CH1        (REG_LVDSTX + 0x0018)
+#define REG_LVDSTX_STAT            (REG_LVDSTX + 0x001C)
+#define REG_LVDSTX_ERR_STAT        (REG_LVDSTX + 0x0020)
 ///@}
 
 /** @name System Registers */
@@ -316,9 +308,6 @@
 #define CMD_ANIMSTART        4294967135UL /**< 0xFFFFFF5FUL */
 #define CMD_ANIMSTOP         4294967117UL /**< 0xFFFFFF4DUL */
 #define CMD_ANIMXY           4294967118UL /**< 0xFFFFFF4EUL */
-#define CMD_APBREAD          4294967138UL /**< 0xFFFFFF62UL */
-#define CMD_APBTHRASH        4294967146UL /**< 0xFFFFFF6AUL */
-#define CMD_APBWRITE         4294967139UL /**< 0xFFFFFF63UL */
 #define CMD_APPEND           4294967068UL /**< 0xFFFFFF1CUL */
 #define CMD_APPENDF          4294967122UL /**< 0xFFFFFF52UL */
 #define CMD_ARC              4294967175UL /**< 0xFFFFFF87UL */
@@ -329,20 +318,15 @@
 #define CMD_CALIBRATESUB     4294967126UL /**< 0xFFFFFF56UL */
 #define CMD_CALLLIST         4294967131UL /**< 0xFFFFFF5BUL */
 #define CMD_CGRADIENT        4294967178UL /**< 0xFFFFFF8AUL */
-#define CMD_CLEARCACHE       4294967113UL /**< 0xFFFFFF49UL */
 #define CMD_CLOCK            4294967058UL /**< 0xFFFFFF12UL */
 #define CMD_COLDSTART        4294967086UL /**< 0xFFFFFF2EUL */
 #define CMD_COPYLIST         4294967176UL /**< 0xFFFFFF88UL */
-#define CMD_CRC              4294967043UL /**< 0xFFFFFF03UL */
 #define CMD_DDRSHUTDOWN      4294967141UL /**< 0xFFFFFF65UL */
 #define CMD_DDRSTARTUP       4294967142UL /**< 0xFFFFFF66UL */
-#define CMD_DEBUGINFO        4294967155UL /**< 0xFFFFFF73UL */
 #define CMD_DIAL             4294967081UL /**< 0xFFFFFF29UL */
 #define CMD_DLSTART          4294967040UL /**< 0xFFFFFF00UL */
 #define CMD_ENABLEREGION     4294967166UL /**< 0xFFFFFF7EUL */
 #define CMD_ENDLIST          4294967133UL /**< 0xFFFFFF5DUL */
-#define CMD_EVALUATE         4294967154UL /**< 0xFFFFFF72UL */
-#define CMD_EXECUTE          4294967045UL /**< 0xFFFFFF05UL */
 #define CMD_FENCE            4294967144UL /**< 0xFFFFFF68UL */
 #define CMD_FGCOLOR          4294967048UL /**< 0xFFFFFF08UL */
 #define CMD_FILLWIDTH        4294967121UL /**< 0xFFFFFF51UL */
@@ -359,14 +343,13 @@
 #define CMD_FLASHUPDATE      4294967105UL /**< 0xFFFFFF41UL */
 #define CMD_FLASHWRITE       4294967103UL /**< 0xFFFFFF3FUL */
 #define CMD_FSDIR            4294967182UL /**< 0xFFFFFF8EUL */
-#define CMD_FSOPTIONS        4294967149UL /**< 0xFFFFFF6DUL */
+#define CMD_FSOPTION         4294967149UL /**< 0xFFFFFF6DUL */
 #define CMD_FSREAD           4294967153UL /**< 0xFFFFFF71UL */
 #define CMD_FSSIZE           4294967168UL /**< 0xFFFFFF80UL */
 #define CMD_FSSOURCE         4294967167UL /**< 0xFFFFFF7FUL */
 #define CMD_GAUGE            4294967057UL /**< 0xFFFFFF11UL */
 #define CMD_GETIMAGE         4294967128UL /**< 0xFFFFFF58UL */
 #define CMD_GETMATRIX        4294967087UL /**< 0xFFFFFF2FUL */
-#define CMD_GETPOINT         4294967046UL /**< 0xFFFFFF06UL */
 #define CMD_GETPROPS         4294967074UL /**< 0xFFFFFF22UL */
 #define CMD_GETPTR           4294967072UL /**< 0xFFFFFF20UL */
 #define CMD_GLOW             4294967179UL /**< 0xFFFFFF8BUL */
@@ -374,19 +357,14 @@
 #define CMD_GRADIENT         4294967049UL /**< 0xFFFFFF09UL */
 #define CMD_GRADIENTA        4294967120UL /**< 0xFFFFFF50UL */
 #define CMD_GRAPHICSFINISH   4294967147UL /**< 0xFFFFFF6BUL */
-#define CMD_HAMMERAUX        4294967044UL /**< 0xFFFFFF04UL */
-#define CMD_HMAC             4294967125UL /**< 0xFFFFFF55UL */
 #define CMD_I2SSTARTUP       4294967145UL /**< 0xFFFFFF69UL */
 #define CMD_INFLATE          4294967114UL /**< 0xFFFFFF4AUL */
 #define CMD_INTERRUPT        4294967042UL /**< 0xFFFFFF02UL */
-#define CMD_INT_RAMSHARED    4294967096UL /**< 0xFFFFFF38UL */
 #define CMD_KEYS             4294967052UL /**< 0xFFFFFF0CUL */
-#define CMD_LAST_            4294967183UL /**< 0xFFFFFF8FUL */
 #define CMD_LOADASSET        4294967169UL /**< 0xFFFFFF81UL */
 #define CMD_LOADIDENTITY     4294967075UL /**< 0xFFFFFF23UL */
 #define CMD_LOADIMAGE        4294967073UL /**< 0xFFFFFF21UL */
 #define CMD_LOADPATCH        4294967170UL /**< 0xFFFFFF82UL */
-#define CMD_LOADQRCODE       4294967163UL /**< 0xFFFFFF7BUL */
 #define CMD_LOADWAV          4294967173UL /**< 0xFFFFFF85UL */
 #define CMD_LOGO             4294967085UL /**< 0xFFFFFF2DUL */
 #define CMD_MEDIAFIFO        4294967092UL /**< 0xFFFFFF34UL */
@@ -398,12 +376,9 @@
 #define CMD_NEWLIST          4294967132UL /**< 0xFFFFFF5CUL */
 #define CMD_NOP              4294967123UL /**< 0xFFFFFF53UL */
 #define CMD_NUMBER           4294967082UL /**< 0xFFFFFF2AUL */
-#define CMD_OTPRD            4294967156UL /**< 0xFFFFFF74UL */
-#define CMD_OTPWR            4294967157UL /**< 0xFFFFFF75UL */
 #define CMD_PLAYVIDEO        4294967093UL /**< 0xFFFFFF35UL */
 #define CMD_PLAYWAV          4294967161UL /**< 0xFFFFFF79UL */
 #define CMD_PROGRESS         4294967053UL /**< 0xFFFFFF0DUL */
-#define CMD_QRCODE           4294967162UL /**< 0xFFFFFF7AUL */
 #define CMD_REGREAD          4294967063UL /**< 0xFFFFFF17UL */
 #define CMD_REGWRITE         4294967174UL /**< 0xFFFFFF86UL */
 #define CMD_RENDERTARGET     4294967181UL /**< 0xFFFFFF8DUL */
@@ -421,20 +396,16 @@
 #define CMD_SCROLLBAR        4294967055UL /**< 0xFFFFFF0FUL */
 #define CMD_SDATTACH         4294967150UL /**< 0xFFFFFF6EUL */
 #define CMD_SDBLOCKREAD      4294967151UL /**< 0xFFFFFF6FUL */
-#define CMD_SDBLOCKWRITE     4294967152UL /**< 0xFFFFFF70UL */
 #define CMD_SETBASE          4294967091UL /**< 0xFFFFFF33UL */
 #define CMD_SETBITMAP        4294967101UL /**< 0xFFFFFF3DUL */
 #define CMD_SETFONT          4294967094UL /**< 0xFFFFFF36UL */
 #define CMD_SETMATRIX        4294967079UL /**< 0xFFFFFF27UL */
 #define CMD_SETROTATE        4294967089UL /**< 0xFFFFFF31UL */
 #define CMD_SETSCRATCH       4294967095UL /**< 0xFFFFFF37UL */
-#define CMD_SHA1             4294967124UL /**< 0xFFFFFF54UL */
 #define CMD_SKETCH           4294967084UL /**< 0xFFFFFF2CUL */
 #define CMD_SKIPCOND         4294967180UL /**< 0xFFFFFF8CUL */
 #define CMD_SLIDER           4294967054UL /**< 0xFFFFFF0EUL */
 #define CMD_SNAPSHOT         4294967069UL /**< 0xFFFFFF1DUL */
-#define CMD_SNAPSHOT2        4294967090UL /**< 0xFFFFFF32UL */
-#define CMD_SOFTBOOT         4294967137UL /**< 0xFFFFFF61UL */
 #define CMD_SPINNER          4294967060UL /**< 0xFFFFFF14UL */
 #define CMD_STOP             4294967061UL /**< 0xFFFFFF15UL */
 #define CMD_SWAP             4294967041UL /**< 0xFFFFFF01UL */
@@ -443,9 +414,6 @@
 #define CMD_TEXT             4294967050UL /**< 0xFFFFFF0AUL */
 #define CMD_TEXTDIM          4294967172UL /**< 0xFFFFFF84UL */
 #define CMD_TOGGLE           4294967056UL /**< 0xFFFFFF10UL */
-#define CMD_TOUCHRD          4294967158UL /**< 0xFFFFFF76UL */
-#define CMD_TOUCHWR          4294967159UL /**< 0xFFFFFF77UL */
-#define CMD_TOUCH_TRANSFORM  4294967070UL /**< 0xFFFFFF1EUL */
 #define CMD_TRACK            4294967080UL /**< 0xFFFFFF28UL */
 #define CMD_TRANSLATE        4294967076UL /**< 0xFFFFFF24UL */
 #define CMD_VIDEOFRAME       4294967099UL /**< 0xFFFFFF3BUL */
@@ -454,7 +422,6 @@
 #define CMD_WAITCHANGE       4294967143UL /**< 0xFFFFFF67UL */
 #define CMD_WAITCOND         4294967160UL /**< 0xFFFFFF78UL */
 #define CMD_WATCHDOG         4294967171UL /**< 0xFFFFFF83UL */
-#define CMD_WORKAREA         4294967148UL /**< 0xFFFFFF6CUL */
 ///@}
 
 /*****************
@@ -514,7 +481,7 @@
 #define PALETTE_SOURCEH(addr)       ((50UL << 24) | (((addr)&255UL) << 0))
 ///@}
 
-/** @name Deawing Actions */
+/** @name Drawing Actions */
 ///@{
 #define CLEAR(c, s, t)                ((38UL << 24) | (((c)&1UL) << 2) | (((s)&1UL) << 1) | (((t)&1UL) << 0))
 #define VERTEX2F(x, y)                ((1UL << 30) | (((x)&32767UL) << 15) | (((y)&32767UL) << 0))
@@ -538,7 +505,6 @@
 /**< @name for REG_DLSWAP */
 ///@{
 #define DLSWAP_DONE       0UL
-#define DLSWAP_LINE       1UL
 #define DLSWAP_FRAME      2UL
 ///@}
 
@@ -546,12 +512,13 @@
 ///@{
 #define OPT_3D            0UL /**< 0x0 */
 #define OPT_RGB565        0UL /**< 0x0 */
+#define OPT_1BIT          0UL /**< 0x0 */
+#define OPT_FULLSPEED     0UL /**< 0x0 */
 #define OPT_MONO          1UL /**< 0x1 */
 #define OPT_SFNLOWER      1UL /**< 0x1 */
 #define OPT_NODL          2UL /**< 0x2 */
 #define OPT_4BIT          2UL /**< 0x2 */
 #define OPT_CASESENSITIVE 2UL /**< 0x2 */
-//#define OPT_NOTEAR        4UL /**< 0x4 */
 #define OPT_DIRSEP_WIN    4UL /**< 0x4 */
 #define OPT_HALFSPEED     4UL /**< 0x4 */
 #define OPT_QUARTERSPEED  8UL /**< 0x8 */
@@ -645,9 +612,6 @@
 #define ARGB4             6UL
 #define RGB565            7UL
 #define BARGRAPH          11UL
-#define PALETTED565       14UL
-#define PALETTED4444      15UL
-#define PALETTED8         16UL
 #define L2                17UL
 #define RGB8              19UL
 #define ARGB8             20UL
@@ -675,7 +639,7 @@
 #define COMPRESSED_RGBA_ASTC_12x12_KHR 37821UL
 ///@}
 
-/** @name for REG_LASH_STATUS */
+/** @name for REG_FLASH_STATUS */
 ///@{
 #define FLASH_STATUS_INIT          0UL
 #define FLASH_STATUS_DETACHED      1UL
@@ -698,8 +662,8 @@
 #define LINEAR_SAMPLES             0UL
 #define ULAW_SAMPLES               1UL
 #define ADPCM_SAMPLES              2UL
-#define S16_SAMPLES                3UL
-#define S16S_SAMPLES               4UL
+#define S16_MONO                   3UL
+#define S16S_STEREO                4UL
 ///@}
 
 #ifdef POINTS
@@ -718,14 +682,6 @@
 #define RECTS                      9UL
 ///@}
 
-/** @name for REG_TOUCH_MODE */
-///@{
-#define TOUCHMODE_OFF              0UL
-#define TOUCHMODE_ONESHOT          1UL
-#define TOUCHMODE_FRAME            2UL
-#define TOUCHMODE_CONTINUOUS       3UL
-///@}
-
 /** @name for REG_CTOUCH_EXTENDED */
 ///@{
 #define CTOUCH_MODE_COMPATIBILITY  1UL /*< single-touch */
@@ -738,8 +694,46 @@
 #define EDGE_ZERO                  1UL
 ///@}
 
+/** @name for REG_LVDSTX_EN */
+///@{
+#define LVDS_CH1_EN                4UL
+#define LVDS_CH0_EN                2UL
+///@}
+
+/** @name for REG_I2S_CTL */
+///@{
+#define I2S_AUDIO_DISABLE          8UL
+#define I2S_TX_EN                  2UL
+#define I2S_SRST                   1UL
+///@}
+
+/** @name for REG_I2S_CFG FORMAT */
+///@{
+#define I2S_FORMAT                 (0UL << 10)
+#define LEFT_FORMAT                (1UL << 10)
+#define RIGHT_FORMAT               (2UL << 10)
+///@}
+
+/** @name for REG_I2S_EN */
+///@{
+#define I2S_ENABLE                 1UL
+#define I2S_DISABLE                0UL
+///@}
+
+/** @name for REG_SO_MODE */
+///@{
+#define ONE_PIXEL_SINGLE_LVDS      0UL
+#define TWO_PIXEL_SINGLE_LVDS      1UL
+#define TWO_PIXEL_DUAL_LVDS        2UL
+#define FOUR_PIXEL_DUAL_LVDS       3UL
+///@}
+
+/** @name for REG_LVDSTX_PLLCFG */
+///@{
+#define LVDSTX_PLLCFG(cps, lock, cks, ns, clkdiv)   ((((cps)&0x7) << 25) | (((lock)&0xFFF) << 13) | (((cks)&0x3) << 11) | (((ns)&0x7F) << 4) | ((clkdiv)&0xF))
+///@}
+
 // clang-format on
-#endif /* BT82X_ENABLE */
 
 #endif /* #ifndef EVE_GPU_DEFS__H */
 

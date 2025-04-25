@@ -38,10 +38,6 @@ static uint32_t d;
 static uint32_t e;
 static uint32_t f;
 
-int16_t w = 1920;
-int16_t h = 1200;
-uint16_t fbformat = YCBCR;
-
 /**
  * @brief Callback function
  * 
@@ -86,13 +82,6 @@ void Gpu_Init(EVE_HalContext* phost) {
     EVE_Hal_open(phost, &params);
 
     EVE_Util_bootupConfig(phost);
-
-#ifdef DISPLAY_RESOLUTION_WXGA
-    EVE_Hal_wr8(phost, REG_CPURESET, 2);
-    EVE_Hal_wr16(phost, REG_TOUCH_CONFIG, 0x05D0);	//for Goodix touch panel
-    EVE_Hal_wr8(phost, REG_CPURESET, 0);
-    EVE_sleep(300);
-#endif
 }
 
 void Gpu_Release(EVE_HalContext* phost) {
@@ -147,8 +136,40 @@ int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value)
 
 /* Below are helper functions, not listed in cocmd */
 
+/**
+ * @brief Do calibration
+ *
+ * @return ft_bool_t True on successfull or otherwise
+ */
+bool EVE_Calibrate(EVE_HalContext *phost)
+{
+    uint32_t result;
+    uint32_t transMatrix[6] = { 0 };
+#if defined(EVE_SUPPORT_CAPACITIVE)
+    EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, CTOUCH_MODE_COMPATIBILITY);
+#endif
 
-void Calibration_Restore(EVE_HalContext* phost) {
+    eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
+
+    EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
+    Display_StartColor(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
+    result = EVE_CoCmd_calibrate(phost, 0);
+    eve_printf("result %x\n", result);
+    EVE_Cmd_waitFlush(phost);
+
+    eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
+
+    // Print the configured values
+    EVE_Hal_rdMem(phost, (uint8_t*)transMatrix, REG_TOUCH_TRANSFORM_A, 4 * 6); // read all the 6 coefficients
+    eve_printf_debug("Touch screen transform values are A 0x%x,B 0x%x,C 0x%x,D 0x%x,E 0x%x, F 0x%x\n",
+        transMatrix[0], transMatrix[1], transMatrix[2], transMatrix[3], transMatrix[4], transMatrix[5]);
+
+    return result != 0;
+}
+
+void Calibration_Restore(EVE_HalContext* phost)
+{
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_A, a);
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_B, b);
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_C, c);
@@ -157,7 +178,8 @@ void Calibration_Restore(EVE_HalContext* phost) {
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_F, f);
 }
 
-void Calibration_Save(EVE_HalContext* phost) {
+void Calibration_Save(EVE_HalContext* phost)
+{
     a = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_A);
     b = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_B);
     c = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_C);
@@ -165,74 +187,6 @@ void Calibration_Save(EVE_HalContext* phost) {
     e = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_E);
     f = EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_F);
 }
-
-/**
- * @brief Do calibration
- *
- * @return ft_bool_t True on successfull or otherwise
- */
-bool Calibration_Init(EVE_HalContext* phost, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
-{
-    printf("utils_calibrateInit with data:0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x\r\n", a, b, c, d, e, f);
-
-    if ((a | b | c | d | e | f) == 0)
-    {
-        printf("utils_calibrateInit zero\r\n");
-        Calibration_Show(phost);
-        Calibration_Save(phost);
-    }
-    else
-    {
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_A, a);
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_B, b);
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_C, c);
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_D, d);
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_E, e);
-        EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_F, f);
-        Calibration_Save(phost);
-    }
-    return 0;
-}
-
-bool Calibration_New(EVE_HalContext* phost) {
-    return Calibration_Init(phost, 0, 0, 0, 0, 0, 0);
-}
-
-bool Calibration_Show(EVE_HalContext* phost)
-{
-    uint32_t result;
-    uint32_t transMatrix[6] = { 0 };
-#if defined(EVE_SUPPORT_CAPACITIVE)
-    EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, CTOUCH_MODE_COMPATIBILITY);
-#else
-    EVE_Hal_wr8(phost, REG_TOUCH_ADC_MODE, ADC_DIFFERENTIAL);
-#endif
-
-    eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
-
-#ifdef BT82X_ENABLE
-    EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
-#endif
-
-    EVE_CoCmd_dlStart(phost);
-    EVE_CoDl_clearColorRgb(phost, 64, 64, 64);
-    EVE_CoDl_clear(phost, 1, 1, 1);
-    EVE_CoDl_colorRgb(phost, 0xff, 0xff, 0xff);
-
-    EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
-    result = EVE_CoCmd_calibrate(phost, 0);
-    EVE_Cmd_waitFlush(phost);
-
-    eve_printf_debug("App_CoPro_Widget_Calibrate: End\n");
-
-    // Print the configured values
-    EVE_Hal_rdMem(phost, (uint8_t*)transMatrix, REG_TOUCH_TRANSFORM_A, 4 * 6); // read all the 6 coefficients
-    eve_printf_debug("Touch screen transform values are A 0x%lx,B 0x%lx,C 0x%lx,D 0x%lx,E 0x%lx, F 0x%lx\n",
-        transMatrix[0], transMatrix[1], transMatrix[2], transMatrix[3], transMatrix[4], transMatrix[5]);
-
-    return result != 0;
-}
-
 
 void Display_StartColor(EVE_HalContext* phost, uint8_t *bgColor, uint8_t *textColor)
 {
@@ -565,7 +519,7 @@ void WelcomeScreen(EVE_HalContext *phost, char *info[])
         EVE_CoCmd_setMatrix(phost);
         Display_End(phost);
 
-    } while (EVE_Hal_rd8(phost, REG_TOUCH_TAG) != 'P');
+    } while (EVE_Hal_rd32(phost, REG_TOUCH_TAG) != 'P');
 
     Play_Sound(phost, 0x50, 255, 0xc0);
 }
@@ -602,7 +556,7 @@ void fadein(EVE_HalContext *phost)
     EVE_Hal_wr8(phost, REG_PWM_DUTY, i);
 }
 
-void scanout_swapping(EVE_HalContext *phost)
+void scanout_swapping(EVE_HalContext *phost, uint16_t fbformat, uint16_t w, uint16_t h)
 {
     EVE_Hal_wr32(phost, REG_SO_SOURCE, SWAPCHAIN_0);
     EVE_Hal_wr32(phost, REG_SO_FORMAT, fbformat);
@@ -610,7 +564,7 @@ void scanout_swapping(EVE_HalContext *phost)
     EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, fbformat, w, h);
 }
 
-void scanout_single(EVE_HalContext *phost)
+void scanout_single(EVE_HalContext *phost, uint16_t fbformat, uint16_t w, uint16_t h)
 {
     EVE_Hal_wr32(phost, REG_SO_SOURCE, DDR_FRAMEBUFFER_STARTADDR);
     EVE_Hal_wr32(phost, REG_SO_FORMAT, fbformat);
@@ -622,75 +576,68 @@ void scanout_single(EVE_HalContext *phost)
  * @brief picture ans testcard
  *
  */
-void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t testcase)
+void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode)
 {
     uint8_t TXPLLDiv = 0;
     uint8_t extsyncmode = 0;
-
-    fbformat = format;
-#if defined(DISPLAY_RESOLUTION_WSVGA)
-    extsyncmode = 1; // 0: 1 pixel single // 1: 2 pixel single // 2: 2 pixel dual // 3: 4 pixel dual
-    w = 1024;
-    h = 600;
-    EVE_Hal_wr32(phost, LVDSPLL_CFG, 0x00301075);
-#elif defined(DISPLAY_RESOLUTION_WUXGA)
+    uint8_t lvdspll_cps = 0;
+    uint16_t lock_delay = 0x180; //384
+    uint8_t lvdspll_cks = 0;
+    uint8_t lvdspll_ns = 7;
+    uint16_t w, h;
+#if defined(DISPLAY_RESOLUTION_WUXGA)
     w = 1920;
     h = 1200;
-    extsyncmode = 3; // 0: 1 pixel single // 1: 2 pixel single // 2: 2 pixel dual // 3: 4 pixel dual
     TXPLLDiv = 0x03;
     eve_printf_debug("TXPLLDiv %d\n", TXPLLDiv);
-    EVE_Hal_wr32(phost, REG_LVDS_PLLCFG, (TXPLLDiv > 4 ? (0x00300870 + TXPLLDiv) : (0x00301070 + TXPLLDiv)));
+    lvdspll_cks = TXPLLDiv > 4 ? 1 : 2;
+    EVE_Hal_wr32(phost, REG_LVDSTX_PLLCFG, LVDSTX_PLLCFG(lvdspll_cps, lock_delay, lvdspll_cks, lvdspll_ns, TXPLLDiv));
 #endif
-    EVE_Hal_wr32(phost, REG_LVDS_EN, 0);
-    EVE_Hal_wr32(phost, REG_LVDS_EN, 7);
+    EVE_Hal_wr32(phost, REG_LVDSTX_EN, 0);
+    EVE_Hal_wr32(phost, REG_LVDSTX_EN, LVDS_CH1_EN | LVDS_CH0_EN);
     EVE_sleep(10);
-    eve_printf_debug("LVDS_EN: %x \n", EVE_Hal_rd32(phost, REG_LVDS_EN));
-    eve_printf_debug("LVDSPLL_CFG: %x \n", EVE_Hal_rd32(phost, REG_LVDS_PLLCFG));
-    eve_printf_debug("LVDS_CTRL_CH0: %x \n", EVE_Hal_rd32(phost, REG_LVDS_CTRL_CH0));
-    eve_printf_debug("LVDS_CTRL_CH1: %x \n", EVE_Hal_rd32(phost, REG_LVDS_CTRL_CH1));
+    eve_printf_debug("LVDSTX_EN: %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_EN));
+    eve_printf_debug("LVDSTX_PLLCFG: %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_PLLCFG));
+    eve_printf_debug("LVDSTX_CTRL_CH0: %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_CTRL_CH0));
+    eve_printf_debug("LVDSTX_CTRL_CH1: %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_CTRL_CH1));
 
-    EVE_Hal_wr32(phost, REG_I2S_CTL, 0x2);
-    EVE_Hal_wr32(phost, REG_I2S_CFG, 0x400);
-    EVE_Hal_wr32(phost, REG_I2S_EN, 1);
-    EVE_Hal_wr32(phost, REG_I2S_FREQ, 0x3CF0);
-
-    EVE_Hal_wr32(phost, REG_SC0_SIZE, 2);
+    EVE_Hal_wr32(phost, REG_SC0_SIZE, 2); // set number of buffers to 2
     EVE_Hal_wr32(phost, REG_SC0_PTR0, SC0_PTR0_STARTADDR);
     EVE_Hal_wr32(phost, REG_SC0_PTR1, SC0_PTR1_STARTADDR);
 
-    EVE_Hal_wr32(phost, REG_SC1_SIZE, 2);
+    EVE_Hal_wr32(phost, REG_SC1_SIZE, 2); // set number of buffers to 2
     EVE_Hal_wr32(phost, REG_SC1_PTR0, SC1_PTR0_STARTADDR);
     EVE_Hal_wr32(phost, REG_SC1_PTR1, SC1_PTR1_STARTADDR);
 
-    EVE_Hal_wr32(phost, REG_SC2_SIZE, 2);
+    EVE_Hal_wr32(phost, REG_SC2_SIZE, 2); // set number of buffers to 2
     EVE_Hal_wr32(phost, REG_SC2_PTR0, SC2_PTR0_STARTADDR);
     EVE_Hal_wr32(phost, REG_SC2_PTR1, SC2_PTR1_STARTADDR);
     EVE_Cmd_waitFlush(phost);
 
-    EVE_Hal_wr32(phost, REG_SO_MODE, extsyncmode);
-    if (testcase == TESTCASE_PICTURE)
+    EVE_Hal_wr32(phost, REG_SO_MODE, FOUR_PIXEL_DUAL_LVDS);
+    if (mode == MODE_PICTURE)
     {
-        scanout_single(phost);
+        scanout_single(phost, format, w, h);
     }
-    else if (testcase == TESTCASE_DIRECTVIDEO)
+    else if (mode == MODE_DIRECTVIDEO)
     {
-        EVE_Hal_wr32(phost, REG_SO_FORMAT, fbformat);
+        EVE_Hal_wr32(phost, REG_SO_FORMAT, format);
 
-        EVE_Hal_wr32(phost, REG_SO_EN, 0);
-        EVE_Hal_wr32(phost, REG_SC1_RESET, 1);
+        EVE_Hal_wr32(phost, REG_SO_EN, 0); // disable
+        EVE_Hal_wr32(phost, REG_SC1_RESET, 1); // write to reset
         EVE_Hal_wr32(phost, REG_SO_SOURCE, SWAPCHAIN_1);
-        EVE_Hal_wr32(phost, REG_SO_EN, 1);
+        EVE_Hal_wr32(phost, REG_SO_EN, 1); // enable
     }
-    else if (testcase == TESTCASE_VIDEO)
+    else if (mode == MODE_VIDEO)
     {
-        scanout_swapping(phost);
+        scanout_swapping(phost, format, w, h);
     }
     else
     {
-        scanout_swapping(phost);
+        scanout_swapping(phost, format, w, h);
     }
 
     EVE_Cmd_waitFlush(phost);
-    eve_printf_debug("LVDS_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDS_STAT));
-    eve_printf_debug("LVDS_ERR_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDS_ERR_STAT));
+    eve_printf_debug("LVDS_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_STAT));
+    eve_printf_debug("LVDS_ERR_STAT is %x \n", EVE_Hal_rd32(phost, REG_LVDSTX_ERR_STAT));
 }

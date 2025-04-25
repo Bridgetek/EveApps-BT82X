@@ -108,7 +108,6 @@ It may also set platform, display, and flash values if none are configured.
 #if defined(EVE_GRAPHICS_BT820)
 
 #define BT820_ENABLE
-#define ENABLE_SPI_QUAD
 #define RESISTANCE_THRESHOLD (1800)
 
 #ifndef EVE_DISPLAY_AVAILABLE
@@ -120,7 +119,6 @@ It may also set platform, display, and flash values if none are configured.
 
 // Re-Mapping BT820 Series to BT82X
 #if defined(BT820_ENABLE)
-#define BT82X_ENABLE
 #define EVE_SUPPORT_CHIPID EVE_BT820
 #define EVE_SUPPORT_GEN EVE5
 #endif
@@ -128,6 +126,15 @@ It may also set platform, display, and flash values if none are configured.
 /** Display config **/
 #if defined(EVE_DISPLAY_WUXGA)
 #define DISPLAY_RESOLUTION_WUXGA
+#endif
+
+/** SPI config **/
+#if defined(EVE_SPI_QUAD)
+#define ENABLE_SPI_QUAD
+#elif defined(EVE_SPI_DUAL)
+#define ENABLE_SPI_DUAL
+#else
+#define ENABLE_SPI_SINGLE
 #endif
 
 /** DDR config **/

@@ -55,25 +55,33 @@ Go to property
 
 Change settings (EVE_PLATFORM_FT4222 / EVE_PLATFORM_MPSSE)
 
-![setting](https://github.com/user-attachments/assets/9ea058a0-e7a5-497c-a7da-cb71f9b23cb0)
+![image](https://github.com/user-attachments/assets/9dd29dea-abd3-4a09-a5f6-31b4f318d41a)
 
 press F5 to build and run
 
 #### Way 2: Use Cmake: (Need Cmake 3.19 installed)
 ```sh
 #Launch the Developer Command Prompt for VS
-cd X:\source\EveApps
+cd [path to EveApps]
 mkdir build
 cd build
-cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] ..
-nmake [Project name]
+cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=[EVE graphics] -DEVE_APPS_DISPLAY=[EVE display] -DEVE_APPS_SPI=[EVE SPI] -DCMAKE_BUILD_TYPE=Debug ..
+nmake SampleApp_[Project Name]
 
-# EVE_APPS_PLATFORM can be FT4222 or MPSSE
-# [EVE graphics] can be BT820
-# [Project name] is the folder name of a subfolder inside SampleApp
+# EVE_APPS_PLATFORM can be one of : EVE_PLATFORM_FT4222 or EVE_PLATFORM_MPSSE
+# [EVE graphics] must be : EVE_GRAPHICS_BT820
+# [EVE display] must be:  EVE_DISPLAY_WUXGA   (1920x1200 LCD)
+# [EVE SPI] can be one of : EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE  (FT4222 can support Quad/Dual/Single, MPSSE supports single only)
+# [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
+# The output binary [Project Name].exe  can be found in build\[Project Name]
+
+One example is :
+cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
 example: 
-![image](https://github.com/user-attachments/assets/93515ee2-33c7-4b45-9c88-42c2b2949860)
+![image](https://github.com/user-attachments/assets/d1d4b27c-8634-44d4-a0db-1efed9333bd4)
 
-![image](https://github.com/user-attachments/assets/a7d0cc56-bd20-4baa-93d7-84a02bcceb1f)
+![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
+
+

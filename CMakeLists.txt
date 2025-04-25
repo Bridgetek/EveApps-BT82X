@@ -1,11 +1,11 @@
 # CMake project ################################################################
 #
 # 1. Build for FT4222 example: Use Deveoper Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_QUAD -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
 # 2. Build for MPSSE example: Use Developer Command Promt For VS
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_QUAD -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
 
@@ -141,6 +141,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_definitions("-D${EVE_APPS_GRAPHICS}")
 add_definitions("-D${EVE_APPS_PLATFORM}")
 add_definitions("-D${EVE_APPS_DISPLAY}")
+add_definitions("-D${EVE_APPS_SPI}")
 
 # Common setup #################################################################
 ADD_SUBDIRECTORY(common)

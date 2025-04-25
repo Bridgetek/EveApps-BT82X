@@ -108,19 +108,6 @@ static void startBufferTransfer(EVE_HalContext *phost)
 }
 
 /**
- * @brief Start transfer data to EVE
- * 
- * @param phost Pointer to Hal context
- */
-static void startCodeBufferTransfer(EVE_HalContext *phost)
-{
-	if (phost->Status != EVE_STATUS_WRITING)
-	{
-		EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, RAM_J1CODE);
-	}
-}
-
-/**
  * @brief Write string to Coprocessor's comand fifo
  * 
  * @param phost Pointer to Hal context
@@ -214,55 +201,6 @@ static uint32_t wrBuffer(EVE_HalContext *phost, const void *buffer, uint32_t siz
 }
 
 /**
- * @brief Write buffer to Coprocessor's comand fifo
- * 
- * @param phost Pointer to Hal context
- * @param buffer Data pointer
- * @param size Size to write
- * @param progmem True if ProgMem 
- * @param string True is string
- * @return uint32_t Byte transfered
- */
-static uint32_t wrCodeBuffer(EVE_HalContext *phost, const void *buffer, uint32_t size, uint32_t* remaining_space)
-{
-	uint32_t transfered = 0;
-
-	do
-	{
-		uint32_t transfer = (size - transfered);
-		uint32_t space = *remaining_space;
-		uint32_t req = min(transfer, (0x8000));
-		if (space < req)
-		{
-			eve_printf("error");
-			return transfered; /* Coprocessor fault */
-		}
-		if (transfer)
-		{
-			startCodeBufferTransfer(phost);
-			EVE_Hal_transferMem(phost, NULL, &((uint8_t *)buffer)[transfered], transfer);
-			if ((transfer & 0x3))
-			{
-				uint32_t pad = 4 - (transfer & 0x3);
-				uint8_t padding[4] = { 0 };
-				eve_assert((transfered + transfer) == size);
-				EVE_Hal_transferMem(phost, NULL, padding, pad);
-				transfer += pad;
-				eve_assert(!(transfer & 0x3));
-			}
-			transfered += transfer;
-			if (!phost->CmdFunc) /* Keep alive while writing function */
-			{
-				EVE_Hal_endTransfer(phost);
-			}
-			space -= (uint16_t)transfer;
-			*remaining_space = space;
-		}
-	} while (transfered < size);
-	return transfered;
-}
-
-/**
  * @brief Begin writing a function, keeps the transfer open
  * 
  * @param phost Pointer to Hal context
@@ -301,22 +239,6 @@ bool EVE_Cmd_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size)
 	eve_assert(!phost->CmdWaiting);
 	eve_assert(phost->CmdBufferIndex == 0);
 	return wrBuffer(phost, buffer, size, false, false) == size;
-}
-
-/**
- * @brief Write buffer to Coprocessor's command fifo
- * 
- * @param phost Pointer to Hal context
- * @param buffer Data pointer
- * @param size Size to write
- * @return true Write ok
- * @return false Write error
- */
-bool EVE_Cmd_wrCodeMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size, uint32_t* space)
-{
-	eve_assert(!phost->CmdWaiting);
-	eve_assert(phost->CmdBufferIndex == 0);
-	return wrCodeBuffer(phost, buffer, size, space) == size;
 }
 
 /**
@@ -443,9 +365,9 @@ bool EVE_Cmd_wr32(EVE_HalContext *phost, uint32_t value)
  * 
  * @param phost Pointer to Hal context
  * @param bytes Number of bytes to move
- * @return uint16_t Previous write pointer
+ * @return uint32_t Previous write pointer
  */
-uint16_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes)
+uint32_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes)
 {
 	uint32_t wp;
 	uint32_t prevWp;
@@ -488,7 +410,7 @@ static bool checkWait(EVE_HalContext *phost, uint16_t rpOrSpace)
 		{
 			eve_printf_debug("Coprocessor fault\n");
 			debugBackupRamG(phost);
-			EVE_Hal_rdMem(phost, (uint8_t *)err, RAM_ERR_REPORT, RAM_ERR_REPORT_MAX);
+			EVE_Hal_rdMem(phost, (uint8_t *)err, RAM_REPORT, RAM_REPORT_MAX);
 			eve_printf_debug("%s\n", err);
 		}
 #endif

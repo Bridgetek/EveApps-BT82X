@@ -44,7 +44,7 @@
 ** MARCOS **
 ***********/
 
-#define RAM_ERR_REPORT_MAX 128
+#define RAM_REPORT_MAX 128
 
 /*************
 ** TYPEDEFS **
@@ -87,8 +87,7 @@ typedef enum EVE_PWR_STATE_T
 	EVE_PWR_STATE_ACTIVE = 0, /**< 0 */
 	EVE_PWR_STATE_STANDBY,
 	EVE_PWR_STATE_SLEEP,
-	EVE_PWR_STATE_POWERDOWN,
-	EVE_PWR_STATE_PULSE
+	EVE_PWR_STATE_POWERDOWN
 } EVE_PWR_STATE_T;
 
 /** SETPLLSP1 */
@@ -277,7 +276,7 @@ typedef struct EVE_HalContext
 
 #if defined(_DEBUG)
 	bool DebugMessageVisible;
-	uint8_t DebugBackup[RAM_ERR_REPORT_MAX];
+	uint8_t DebugBackup[RAM_REPORT_MAX];
 #endif
 
 	/** @name Status flags */

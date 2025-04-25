@@ -257,11 +257,6 @@ void EVE_CoCmd_sync(EVE_HalContext *phost)
 	EVE_CoCmd_d(phost, CMD_SYNC);
 }
 
-void EVE_CoCmd_clearCache(EVE_HalContext *phost)
-{
-	EVE_CoCmd_d(phost, CMD_CLEARCACHE);
-}
-
 void EVE_CoCmd_nop(EVE_HalContext *phost)
 {
 	EVE_CoCmd_d(phost, CMD_NOP);
@@ -294,7 +289,7 @@ void EVE_CoCmd_endList(EVE_HalContext *phost)
 
 bool EVE_CoCmd_getMatrix(EVE_HalContext *phost, int32_t *m)
 {
-	uint16_t resAddr;
+	uint32_t resAddr;
 	int i;
 
 #if EVE_CMD_HOOKS

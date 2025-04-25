@@ -124,12 +124,6 @@ void EVE_CoCmd_coldStart(EVE_HalContext *phost);
 void EVE_CoCmd_sync(EVE_HalContext *phost);
 
 /**
- * @brief Send CMD_CLEARCACHE
- *
- * @param phost Pointer to Hal context
- */
-void EVE_CoCmd_clearCache(EVE_HalContext *phost);
-/**
  * @brief Send CMD_NOP
  *
  * @param phost Pointer to Hal context
@@ -720,6 +714,44 @@ uint32_t EVE_CoCmd_sdattach(EVE_HalContext *phost, uint32_t options, uint32_t re
  * @param result
  */
 uint32_t EVE_CoCmd_fssource(EVE_HalContext *phost, const char *file, uint32_t result);
+
+/**
+ * @brief Send CMD_FSREAD.
+ *
+ * @param phost Pointer to Hal context
+ * @param dst destination address in RAM
+ * @param file file name
+ * @param result
+ */
+uint32_t EVE_CoCmd_fsread(EVE_HalContext *phost, uint32_t dst, const char *file, uint32_t result);
+
+/**
+ * @brief Send CMD_FSOPTION.
+ *
+ * @param phost Pointer to Hal context
+ * @param options
+ */
+void EVE_CoCmd_fsoption(EVE_HalContext *phost, uint32_t options);
+
+/**
+ * @brief Send CMD_FSSIZE.
+ *
+ * @param phost Pointer to Hal context
+ * @param file file name
+ * @param size
+ */
+uint32_t EVE_CoCmd_fssize(EVE_HalContext *phost, const char *file, uint32_t size);
+
+/**
+ * @brief Send CMD_FSDIR.
+ *
+ * @param phost Pointer to Hal context
+ * @param dst start of buffer
+ * @param num size of buffer
+ * @param path path of directory to list
+ * @param result
+ */
+uint32_t EVE_CoCmd_fsdir(EVE_HalContext *phost, uint32_t dst, uint32_t num, const char *path, uint32_t result);
 
 /**
  * @brief Send CMD_PLAYWAV.
