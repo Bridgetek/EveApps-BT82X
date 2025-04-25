@@ -1,7 +1,8 @@
 
 
-# EveApps-BT82X
+# EveApps-BT82X-RP2040
 EveApps-BT82X is a collection of applications designed as reference resources for Bridgetek's 5th-generation graphics controller, the BT82X.
+EveApps-BT82X-RP2040 branch adds RP2040 interfacing with VM820C.
 
 The collection is divided into two categories: **Sample** and **Demo** applications. Both are written in ANSI C, with complete source code provided.
 
@@ -83,5 +84,19 @@ example:
 ![image](https://github.com/user-attachments/assets/d1d4b27c-8634-44d4-a0db-1efed9333bd4)
 
 ![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
+
+### RP2040
+#### Use Cmake: (Need Cmake 3.19 installed)
+```sh
+#Launch the Developer Command Prompt for VS
+cd [path to EveApps]
+mkdir build
+cd build
+cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_RP2040 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA ..
+nmake SampleApp_[Project Name]
+
+# [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
+# The output binary [Project Name].exe  can be found in build\[Project Name]
+```
 
 
