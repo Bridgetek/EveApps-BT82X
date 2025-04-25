@@ -52,8 +52,9 @@ Mkfile.old
 dkms.conf
 
 # MSVC build files
-Debug
-Release
-.vs
+*Debug
+*Release
+*.vs
+*build
 
 *.bak

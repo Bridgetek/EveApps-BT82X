@@ -384,17 +384,15 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		boot_cfg_en.enable = 1;
 		EVE_Hal_SPICmd_bootcfgen(phost, boot_cfg_en);
 		boot_cfg.DDR = 1;
-		boot_cfg.JT = 1;
+		boot_cfg.touch = 1;
 		boot_cfg.audio = 1;
 		boot_cfg.watchdog = 1;
 		boot_cfg.source = 0;
-		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg); // REG_BOOT_CONTROL settings: DDR(0) JT(1) AUD(1) WD(0) reserved source(0)
+		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg); // REG_BOOT_CONTROL settings: DDR(0) touch(1) AUD(1) WD(0) reserved source(0)
 		ddr_type.speed = 0; //1333
 		ddr_type.type = 1;
 		ddr_type.size = EVE_DDR_SIZE;
 		EVE_Hal_SPICmd_setddrtype(phost, ddr_type);
-		gpreg.mode = 0;
-		EVE_Hal_SPICmd_setgpreg(phost, gpreg); // SPI Master slow mode(0) 
 		boot_cfg_en.boot = 1;
 		boot_cfg_en.DDRtype = 1;
 		boot_cfg_en.GPREG = 0;

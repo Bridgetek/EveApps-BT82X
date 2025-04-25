@@ -85,7 +85,6 @@ void EVE_Hal_SPICmd_sysclkdiv(EVE_HalContext *phost, EVE_CMD_SYS_CLK_DIV val);
 void EVE_Hal_SPICmd_setbootcfg(EVE_HalContext *phost, EVE_CMD_BOOT_CFG val);
 void EVE_Hal_SPICmd_bootcfgen(EVE_HalContext *phost, EVE_CMD_BOOT_CFG_EN val);
 void EVE_Hal_SPICmd_setddrtype(EVE_HalContext *phost, EVE_CMD_DDR_TYPE val);
-void EVE_Hal_SPICmd_setgpreg(EVE_HalContext *phost, EVE_CMD_GPREG val);
 ///@}
 
 #endif /* #ifndef EVE_HAL__H */

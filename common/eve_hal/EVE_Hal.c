@@ -331,7 +331,7 @@ void EVE_Hal_SPICmd_pwr_state(EVE_HalContext *phost, EVE_PWR_STATE_T state)
 		CmdBuf[1] = 0xE7;
 		break;
 	default:
-		break;
+		return;
 	}
 	EVE_Hal_spiCommand(phost, CmdBuf);
 }
@@ -371,13 +371,13 @@ void EVE_Hal_SPICmd_sysclkdiv(EVE_HalContext *phost, EVE_CMD_SYS_CLK_DIV val)
  * @param val
  * ----------------------------------------------------
  * |  7  |  6  |  5  |  4     |  3  |  2  |  1  |  0  |
- * | DDR | JT  |audio|watchdog| rev |      source     |
+ * | DDR |touch|audio|watchdog| rev |      source     |
  * ----------------------------------------------------
  */
 void EVE_Hal_SPICmd_setbootcfg(EVE_HalContext *phost, EVE_CMD_BOOT_CFG val)
 {
 	uint8_t CmdBuf[5] = { 0xFF, 0xE8, 0x00, 0x00, 0x00 };
-	CmdBuf[2] = (val.DDR << 7) | (val.JT << 6) | (val.audio << 5) | (val.watchdog << 4) | val.source;
+	CmdBuf[2] = (val.DDR << 7) | (val.touch << 6) | (val.audio << 5) | (val.watchdog << 4) | val.source;
 	EVE_Hal_spiCommand(phost, CmdBuf);
 }
 
@@ -408,21 +408,6 @@ void EVE_Hal_SPICmd_setddrtype(EVE_HalContext *phost, EVE_CMD_DDR_TYPE val)
 {
 	uint8_t CmdBuf[5] = { 0xFF, 0xEB, 0x00, 0x00, 0x00 };
 	CmdBuf[2] = (val.speed << 5) | (val.type << 3) | val.size;
-	EVE_Hal_spiCommand(phost, CmdBuf);
-}
-
-/**
- * @brief program a 32-bit general purpose register
- * @param val
- * -------------------------------------------------
- * |  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
- * |              rev                        |mode |
- * -------------------------------------------------
- */
-void EVE_Hal_SPICmd_setgpreg(EVE_HalContext *phost, EVE_CMD_GPREG val)
-{
-	uint8_t CmdBuf[5] = { 0xFF, 0xEC, 0x00, 0x00, 0x00 };
-	CmdBuf[2] = val.mode;
 	EVE_Hal_spiCommand(phost, CmdBuf);
 }
 ///@}
