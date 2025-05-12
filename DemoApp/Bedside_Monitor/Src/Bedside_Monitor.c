@@ -21,60 +21,35 @@
 EVE_HalContext s_halContext;
 EVE_HalContext* s_pHalContext;
 void SAMAPP_Bedside_Monitor();
-#define SAMAPP_DELAY EVE_sleep(2000);
 #define SCANOUT_FORMAT RGB8
 
-// flash.map content
-static const uint32_t arial_25_ASTC_glyph           []={ 649344   , 52416 };
-static const uint32_t arial_25_ASTC_xfont           []={ 701760   , 176   };
-static const uint32_t arial_25_ASTC_xfont_padding   []={ 701936   , 16    };
-static const uint32_t arial_38_ASTC_glyph           []={ 1880704  , 157248};
-static const uint32_t arial_38_ASTC_xfont           []={ 2037952  , 176   };
-static const uint32_t arial_38_ASTC_xfont_padding   []={ 2038128  , 16    };
-static const uint32_t ARIALNB_88_ASTC_glyph         []={ 10943360 , 66560 };
-static const uint32_t ARIALNB_88_ASTC_xfont         []={ 11009920 , 176   };
-static const uint32_t ARIALNB_88_ASTC_xfont_padding []={ 11010096 , 16    };
+typedef struct
+{
+	uint32_t ramg_address;
+	uint32_t flash_address;
+	uint32_t size_on_flash;
+} app_image_from_flash_t;
 
-#define F_ADDR 0
-#define F_SIZE 1
-
-typedef struct {
-	uint32_t flash_addr;
-	uint32_t flash_size;
-
-	uint32_t xfont_addr;
-	uint32_t xfont_size;
-	uint32_t handler;
-	uint32_t* xfont;
-	uint32_t cache_addr;
-	uint32_t cache_size;
-}app_font;
-
-app_font font0 = { .xfont = &ARIALNB_88_ASTC_xfont };
-app_font font2 = { .xfont = &arial_25_ASTC_xfont };
-app_font* fonts[] = { &font0, &font2 };
-uint32_t zoom_in[] = { 0, 11010112 , 784 + 48}; // structure: address on ramg (set later), address on flash, size
-uint32_t zoom_out[] = { 0, 11010944 , 784 + 48};
+uint32_t font0 = FONT_34;
+uint32_t font2 = 30;
+app_image_from_flash_t zoom_in = { 0, 4096, 832 };
+app_image_from_flash_t zoom_out = { 0, 4928, 832};
 
 int32_t main(int32_t argc, char* argv[])
 {
 	s_pHalContext = &s_halContext;
 	Gpu_Init(s_pHalContext);
-#if defined(BT82X_ENABLE)
-	LVDS_Config(s_pHalContext, SCANOUT_FORMAT, TESTCASE_PICTURE);
+#if defined(BT820_ENABLE)
+	LVDS_Config(s_pHalContext, SCANOUT_FORMAT, MODE_PICTURE);
 #endif
 
 	EVE_Util_clearScreen(s_pHalContext);
 
 	// read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && !defined(BT82X_ENABLE) && GET_CALIBRATION == 1
-	Calibration_New(s_pHalContext);
+#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+	EVE_Calibrate(s_pHalContext);
 #endif 
 
-#if !defined(BT8XXEMU_PLATFORM)
-	uint32_t sent = Flash_Init(s_pHalContext, TEST_DIR "ew2025_bedside_monitor_bt81x.bin", "ew2025_bedside_monitor_bt81x.bin", 0);
-#endif
-	FlashHelper_SwitchFullMode(s_pHalContext);
 
 	char* info[] = { "EVE Sample Application",
 					"This sample demonstrate a Beside Monitoring",
@@ -92,7 +67,7 @@ int32_t main(int32_t argc, char* argv[])
 
 		/* Init HW Hal for next loop*/
 		Gpu_Init(s_pHalContext);
-#if !defined(BT8XXEMU_PLATFORM) && !defined(BT82X_ENABLE) && GET_CALIBRATION == 1
+#if !defined(BT8XXEMU_PLATFORM) && !defined(BT820_ENABLE) && GET_CALIBRATION == 1
 		Calibration_Restore(s_pHalContext);
 #endif
 	}
@@ -111,66 +86,6 @@ uint8_t month_mode = MONTH_MODE_DIGIT;
 #define TIME_MODE_HH_MM_SS_MS 2
 uint8_t time_mode = TIME_MODE_HH_MM;
 
-void load_app_assets(uint32_t ramg_offset) {
-
-	// font addr calculation
-	const uint8_t font_handler_start = 9;
-	uint32_t num_font = sizeof(fonts) / sizeof(app_font*);
-
-	// prepare the font
-	for (int32_t i = 0; i < num_font; i++) {
-		app_font* f = fonts[i];
-
-		f->flash_addr = f->xfont[F_ADDR];
-		f->flash_size = f->xfont[F_SIZE];
-		f->handler = i + font_handler_start;
-		f->xfont_addr = ALIGN_UP_TO_N( ramg_offset, 32); // SetFont2 32 bit align
-		f->xfont_size = f->flash_size;
-		ramg_offset = f->xfont_addr + f->xfont_size;
-	
-		// prepare font handler
-		Display_Start(s_pHalContext);
-		EVE_CoCmd_flashRead(s_pHalContext, f->xfont_addr, f->flash_addr, f->flash_size);
-		EVE_CoCmd_setFont2(s_pHalContext, f->handler, f->xfont_addr, 0);
-		Display_End(s_pHalContext);
-	}
-
-	// zoom icon
-	zoom_in[0] = ramg_offset;
-	zoom_out[0] = zoom_in[0] + zoom_in[2];
-	EVE_CoCmd_flashRead(s_pHalContext, zoom_in[0], zoom_in[1], zoom_in[2]);
-	EVE_CoCmd_flashRead(s_pHalContext, zoom_out[0], zoom_out[1], zoom_out[2]);
-
-#define ENABLE_FONT_CACHE 1
-#if ENABLE_FONT_CACHE
-	// caching the font, only BT817/8, BT82x incompatible
-	ramg_offset += zoom_in[2] + zoom_out[2];
-	uint32_t ramg_remain = RAM_G_SIZE - ramg_offset;
-	uint32_t cache_size_per_font = ramg_remain / num_font;
-	for (int32_t i = 0; i < num_font; i++) {
-		app_font* f = fonts[i];
-		
-		uint32_t cache_size = min(cache_size_per_font, RAM_G_SIZE - ramg_offset);
-		if (cache_size < 16 * 1024) {
-			printf("Warning: RAMG free < 16Kb\n");
-			break;
-		}
-		if (ramg_offset > RAM_G_SIZE) {
-			printf("Warning: RAMG full\n");
-			break;
-		}
-		
-		f->cache_addr = ALIGN_UP_TO_N(ramg_offset, 64); // 64-byte aligned.
-		f->cache_size = ALIGN_UP_TO_N(cache_size, 4); // 4 byte aligned. Must be at least 16 Kbytes.
-
-		Display_Start(s_pHalContext);
-		EVE_CoCmd_fontCache(s_pHalContext, f->handler, f->cache_addr, f->cache_size);
-		Display_End(s_pHalContext);
-		ramg_offset = f->cache_addr + f->cache_size;
-	}
-#endif
-}
-
 void draw_app_window(app_box app_window)
 {
 	int32_t border = 5;
@@ -188,19 +103,13 @@ void draw_app_window(app_box app_window)
 
 #define ENABLE_SCREENSHOT_CAPTURE 0
 
-#define USE_BITMAP_L1                  0
 #define USE_BITMAP_L1_ROTATE           1
 #define USE_BITMAP_PALETTED_ROTATE     2
 #define USE_BITMAP_BARGRAPH            3
-#define USE_BITMAP_LINESTRIP           4
 
 #define USEBITMAP USE_BITMAP_L1_ROTATE
 
-#if  USEBITMAP == USE_BITMAP_L1
-#define GRAPH_INIT graph_l1_init
-#define GRAPH_DRAW graph_l1_draw
-
-#elif  USEBITMAP == USE_BITMAP_L1_ROTATE
+#if  USEBITMAP == USE_BITMAP_L1_ROTATE
 #define GRAPH_INIT graph_l1_rotate_init
 #define GRAPH_DRAW graph_l1_rotate_draw
 
@@ -211,10 +120,6 @@ void draw_app_window(app_box app_window)
 #elif  USEBITMAP == USE_BITMAP_BARGRAPH
 #define GRAPH_INIT graph_bargraph_init
 #define GRAPH_DRAW graph_bargraph_draw
-
-#elif  USEBITMAP == USE_BITMAP_LINESTRIP
-#define GRAPH_INIT graph_linestrip_init
-#define GRAPH_DRAW graph_linestrip_draw
 
 #endif
 
@@ -241,11 +146,16 @@ uint32_t grid_bytes = 0;
 uint32_t graph_size_ramg = 0;
 uint8_t is_datetime_setting_active = 0;
 
-void process_event() {
-#if defined(BT82X_ENABLE)
-	return; // disable touch on bt820
-#endif
 
+void load_app_assets(uint32_t ramg_offset)
+{
+	Draw_Text(s_pHalContext, "Loading images ...");
+	EVE_Util_loadImageFile(s_pHalContext, ramg_offset, TEST_DIR "\\Flash\\zoom-in-25-white_25x25_ARGB4_converted.png", NULL, OPT_RGB565);
+	EVE_Util_loadImageFile(s_pHalContext, ramg_offset + 1024, TEST_DIR "\\Flash\\zoom-out-25-white_25x25_ARGB4_converted.png", NULL, OPT_RGB565);
+}
+
+
+void process_event() {
 #if  USEBITMAP == USE_BITMAP_BARGRAPH
 	return; // disable touch on bargraph
 #endif
@@ -282,6 +192,7 @@ void process_event() {
 	}
 
 	if (ges->distanceX > 300) { // 300 pixels
+		return;
 		is_datetime_setting_active = 1;
 		dateime_adjustment(s_pHalContext);
 		//reset graph
@@ -367,7 +278,7 @@ void SAMAPP_Bedside_Monitor()
 	int32_t graph_margin_l = box_ecg.w / 40;
 	int32_t graph_margin_r = 5;
 	int32_t graph_margin_b = box_ecg.h / 10;
-	int32_t graph_margin_w = graph_margin_l + graph_margin_r + graph_start;
+	int32_t graph_margin_w = graph_margin_l + graph_margin_r + 35;
 	int32_t graph_margin_h = graph_margin_t + graph_margin_b;
 
 	box_graph_ecg = INIT_APP_BOX(box_ecg.x + graph_margin_l, box_ecg.y + graph_margin_t, box_ecg.w - graph_margin_w, box_ecg.h - graph_margin_h);
@@ -386,7 +297,7 @@ void SAMAPP_Bedside_Monitor()
 	app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
 
 	init_datetime(11, 12, 2024, 9, 11, 0, 0);
-	dateime_adjustment(s_pHalContext); // set date and time at initialize
+	//dateime_adjustment(s_pHalContext); // set date and time at initialize
 
 	int32_t time_start_ms = 0;
 	int32_t val_hr = 66;
@@ -398,8 +309,12 @@ void SAMAPP_Bedside_Monitor()
 	static int32_t screenshot_counter = 0;
 
 	graph_size_ramg = GRAPH_INIT(&box_graph_ecg, &box_graph_pth, &box_graph_co2);
+	graph_size_ramg += 1024 * 1024;
 	load_app_assets(graph_size_ramg);
-	
+
+	zoom_in.ramg_address = graph_size_ramg;
+	zoom_out.ramg_address = graph_size_ramg+1024;
+
 	while (1)
 	{
 		Display_Start(s_pHalContext);
@@ -407,7 +322,7 @@ void SAMAPP_Bedside_Monitor()
 
 		process_event();
 
-#if defined(BT82X_ENABLE)
+#if defined(BT820_ENABLE)
 		EVE_CoCmd_sync(s_pHalContext);
 #endif
 
@@ -506,10 +421,10 @@ void SAMAPP_Bedside_Monitor()
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 #define ENABLE_FONT_CUSTOM 0
 #if ENABLE_FONT_CUSTOM 
-		EVE_CoCmd_text(s_pHalContext, x + 5, y, font1.handler, OPT_CENTERY, "Bed");
-		EVE_CoCmd_text(s_pHalContext, x + 155, y, font1.handler, OPT_CENTERY, "No. 5");
-		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, font1.handler, OPT_CENTERY | OPT_RIGHTX, hh_mm());
-		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, font1.handler, OPT_CENTER, dd_mm_yyyy());
+		EVE_CoCmd_text(s_pHalContext, x + 5, y, font1, OPT_CENTERY, "Bed");
+		EVE_CoCmd_text(s_pHalContext, x + 155, y, font1, OPT_CENTERY, "No. 5");
+		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_end - 10, y, font1, OPT_CENTERY | OPT_RIGHTX, hh_mm());
+		EVE_CoCmd_text(s_pHalContext, box_menu_top.x_mid, y, font1, OPT_CENTER, dd_mm_yyyy());
 #else
 		EVE_CoCmd_text(s_pHalContext, x + 5, y, FONT_32, OPT_CENTERY, "Bed");
 		EVE_CoCmd_text(s_pHalContext, x + 155, y, 31, OPT_CENTERY, "No. 5");
@@ -538,20 +453,20 @@ void SAMAPP_Bedside_Monitor()
 		btn_h = 40;
 		x = box_menu_top.x_end + (app_window.x_end - box_menu_top.x_end) / 2 - btn_w / 2;
 		y = box_menu_top.y_mid - btn_h / 2;
-		int zoom_icon_wh = 28;
+		int zoom_icon_wh = 25;
 		int zoom_icon_padding = 5;
 		app_box zoombox= INIT_APP_BOX(x, y, btn_w, btn_h); // top right side
 		EVE_Cmd_wr32(s_pHalContext, TAG(0));
 		EVE_CoCmd_button(s_pHalContext, zoombox.x, zoombox.y, zoombox.w, zoombox.h, 28, 0, "");
 		EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 0, 0));
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out[0], COMPRESSED_RGBA_ASTC_4x4_KHR, zoom_icon_wh, zoom_icon_wh);
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_out.ramg_address, OPT_RGB565, zoom_icon_wh, zoom_icon_wh);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
 		EVE_DRAW_AT(zoombox.x + zoom_icon_padding, zoombox.y_mid - zoom_icon_wh/2); // 14 is zoom icon height / 2
-		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in[0], COMPRESSED_RGBA_ASTC_4x4_KHR, zoom_icon_wh, zoom_icon_wh);
+		EVE_CoCmd_setBitmap(s_pHalContext, zoom_in.ramg_address, OPT_RGB565, zoom_icon_wh, zoom_icon_wh);
 		EVE_Cmd_wr32(s_pHalContext, BEGIN(BITMAPS));
 		EVE_DRAW_AT(zoombox.x_end - zoom_icon_wh - zoom_icon_padding, zoombox.y_mid - zoom_icon_wh / 2);
-		EVE_CoCmd_text(s_pHalContext, zoombox.x_mid, zoombox.y_mid, font2.handler, OPT_FORMAT | OPT_CENTER, "%d", g_graph_zoom_lv);
+		EVE_CoCmd_text(s_pHalContext, zoombox.x_mid, zoombox.y_mid, font2, OPT_FORMAT | OPT_CENTER, "%d", g_graph_zoom_lv);
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_A(0));
 		// transparent touch circle
@@ -563,9 +478,9 @@ void SAMAPP_Bedside_Monitor()
 
 		// Graph title text information
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
-		EVE_CoCmd_text(s_pHalContext, box_ecg.x + box_ecg.w / 100, box_ecg.y + box_ecg.h / 10, font2.handler, 0, "ECG");
-		EVE_CoCmd_text(s_pHalContext, box_pth.x + box_pth.w / 100, box_pth.y + box_pth.h / 10, font2.handler, 0, "PLETH");
-		EVE_CoCmd_text(s_pHalContext, box_co2.x + box_co2.w / 100, box_co2.y + box_co2.h / 10, font2.handler, 0, "CO2");
+		EVE_CoCmd_text(s_pHalContext, box_ecg.x + box_ecg.w / 100, box_ecg.y + box_ecg.h / 10, font2, 0, "ECG");
+		EVE_CoCmd_text(s_pHalContext, box_pth.x + box_pth.w / 100, box_pth.y + box_pth.h / 10, font2, 0, "PLETH");
+		EVE_CoCmd_text(s_pHalContext, box_co2.x + box_co2.w / 100, box_co2.y + box_co2.h / 10, font2, 0, "CO2");
 
 		// create random data change
 		int32_t time_end_ms = EVE_millis();
@@ -589,30 +504,30 @@ void SAMAPP_Bedside_Monitor()
 		EVE_Cmd_wr32(s_pHalContext, BITMAP_HANDLE(0));
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 0));
 		// Heart rate
-		EVE_CoCmd_text(s_pHalContext, box_right1.x + 5, box_right1.y + 5, font2.handler, 0, "HR");
-		EVE_CoCmd_number(s_pHalContext, box_right1.x_mid, box_right1.y_mid, font0.handler, OPT_CENTER, val_hr);
-		EVE_CoCmd_text(s_pHalContext, box_right1.x_mid + 40, box_right1.y_mid, font2.handler, OPT_CENTERY, "bpm");
+		EVE_CoCmd_text(s_pHalContext, box_right1.x + 5, box_right1.y + 5, font2, 0, "HR");
+		EVE_CoCmd_number(s_pHalContext, box_right1.x_mid, box_right1.y_mid, font0, OPT_CENTER, val_hr);
+		EVE_CoCmd_text(s_pHalContext, box_right1.x_mid + 50, box_right1.y_mid, font2, OPT_CENTERY, "bpm");
 
 		// SPO2
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(0, 255, 255));
-		EVE_CoCmd_text(s_pHalContext, box_right2.x + 5, box_right2.y + 5, font2.handler, 0, "spO2");
+		EVE_CoCmd_text(s_pHalContext, box_right2.x + 5, box_right2.y + 5, font2, 0, "spO2");
 		EVE_CoCmd_number(s_pHalContext, box_right2.x_mid, box_right2.y_mid, FONT_33, OPT_CENTER, val_spo2);
-		EVE_CoCmd_text(s_pHalContext, box_right2.x_mid + 40, box_right2.y_mid, font2.handler, OPT_CENTERY, "%");
+		EVE_CoCmd_text(s_pHalContext, box_right2.x_mid + 40, box_right2.y_mid, font2, OPT_CENTERY, "%");
 
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 0));
 		// ETCO2
-		EVE_CoCmd_text(s_pHalContext, box_right3.x + 5, box_right3.y + 5, font2.handler, 0, "etCO2");
-		EVE_CoCmd_number(s_pHalContext, box_right3.x_mid, box_right3.y_mid, FONT_33, OPT_CENTER, val_co2);
-		EVE_CoCmd_text(s_pHalContext, box_right3.x_mid + 40, box_right3.y_mid, font2.handler, OPT_CENTERY, "mmHg");
+		EVE_CoCmd_text(s_pHalContext, box_right3.x + 5, box_right3.y + 5, font2, 0, "etCO2");
+		EVE_CoCmd_number(s_pHalContext, box_right3.x_mid-10, box_right3.y_mid, FONT_33, OPT_CENTER, val_co2);
+		EVE_CoCmd_text(s_pHalContext, box_right3.x_mid + 30, box_right3.y_mid, font2, OPT_CENTERY, "mmHg");
 
 		EVE_Cmd_wr32(s_pHalContext, COLOR_RGB(255, 255, 255));
 		// NIBP
-		EVE_CoCmd_text(s_pHalContext, box_right4.x + 5, box_right4.y + 5, font2.handler, 0, "NIBP");
+		EVE_CoCmd_text(s_pHalContext, box_right4.x + 5, box_right4.y + 5, font2, 0, "NIBP");
 		EVE_CoCmd_number(s_pHalContext, box_right4.x + 2, box_right4.y + 55, FONT_32, 0, val_sys);
-		EVE_CoCmd_text(s_pHalContext, box_right4.x_mid+4, box_right4.y_mid, font2.handler, OPT_CENTERX, "mmHg");
+		EVE_CoCmd_text(s_pHalContext, box_right4.x_mid+4, box_right4.y_mid, font2, OPT_CENTERX, "mmHg");
 		EVE_CoCmd_number(s_pHalContext, box_right4.x_mid + 50, box_right4.y + 55, FONT_32, 0, val_dias);
-		EVE_CoCmd_text(s_pHalContext, box_right4.x + 35, box_right4.y_end - 40, font2.handler, 0, "sys");
-		EVE_CoCmd_text(s_pHalContext, box_right4.x_end - 70, box_right4.y_end - 40, font2.handler, 0, "dias");
+		EVE_CoCmd_text(s_pHalContext, box_right4.x + 35, box_right4.y_end - 40, font2, 0, "sys");
+		EVE_CoCmd_text(s_pHalContext, box_right4.x_end - 70, box_right4.y_end - 40, font2, 0, "dias");
 
 		Display_End(s_pHalContext);
 

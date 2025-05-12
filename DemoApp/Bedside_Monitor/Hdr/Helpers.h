@@ -156,7 +156,7 @@ void bt82x_wr16(EVE_HalContext* phost, uint32_t addr, uint16_t data16);
 void bt82x_wr8(EVE_HalContext* phost, uint32_t addr, uint8_t data8);
 uint8_t Gesture_GetTag(EVE_HalContext* phost);
 
-#ifdef BT82X_ENABLE
+#ifdef BT820_ENABLE
 #define EVE2_wr8  bt82x_wr8
 #define EVE2_wr16 bt82x_wr16
 #define EVE2_wr32 bt82x_wr32
@@ -168,7 +168,7 @@ uint8_t Gesture_GetTag(EVE_HalContext* phost);
 #define EVE2_wr32 EVE_Hal_wr32
 #define EVE2_wrmem EVE_Hal_wrmem
 #define EVE2_flush EVE_Hal_flush
-#endif // BT82X_ENABLE
+#endif // BT820_ENABLE
 
 
 // coloring

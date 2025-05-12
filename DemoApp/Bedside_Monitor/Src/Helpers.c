@@ -259,7 +259,7 @@ int save_buffer_to_file(const char* filename, const void* buffer, size_t buffer_
 }
 
 void take_ddr_screenshot(EVE_HalContext *phost, char *name, int ramg_render) {
-#if defined(BT82X_ENABLE)
+#if defined(BT820_ENABLE)
 	int offset = 1024 * 1024;
 	EVE_CoCmd_renderTarget(phost, offset, RGB8, phost->Width, phost->Height);
 	const int bbp_rgb8 = 24;

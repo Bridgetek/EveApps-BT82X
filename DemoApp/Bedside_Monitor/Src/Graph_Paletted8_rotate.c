@@ -8,7 +8,7 @@ int new_data_heartbeat(int** data, int* data_size);
 int new_data_pleth(int** data, int* data_size);
 int new_data_co2(int** data, int* data_size);
 
-#ifdef BT82X_ENABLE
+#ifdef BT820_ENABLE
 #define graph_display graph_display_bt82
 #else
 #define graph_display graph_display_bt81
@@ -134,8 +134,14 @@ static void graph_append(app_graph_t* graph, SIGNALS_DATA_TYPE* lines, int line_
 }
 
 static void graph_display_bt82(app_graph_t* graph) {
-	uint16_t bformat = PALETTED8;
-#ifdef BT82X_ENABLE
+#ifdef BT820_ENABLE
+#define PALETTED_FMT PALETTEDARGB8
+#else
+#define PALETTED_FMT PALETTED8
+#endif
+
+	uint16_t bformat = PALETTED_FMT;
+#ifdef BT820_ENABLE
 	bformat = PALETTEDARGB8;
 #endif
 	int lw = max(GRAPH_H, GRAPH_W);
@@ -168,8 +174,14 @@ static void graph_display_bt82(app_graph_t* graph) {
 }
 
 static void graph_display_bt81(app_graph_t* graph) {
-	uint16_t bformat = PALETTED8;
-#ifdef BT82X_ENABLE
+#ifdef BT820_ENABLE
+#define PALETTED_FMT PALETTEDARGB8
+#else
+#define PALETTED_FMT PALETTED8
+#endif
+
+	uint16_t bformat = PALETTED_FMT;
+#ifdef BT820_ENABLE
 	bformat = PALETTEDARGB8;
 #endif
 	int lw = max(GRAPH_H, GRAPH_W);

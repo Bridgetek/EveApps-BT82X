@@ -3,6 +3,7 @@
 
 #include "Helpers.h"
 #include "common.h"
+#include "Gesture.h"
 #include "Bedside_Monitor.h"
 
 #define APP_PRINTF //printf

@@ -1,5 +1,6 @@
 ﻿#include "Helpers.h"
 #include "Bedside_Monitor.h"
+#include "common.h"
 
 extern EVE_HalContext s_halContext;
 extern EVE_HalContext* s_pHalContext;
@@ -224,7 +225,7 @@ uint32_t graph_l1_rotate_init(app_box* box_heartbeat, app_box* box_pleth, app_bo
 
 	for (int32_t i = 0; i < 3; i++) {
 		app_graph_t* gh = graphs[i];
-		gh->buffer0 = i * GRAPH_BUFFER_SIZE; // loopback buffer
+		gh->buffer0 = DDR_BITMAPS_STARTADDR +  i * GRAPH_BUFFER_SIZE; // loopback buffer
 		gh->buffer1 = gh->buffer0 + GRAPH_BYTE_PER_BUFFER;
 		gh->buffer2 = gh->buffer1 + GRAPH_BYTE_PER_BUFFER;
 
