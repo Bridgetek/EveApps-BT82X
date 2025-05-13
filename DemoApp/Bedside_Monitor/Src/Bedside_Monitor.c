@@ -297,7 +297,7 @@ void SAMAPP_Bedside_Monitor()
 	app_box box_right4 = INIT_APP_BOX(x, y + h * 3, w, h);
 
 	init_datetime(11, 12, 2024, 9, 11, 0, 0);
-	//dateime_adjustment(s_pHalContext); // set date and time at initialize
+	dateime_adjustment(s_pHalContext); // set date and time at initialize
 
 	int32_t time_start_ms = 0;
 	int32_t val_hr = 66;
