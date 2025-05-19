@@ -525,14 +525,13 @@ void SAMAPP_Utility_CmdInflateFromFifo()
 
     uint32_t mediafifo = w * h * 2; //the starting address of the media fifo
     uint32_t mediafifolen = 20 * 1024;
-    uint32_t transfered = 0;
 
     /* Clear the memory at location 0 - any previous bitmap data */
     EVE_CoCmd_memSet(s_pHalContext, RAM_G, 255L, 1L * w * 2 * h);
     /*Load data to mediafifo */
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", NULL, 0);
 
     Display_Start(s_pHalContext);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
@@ -842,31 +841,6 @@ void SAMAPP_Utility_crcCheck()
     SAMAPP_DELAY;
 }
 
-/**
-* @brief API to demonstrate the use of region commands
-*
-*/
-void SAMAPP_Utility_region()
-{
-    Draw_Text(s_pHalContext, "Example for: region");
-
-    Display_Start(s_pHalContext);
-    EVE_CoDl_scissorSize(s_pHalContext, 50, 500);
-    EVE_CoDl_clearColorRgb(s_pHalContext, 0, 128, 128);
-    EVE_CoDl_scissorXY(s_pHalContext, 100, 100);
-    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-    EVE_CoDl_region(s_pHalContext, 8, 4, 13); // 8 * 1200 / 64 = 150, (8+4) * 1200 / 64 = 225, so region is from y:150 to y:225
-    EVE_CoDl_clearColorRgb(s_pHalContext, 255, 165, 0);
-    EVE_CoDl_scissorXY(s_pHalContext, 200, 100);
-    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-    EVE_CoDl_restoreContext(s_pHalContext);
-    EVE_CoDl_scissorXY(s_pHalContext, 300, 100);
-    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-    Display_End(s_pHalContext);
-    SAMAPP_DELAY;
-}
-
-
 void SAMAPP_Utility() {
     SAMAPP_Utility_wait();
     SAMAPP_Utility_callList();
@@ -882,7 +856,6 @@ void SAMAPP_Utility() {
     SAMAPP_Utility_screenRotate();
     SAMAPP_Utility_numberBases();
     SAMAPP_Utility_crcCheck();
-    SAMAPP_Utility_region();
 }
 
 

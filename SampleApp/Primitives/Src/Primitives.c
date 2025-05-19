@@ -982,6 +982,30 @@ void SAMAPP_Primitives_simpleMap()
     SAMAPP_DELAY;
 }
 
+/**
+* @brief API to demonstrate the use of region commands
+*
+*/
+void SAMAPP_Primitives_region()
+{
+	Draw_Text(s_pHalContext, "Example for: region");
+
+	Display_Start(s_pHalContext);
+	EVE_CoDl_scissorSize(s_pHalContext, 50, 500);
+	EVE_CoDl_clearColorRgb(s_pHalContext, 0, 128, 128);
+	EVE_CoDl_scissorXY(s_pHalContext, 100, 100);
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	EVE_CoDl_region(s_pHalContext, 8, 4, 13); // 8 * 1200 / 64 = 150, (8+4) * 1200 / 64 = 225, so region is from y:150 to y:225
+	EVE_CoDl_clearColorRgb(s_pHalContext, 255, 165, 0);
+	EVE_CoDl_scissorXY(s_pHalContext, 200, 100);
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	EVE_CoDl_restoreContext(s_pHalContext);
+	EVE_CoDl_scissorXY(s_pHalContext, 300, 100);
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	Display_End(s_pHalContext);
+	SAMAPP_DELAY;
+}
+
 void SAMAPP_Primitives() 
 {
     SAMAPP_Primitives_points();
@@ -1002,6 +1026,7 @@ void SAMAPP_Primitives()
     SAMAPP_Primitives_calibratesub();
     SAMAPP_Primitives_testcard();
     SAMAPP_Primitives_simpleMap();
+	SAMAPP_Primitives_region();
 }
 
 

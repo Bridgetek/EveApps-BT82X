@@ -401,11 +401,11 @@ static bool checkWait(EVE_HalContext *phost, uint16_t rpOrSpace)
 	/* Check for coprocessor fault */
 	if (EVE_CMD_FAULT(rpOrSpace))
 	{
-		char err[128];
-		err[0] = '\0';
 		/* Coprocessor fault */
 		phost->CmdWaiting = false;
 #if defined(_DEBUG)
+		char err[128];
+		err[0] = '\0';
 		if (!phost->DebugMessageVisible)
 		{
 			eve_printf_debug("Coprocessor fault\n");

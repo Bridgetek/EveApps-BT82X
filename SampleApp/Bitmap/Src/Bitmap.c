@@ -474,7 +474,6 @@ void SAMAPP_Bitmap_rotateAndTranslate()
 void SAMAPP_Bitmap_loadImagefromSD()
 {
     uint32_t result = 0;
-    uint32_t options;
     const char *file;
     uint32_t ptr = 0;
     uint32_t w;
@@ -484,11 +483,21 @@ void SAMAPP_Bitmap_loadImagefromSD()
 
     file = "pic_in_SD.jpg";
     eve_printf_debug("picture name %s \n", file);
-    options = OPT_HALFSPEED | OPT_4BIT | OPT_IS_SD;
-    result = EVE_CoCmd_sdattach(s_pHalContext, options, result);
-    eve_printf_debug("SD attach status 0x%x \n", result);
-    result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
-    eve_printf_debug("file read status 0x%x \n", result);
+	result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+	eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
+
+	result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
+	eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
 
     Display_Start(s_pHalContext);
     EVE_CoCmd_loadImage(s_pHalContext, DDR_BITMAPS_STARTADDR2, OPT_FS | OPT_TRUECOLOR);

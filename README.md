@@ -29,7 +29,8 @@ Users are expected to have familiarity with the BT82X programming guide and data
     |    ├───Audio           | Sample usage of audio functionality    
     │    ├───Bitmap          | Sample usage of bitmap 
     │    ├───Flash           | Sample usage of flash 
-    │    ├───Font            | Sample usage of font 
+    │    ├───Font            | Sample usage of font
+    |    ├───Lvds            | Sample usage of LVDSRX
     │    ├───Primitives      | Sample usage of drawing primitives
     │    ├───Touch           | Sample usage of touch functionality
     │    ├───Utility         | Sample usage of helper utilities

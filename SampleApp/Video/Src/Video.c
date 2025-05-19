@@ -130,6 +130,7 @@ void SAMAPP_Video_frameByFrameFromFlash()
         EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
         EVE_CoDl_end(s_pHalContext);
         Display_End(s_pHalContext);
+		EVE_sleep(10);
     } while ((EVE_CoCmd_regRead(s_pHalContext, completionPtr, &ptr_val)) && (ptr_val != 0));
 }
 
@@ -197,6 +198,7 @@ void SAMAPP_Video_frameByFrameFlashPauseResume()
         EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, 31, 0, txtPause[isPause]);
         /*** Done button ***/
         Display_End(s_pHalContext);
+		EVE_sleep(10);
     } while ((EVE_CoCmd_regRead(s_pHalContext, completionPtr, &ptr_val)) && (ptr_val != 0));
 }
 
@@ -238,9 +240,19 @@ void SAMAPP_Video_fromSD()
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
     eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
 
     result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
     eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
@@ -264,11 +276,22 @@ void SAMAPP_Video_fromSDbackground()
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
     eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
 
     file = "pic_in_SD.jpg";
     eve_printf_debug("picture name %s \n", file);
     result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
     eve_printf_debug("file read status 0x%lx \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
+
     Display_Start(s_pHalContext);
     EVE_CoCmd_loadImage(s_pHalContext, DDR_BITMAPS_STARTADDR2, OPT_FS | OPT_TRUECOLOR);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
@@ -315,10 +338,20 @@ void SAMAPP_Video_frameByFrameSDPauseResume()
     Draw_Text(s_pHalContext, "Example for: Video playback frame by frame with pause/resume button");
 
     uint32_t result = 0;
-    EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+    result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
     eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
     result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
     eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
 
     EVE_CoCmd_videoStart(s_pHalContext, OPT_FS);
     do
@@ -354,6 +387,7 @@ void SAMAPP_Video_frameByFrameSDPauseResume()
         EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, 31, 0, txtPause[isPause]);
         /*** Done button ***/
         Display_End(s_pHalContext);
+		EVE_sleep(10);
 	} while ((EVE_CoCmd_regRead(s_pHalContext, completionPtr, &ptr_val)) && (ptr_val != 0));
 }
 
@@ -425,9 +459,35 @@ void SAMAPP_Video_fromMediafifoFullscreen()
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAY_CONTROL, 1); // restore default value
     EVE_CoCmd_playVideo(s_pHalContext, OPT_MEDIAFIFO | OPT_SOUND | OPT_FULLSCREEN);
-    uint32_t transfered = 0;
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\flowers_1024x600.avi", &transfered);
-    eve_printf_debug("transfered %ld\n", transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\flowers_1024x600.avi", NULL, 0);
+
+    EVE_Cmd_waitFlush(s_pHalContext);
+    EVE_MediaFifo_close(s_pHalContext);
+}
+
+/**
+* @brief Test AVI video playback via MediaFiFo and full screen
+*
+*/
+void SAMAPP_Video_fromMediafifowithCompletereg()
+{
+    Draw_Text(s_pHalContext, "Example for: Video display via Media FIFO with OPT_COMPLETEREG");
+
+    uint32_t mediafifo;
+    uint32_t mediafifolen;
+    /* start video playback, load the data into media fifo */
+    mediafifo = RAM_G; //the starting address of the media fifo
+    mediafifolen = 16 * 1024;
+    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen); //address of the media fifo buffer
+    eve_printf_debug("Mediafifo: Start address and length %d %d\n", mediafifo, mediafifolen);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAY_CONTROL, 1); // restore default value
+    uint32_t complete = 0;
+    EVE_CoCmd_regRead(s_pHalContext, REG_OBJECT_COMPLETE, &complete);
+    eve_printf_debug("REG_OBJECT_COMPLETE %ld\n", complete);
+    EVE_CoCmd_playVideo(s_pHalContext, OPT_MEDIAFIFO | OPT_SOUND | OPT_COMPLETEREG);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\flowers_1024x600.avi", NULL, OPT_COMPLETEREG);
 
     EVE_Cmd_waitFlush(s_pHalContext);
     EVE_MediaFifo_close(s_pHalContext);
@@ -456,7 +516,7 @@ void SAMAPP_Video_frameByFrameMediafifo()
     eve_printf_debug("Mediafifo: Start address and length %d %d\n", mediafifo, mediafifolen);
 
     EVE_CoCmd_videoStart(s_pHalContext, OPT_MEDIAFIFO); //initialize AVI video decode
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\flowers_1024x600.avi", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\flowers_1024x600.avi", &transfered, 0);
     do
     {
         EVE_CoCmd_videoFrame(s_pHalContext, 4, videoFrameStatusAddr);
@@ -466,8 +526,9 @@ void SAMAPP_Video_frameByFrameMediafifo()
         EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
         EVE_CoDl_end(s_pHalContext);
         Display_End(s_pHalContext);
+		EVE_sleep(10);
         if (s_pHalContext->LoadFileRemaining > 0)
-            EVE_Util_loadMediaFile(s_pHalContext, NULL, &transfered);
+            EVE_Util_loadMediaFile(s_pHalContext, NULL, &transfered, 0);
     } while ((EVE_CoCmd_regRead(s_pHalContext, videoFrameStatusAddr, &ptr_val)) && (ptr_val != 0) && (EVE_MediaFifo_space(s_pHalContext) != mediafifolen - 4)); //loop till end of the file
     EVE_Cmd_waitFlush(s_pHalContext);
     EVE_MediaFifo_close(s_pHalContext);
@@ -484,6 +545,7 @@ void SAMAPP_Video() {
     SAMAPP_Video_fromCMDB();
     SAMAPP_Video_fromCMDBwithLogoBeside();
     SAMAPP_Video_fromMediafifoFullscreen();
+	SAMAPP_Video_fromMediafifowithCompletereg();
     SAMAPP_Video_frameByFrameMediafifo();
 }
 

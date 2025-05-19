@@ -88,7 +88,6 @@ void EVE_CoCmd_videoStart(EVE_HalContext *phost, uint32_t options)
 
 void EVE_CoCmd_videoFrame(EVE_HalContext *phost, uint32_t dst, uint32_t ptr)
 {
-	EVE_CoCmd_dddd(phost, CMD_MEMWRITE, 3182934, 1, OPT_NODL); // WORKAROUND CMD_VIDEOFRAME
 	EVE_CoCmd_ddd(phost, CMD_VIDEOFRAME, dst, ptr);
 }
 

@@ -31,7 +31,6 @@
 
 #include "EVE_Platform.h"
 
-#define TEST_BOOT_DDR 0
 
 static eve_progmem_const uint8_t c_DlCodeBootup[12] = {
 	0, 0, 0, 2, // GPU instruction CLEAR_COLOR_RGB: BLUE, GREEN, RED, ID(0x02)
@@ -358,13 +357,12 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 	EVE_CMD_BOOT_CFG boot_cfg = { 0 };
 	EVE_CMD_BOOT_CFG_EN boot_cfg_en = { 0 };
 	EVE_CMD_DDR_TYPE ddr_type = { 0 };
-	EVE_CMD_GPREG gpreg = { 0 };
 
 	do
 	{
-	/* EVE will be in SPI Single channel after POR */
-	if (!EVE_Hal_powerCycle(phost, true))
-		return false;
+		/* EVE will be in SPI Single channel after POR */
+		if (!EVE_Hal_powerCycle(phost, true))
+			return false;
 
 		boot_cfg_en.boot = 1;
 		boot_cfg_en.DDRtype = 1;
@@ -397,11 +395,11 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		while (EVE_Hal_rd32(phost, REG_BOOT_STATUS) != 0x522e2e2e) // Polling to indicate EVE is in normal running operation state
 		{
 			EVE_sleep(10);
-			eve_printf_debug("Boot status %x \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
+			eve_printf_debug("Boot status %lx \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
 		}
-		eve_printf_debug("Boot status %x \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
+		eve_printf_debug("Boot status %lx \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
 		chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
-		eve_printf_debug("chipID %x \n", chipId);
+		eve_printf_debug("chipID %lx \n", chipId);
 
 		while (EXTRACT_CHIPID(chipId) != EVE_BT820)
 		{
@@ -673,7 +671,7 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 	eve_printf_debug("Reset coprocessor\n");
 
 	/* Set REG_CPURESET to 1, to hold the coprocessor in the reset condition */
-	EVE_Hal_wr8(phost, REG_CPURESET, 1);
+	EVE_Hal_wr32(phost, REG_CPURESET, 1);
 	EVE_Hal_flush(phost);
 	EVE_sleep(100);
 
@@ -683,7 +681,7 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 	EVE_Hal_wr32(phost, REG_CMD_DL, 0);
 
 	/* Stop playing audio in case video with audio was playing during reset */
-	EVE_Hal_wr8(phost, REG_PLAYBACK_PLAY, 0);
+	EVE_Hal_wr32(phost, REG_PLAYBACK_PLAY, 0);
 
 	/* Default */
 	phost->CmdFault = false;

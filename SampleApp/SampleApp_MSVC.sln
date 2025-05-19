@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Video_MSVC", "Video\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Widget_MSVC", "Widget\Project\Msvc\Widget_Msvc.vcxproj", "{D1C87E09-4BF1-435B-932E-B929A65B076E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAMAPP_Lvds_MSVC", "Lvds\Project\Msvc\Lvds_Msvc.vcxproj", "{B8200420-E1F2-4602-B95D-572057C3630E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -69,6 +71,10 @@ Global
 		{D1C87E09-4BF1-435B-932E-B929A65B076E}.Debug|x86.Build.0 = Debug|Win32
 		{D1C87E09-4BF1-435B-932E-B929A65B076E}.Release|x86.ActiveCfg = Release|Win32
 		{D1C87E09-4BF1-435B-932E-B929A65B076E}.Release|x86.Build.0 = Release|Win32
+		{B8200420-E1F2-4602-B95D-572057C3630E}.Debug|x86.ActiveCfg = Debug|Win32
+		{B8200420-E1F2-4602-B95D-572057C3630E}.Debug|x86.Build.0 = Debug|Win32
+		{B8200420-E1F2-4602-B95D-572057C3630E}.Release|x86.ActiveCfg = Release|Win32
+		{B8200420-E1F2-4602-B95D-572057C3630E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

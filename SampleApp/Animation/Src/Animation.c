@@ -148,11 +148,22 @@ void SAMAPP_Animation_SD()
 
     Draw_Text(s_pHalContext, "Example for: Run animation from SD card");
 
-    result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-    eve_printf_debug("SD attach status 0x%x \n", result);
+	result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+	eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
 
-    result = EVE_CoCmd_fssource(s_pHalContext, "abstract.anim.ram_g.reloc", 0);
-    eve_printf_debug("file read status 0x%x \n", result);
+	result = EVE_CoCmd_fssource(s_pHalContext, "abstract.anim.ram_g.reloc", 0);
+	eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
+
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FS);
 
     EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
@@ -198,7 +209,6 @@ void SAMAPP_Animation_mediafifo()
     uint32_t waitmask = -1;
     uint32_t play_control = 1024 * 512;
     uint32_t ch = 0;
-    uint32_t transfered = 0;
     uint32_t mediafifo = DDR_BITMAPS_STARTADDR;
     uint32_t mediafifolen = 16 * 1024;
 
@@ -206,7 +216,7 @@ void SAMAPP_Animation_mediafifo()
 
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", NULL, 0);
 
     EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
     EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);

@@ -280,11 +280,22 @@ void SAMAPP_Font_fromConvertedTTF_SD()
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: Custom font from a converted font file in SD card");
-    result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-    eve_printf_debug("SD attach status 0x%x \n", result);
+	result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+	eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
 
-    result = EVE_CoCmd_fssource(s_pHalContext, "Roboto-BoldCondensed_30_L4.reloc", 0);
-    eve_printf_debug("file read status 0x%x \n", result);
+	result = EVE_CoCmd_fssource(s_pHalContext, "Roboto-BoldCondensed_30_L4.reloc", 0);
+	eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
+
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FS);
 
     EVE_Hal_rdMem(s_pHalContext, (uint8_t *)&fontstruct, RAM_G, EVE_GPU_FONT_TABLE_SIZE);

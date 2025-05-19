@@ -168,7 +168,6 @@ inline static void EVE_CoDl_tag(EVE_HalContext *phost, uint32_t s)
  */
 inline static void EVE_CoDl_colorRgb_ex(EVE_HalContext *phost, uint32_t c)
 {
-	uint32_t rgb = c & 0xFFFFFF;
 	EVE_CoCmd_dl(phost, COLOR_RGB(0, 0, 0) | (c & 0xFFFFFF));
 }
 

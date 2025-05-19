@@ -337,8 +337,7 @@ void SAMAPP_Audio_playWavFromMediaFifo()
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
     EVE_CoCmd_playWav(s_pHalContext, OPT_MEDIAFIFO);
-    uint32_t transfered = 0;
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL, 0);
 
     EVE_Cmd_waitFlush(s_pHalContext);
     //The file is done, mute the audio.
@@ -361,9 +360,20 @@ void SAMAPP_Audio_playWavFromSD()
     Draw_Text(s_pHalContext, "Now you will hear the music");
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-    eve_printf_debug("SD attach status 0x%x \n", result);
-    result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
-    eve_printf_debug("file read status 0x%x \n", result);
+	eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
+
+	result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
+	eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
@@ -483,8 +493,7 @@ void SAMAPP_Audio_loadWavFromMediaFifo()
     Draw_Text(s_pHalContext, "Now you will hear the music");
 
     EVE_CoCmd_loadWav(s_pHalContext, RAM_G + mediafifolen, OPT_MEDIAFIFO);
-    uint32_t transfered = 0;
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL, 0);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
@@ -519,9 +528,20 @@ void SAMAPP_Audio_loadWavFromSD()
     Draw_Text(s_pHalContext, "Now you will hear the music");
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-    eve_printf_debug("SD attach status 0x%x \n", result);
-    result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
-    eve_printf_debug("file read status 0x%x \n", result);
+	eve_printf_debug("SD attach status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD attach failed\n");
+		return;
+	}
+
+	result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
+	eve_printf_debug("file read status 0x%x \n", result);
+	if (result != 0)
+	{
+		eve_printf_debug("SD read failed\n");
+		return;
+	}
 
     EVE_CoCmd_loadWav(s_pHalContext, RAM_G, OPT_FS);
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);

@@ -250,7 +250,7 @@ typedef struct EVE_HalContext
 	/** @name Write buffer to optimize writes into larger batches */
 	///@{
 #if defined(EVE_BUFFER_WRITES) || defined(FT4222_PLATFORM)
-	uint8_t SpiWrBuf[0xFFFF];
+	uint8_t SpiWrBuf[65536];
 	uint32_t SpiWrBufIndex;
 	uint32_t SpiRamGAddr; /**< Current RAM_G address of ongoing SPI write transaction */
 #endif

@@ -87,8 +87,8 @@ void Gpu_Release(EVE_HalContext *phost);
 int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value);
 
 bool EVE_Calibrate(EVE_HalContext *phost);
-void Calibration_Restore(EVE_HalContext* phost);
-void Calibration_Save(EVE_HalContext* phost);
+void Calibration_Restore(EVE_HalContext *phost);
+void Calibration_Save(EVE_HalContext *phost);
 void Display_Start(EVE_HalContext *phost);
 void Display_StartColor(EVE_HalContext* phost, uint8_t* bgColor, uint8_t* textColor);
 void Display_End(EVE_HalContext *phost);

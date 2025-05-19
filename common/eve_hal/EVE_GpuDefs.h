@@ -52,7 +52,7 @@
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
 #define FREQUENCY                72000000UL
-#define READ_TIMOUT              0x10
+#define READ_TIMOUT              500
 
 /**************
 ** Addresses **
@@ -709,9 +709,9 @@
 
 /** @name for REG_I2S_CFG FORMAT */
 ///@{
-#define I2S_FORMAT                 (0UL << 10)
-#define LEFT_FORMAT                (1UL << 10)
-#define RIGHT_FORMAT               (2UL << 10)
+#define I2S_FORMAT                 0UL
+#define LEFT_FORMAT                1UL
+#define RIGHT_FORMAT               2UL
 ///@}
 
 /** @name for REG_I2S_EN */
@@ -731,6 +731,35 @@
 /** @name for REG_LVDSTX_PLLCFG */
 ///@{
 #define LVDSTX_PLLCFG(cps, lock, cks, ns, clkdiv)   ((((cps)&0x7) << 25) | (((lock)&0xFFF) << 13) | (((cks)&0x3) << 11) | (((ns)&0x7F) << 4) | ((clkdiv)&0xF))
+///@}
+
+/** @name for REG_LVDSRX_CORE_SETUP */
+///@{
+#define LVDSRX_ONE_CHANNEL         0UL
+#define LVDSRX_TWO_CHANNEL         1UL
+#define LVDSRX_ONE_PIXEL_PER_CLK   0UL
+#define LVDSRX_TWO_PIXEL_PER_CLK   1UL
+///@}
+
+/** @name for REG_LVDSRX_SETUP */
+///@{
+#define LVDS_MODE_JEIDA_18         0UL
+#define LVDS_MODE_JEIDA_24         1UL
+#define LVDS_MODE_VESA_24          2UL
+#define VS_POL_LOW                 0UL
+#define VS_POL_HIGH                1UL
+///@}
+
+/** @name for REG_LVDSRX_CTRL */
+///@{
+#define CHn_CLKSEL_RISING          0UL
+#define CHn_CLKSEL_FALLING         1UL
+#define CHn_FRANGE_10_30           0UL
+#define CHn_FRANGE_30_60           1UL
+#define CHn_FRANGE_60_100          2UL
+#define CHn_FRANGE_100_180         3UL
+#define CHn_PWDN_B_OFF             0UL
+#define CHn_PWDN_B_ON              1UL
 ///@}
 
 // clang-format on
