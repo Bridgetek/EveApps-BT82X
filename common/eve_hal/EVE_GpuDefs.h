@@ -662,8 +662,8 @@
 #define LINEAR_SAMPLES             0UL
 #define ULAW_SAMPLES               1UL
 #define ADPCM_SAMPLES              2UL
-#define S16_MONO                   3UL
-#define S16S_STEREO                4UL
+#define S16_SAMPLES                3UL
+#define S16S_SAMPLES               4UL
 ///@}
 
 #ifdef POINTS
