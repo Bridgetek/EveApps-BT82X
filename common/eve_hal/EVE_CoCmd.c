@@ -452,4 +452,37 @@ void EVE_CoCmd_renderTarget(EVE_HalContext *phost, uint32_t source, uint16_t fmt
 {
 	EVE_CoCmd_ddwww(phost, CMD_RENDERTARGET, source, fmt, w, h);
 }
+
+void EVE_CoCmd_skipCond(EVE_HalContext *phost, uint32_t a, uint32_t func, uint32_t ref, uint32_t mask, uint32_t num)
+{
+#if EVE_CMD_HOOKS
+	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_SKIPCOND, 0))
+		return;
+#endif
+
+	EVE_Cmd_startFunc(phost);
+	EVE_Cmd_wr32(phost, CMD_SKIPCOND);
+	EVE_Cmd_wr32(phost, a);
+	EVE_Cmd_wr32(phost, func);
+	EVE_Cmd_wr32(phost, ref);
+	EVE_Cmd_wr32(phost, mask);
+	EVE_Cmd_wr32(phost, num);
+	EVE_Cmd_endFunc(phost);
+}
+
+void EVE_CoCmd_waitCond(EVE_HalContext *phost, uint32_t a, uint32_t func, uint32_t ref, uint32_t mask)
+{
+#if EVE_CMD_HOOKS
+	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_WAITCOND, 0))
+		return;
+#endif
+
+	EVE_Cmd_startFunc(phost);
+	EVE_Cmd_wr32(phost, CMD_WAITCOND);
+	EVE_Cmd_wr32(phost, a);
+	EVE_Cmd_wr32(phost, func);
+	EVE_Cmd_wr32(phost, ref);
+	EVE_Cmd_wr32(phost, mask);
+	EVE_Cmd_endFunc(phost);
+}
 /* Nothing beyond this */

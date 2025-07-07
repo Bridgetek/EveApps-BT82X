@@ -716,6 +716,23 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 	return ready;
 }
 
+void EVE_Util_coprocessorFaultRecover(EVE_HalContext *phost)
+{
+	EVE_Hal_wr32(phost, REG_CMD_READ, 0);
+	while (EVE_Hal_rd32(phost, REG_CMD_WRITE) != 0)
+		;
+
+	eve_assert((EVE_Hal_rd32(phost, REG_CMD_WRITE)) == 0);
+	eve_assert((EVE_Hal_rd32(phost, REG_CMD_READ)) == 0);
+
+	/* Default */
+	phost->CmdFault = false;
+
+#if defined(_DEBUG)
+	debugRestoreRamG(phost);
+#endif
+}
+
 /**
  * @brief Bootup Coprocessor
  * 

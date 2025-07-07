@@ -988,22 +988,60 @@ void SAMAPP_Primitives_simpleMap()
 */
 void SAMAPP_Primitives_region()
 {
-	Draw_Text(s_pHalContext, "Example for: region");
+#define ENABLE_REGION 1
+    Draw_Text(s_pHalContext, "Example for: region");
+    int32_t y;
+    char string[10];
+    uint16_t yoffset = 100;
+    uint32_t m, p, q;
 
-	Display_Start(s_pHalContext);
-	EVE_CoDl_scissorSize(s_pHalContext, 50, 500);
-	EVE_CoDl_clearColorRgb(s_pHalContext, 0, 128, 128);
-	EVE_CoDl_scissorXY(s_pHalContext, 100, 100);
-	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-	EVE_CoDl_region(s_pHalContext, 8, 4, 13); // 8 * 1200 / 64 = 150, (8+4) * 1200 / 64 = 225, so region is from y:150 to y:225
-	EVE_CoDl_clearColorRgb(s_pHalContext, 255, 165, 0);
-	EVE_CoDl_scissorXY(s_pHalContext, 200, 100);
-	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-	EVE_CoDl_restoreContext(s_pHalContext);
-	EVE_CoDl_scissorXY(s_pHalContext, 300, 100);
-	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
-	Display_End(s_pHalContext);
-	SAMAPP_DELAY;
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 55, 0 }, (uint8_t[]) { 200, 200, 200 });
+    for (uint8_t i = 0; i < 37; i++)
+    {
+        y = (int32_t)(s_pHalContext->Height * i / 64);
+        if (i % 4 == 0)
+        {
+            string[0] = '\0';
+            Gpu_Hal_Dec2Ascii(string, (int32_t)i);
+            EVE_CoCmd_text(s_pHalContext, 50, y, 30, OPT_CENTERY | OPT_RIGHTX, string);
+            string[0] = '\0';
+            Gpu_Hal_Dec2Ascii(string, y);
+            EVE_CoCmd_text(s_pHalContext, 500 - 50, y, 30, OPT_CENTERY, string);
+            EVE_CoDl_lineWidth(s_pHalContext, 16);
+        }
+        else
+            EVE_CoDl_lineWidth(s_pHalContext, 8);
+        EVE_CoDl_begin(s_pHalContext, LINES);
+        EVE_CoDl_vertex2f_4(s_pHalContext, 55 * 16, y * 16);
+        EVE_CoDl_vertex2f_4(s_pHalContext, (500 - 55) * 16, y * 16);
+        EVE_CoDl_end(s_pHalContext);
+    }
+
+    EVE_CoCmd_regRead(s_pHalContext, REG_CMD_DL, &m);
+
+    EVE_CoDl_scissorSize(s_pHalContext, 50, 500);
+    EVE_CoDl_clearColorRgb(s_pHalContext, 0, 128, 128);
+    EVE_CoDl_scissorXY(s_pHalContext, 150, yoffset);
+    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+
+    EVE_CoCmd_regRead(s_pHalContext, REG_CMD_DL, &p);
+
+    EVE_CoDl_saveContext(s_pHalContext);
+    EVE_CoDl_clearColorRgb(s_pHalContext, 255, 165, 0);
+    EVE_CoDl_scissorXY(s_pHalContext, 250, yoffset);
+    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+    EVE_CoDl_restoreContext(s_pHalContext);
+
+#if ENABLE_REGION
+    EVE_CoCmd_regRead(s_pHalContext, REG_CMD_DL, &q);
+    EVE_CoCmd_memWrite(s_pHalContext, RAM_DL + p, 4);
+    EVE_CoDl_region(s_pHalContext, 8, 4, q/4); // 8 * 1200 / 64 = 150, (8+4) * 1200 / 64 = 225, so region is from y:150 to y:225
+#endif
+
+    EVE_CoDl_scissorXY(s_pHalContext, 350, yoffset);
+    EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
 }
 
 void SAMAPP_Primitives() 

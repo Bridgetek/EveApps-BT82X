@@ -42,7 +42,7 @@ Note:
 - For Eve registers and commands/instructions definition, user can find it at the file common/eve_hal/EVE_GpuDef.h and common/eve_hal/Eve_CoCmd.h.
 - For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.
 
-## Hardeware dependency 
+## Hardware dependency 
 Unless specified otherwise, the default hardware platform is the VM820C.  You may refer to the details at www.brtchip.com
 
 ## Build instructions
@@ -74,7 +74,7 @@ nmake SampleApp_[Project Name]
 # [EVE display] must be:  EVE_DISPLAY_WUXGA   (1920x1200 LCD)
 # [EVE SPI] can be one of : EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE  (FT4222 can support Quad/Dual/Single, MPSSE supports single only)
 # [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
-# The output binary [Project Name].exe  can be found in build\[Project Name]
+# The output binary [Project Name].exe can be found in build\[Project Name]
 
 One example is :
 cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DCMAKE_BUILD_TYPE=Debug ..

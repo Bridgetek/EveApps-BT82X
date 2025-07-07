@@ -287,7 +287,30 @@ void EVE_CoCmd_testCard(EVE_HalContext *phost);
  */
 void EVE_CoCmd_renderTarget(EVE_HalContext *phost, uint32_t source, uint16_t fmt, uint16_t w, uint16_t h);
 
+/**
+ * @brief Send CMD_SKIPCOND
+ *
+ * @param phost Pointer to Hal context
+ * @param a Address of RAM_G or register to check, 32-bit aligned
+ * @param func Functions
+ * @param ref 32-bit reference value
+ * @param mask 32-bit mask
+ * @param num Number of bytes to skip 
+ * 
+ */
+void EVE_CoCmd_skipCond(EVE_HalContext *phost, uint32_t a, uint32_t func, uint32_t ref, uint32_t mask, uint32_t num);
 
+/**
+ * @brief Send CMD_WAITCOND
+ *
+ * @param phost Pointer to Hal context
+ * @param a Address of RAM_G or register to check, 32-bit aligned
+ * @param func Functions
+ * @param ref 32-bit reference value
+ * @param mask 32-bit mask
+ * 
+ */
+void EVE_CoCmd_waitCond(EVE_HalContext *phost, uint32_t a, uint32_t func, uint32_t ref, uint32_t mask);
 
 /**********************************************************************
 ************************ EVE_CoCmd_IO.c *******************************

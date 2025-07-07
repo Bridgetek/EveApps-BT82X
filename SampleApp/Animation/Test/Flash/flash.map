@@ -1,0 +1,5 @@
+bt82x.blob                    : 0       : 4096   
+abstract.anim.ram_g.reloc     : 4096    : 1449968
+abstract.anim.ram_g.reloc.pad : 1454064 : 16     
+bicycle.anim.ram_g            : 1454080 : 123956 
+bicycle.anim.ram_g.pad        : 1578036 : 12     

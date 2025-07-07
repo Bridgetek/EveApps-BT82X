@@ -216,7 +216,7 @@ void SAMAPP_Animation_mediafifo()
 
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", NULL, 0);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", NULL);
 
     EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
     EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);

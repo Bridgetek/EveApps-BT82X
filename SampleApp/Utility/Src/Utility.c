@@ -81,46 +81,6 @@ int main(int argc, char* argv[])
 }
 
 /**
-* @brief Check Coprocesor fault
-*
-*/
-void helperCoprocessorFaultReport()
-{
-    char DiagMessage[128];
-    uint32_t val = 0;
-    if ((EVE_CoCmd_regRead(s_pHalContext, REG_CMD_READ, &val)) && (val == 0x3fff)) //Fault reported
-    {
-        EVE_Hal_rdMem(s_pHalContext, DiagMessage, RAM_REPORT, RAM_REPORT_MAX);
-        eve_printf_debug("%s\n", DiagMessage);
-        DiagMessage[0] = '\0'; //Reset message
-    }
-}
-
-/**
-* @brief Restore Coprocessor after fault
-*
-*/
-void helperCoprocessorFaultRecover()
-{
-    uint32_t val = 0;
-    /* recovery coprocessor sequence */
-    /* Set REG_CMD_READ to zero */
-    EVE_Hal_wr32(s_pHalContext, REG_CMD_READ, 0);
-    EVE_Hal_wr32(s_pHalContext, REG_CMD_WRITE, 0);
-    EVE_Cmd_waitFlush(s_pHalContext);
-    eve_assert((EVE_Hal_rd32(s_pHalContext, REG_CMD_WRITE)) == 0);
-    eve_assert((EVE_Hal_rd32(s_pHalContext, REG_CMD_READ)) == 0);
-    EVE_sleep(100);
-
-    EVE_CoCmd_flashFast(s_pHalContext, 0);
-    EVE_CoCmd_regRead(s_pHalContext, REG_FLASH_STATUS, &val);
-    if (val != FLASH_STATUS_FULL)
-    {
-        eve_printf_debug("Flash is not able to get into full mode\n");
-    }
-}
-
-/**
 * @brief Flush a command to REG_CMDB_WRITE
 *
 * @param command Command value
@@ -244,7 +204,7 @@ void SAMAPP_Utility_callList()
         if (i == 0)
         {
             uint32_t cmd = 0;
-            EVE_CoCmd_regRead(s_pHalContext, RAM_G + endPtrArr[i] + 108, &cmd);
+            EVE_CoCmd_regRead(s_pHalContext, RAM_G + endPtrArr[i] + 108, &cmd);// 108 is the length of the command list from CMD_NEWLIST to CMD_ENDLIST
             eve_printf_debug("Return: 0x%08x\n", cmd);
 
             if (cmd == CMD_RETURN)
@@ -531,7 +491,7 @@ void SAMAPP_Utility_CmdInflateFromFifo()
     /*Load data to mediafifo */
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
     EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", NULL, 0);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", NULL);
 
     Display_Start(s_pHalContext);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
@@ -596,10 +556,9 @@ void SAMAPP_Utility_coprocessorFaultRecover()
     int32_t bitmapHeight = 128;
     Draw_Text(s_pHalContext, "Example for: Coprocessor fault and recover");
 
-    //Fault case: enable interlace option
-    EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_unsupported.png", NULL, 0);
-
     Display_Start(s_pHalContext);
+	//Fault case: enable interlace option
+	EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_unsupported.png", NULL, 0);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
     EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - bitmapWidth / 2) * 16,
         (s_pHalContext->Height / 2 - bitmapHeight / 2) * 16);
@@ -607,21 +566,18 @@ void SAMAPP_Utility_coprocessorFaultRecover()
     Display_End(s_pHalContext);
     EVE_sleep(100);
 
-    helperCoprocessorFaultReport();
-    helperCoprocessorFaultRecover();
-
-    //Fault case: change bit depth into 7
-    EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_corrupted.png", NULL, 0);
+    EVE_Util_coprocessorFaultRecover(s_pHalContext);
 
     Display_Start(s_pHalContext);
+	//Fault case: change bit depth into 7
+	EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_corrupted.png", NULL, 0);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
     EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - bitmapWidth / 2) * 16,
         (s_pHalContext->Height / 2 - bitmapHeight / 2) * 16);
     EVE_CoDl_end(s_pHalContext);
 
-    EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), 100, 31, OPT_CENTER,
-        "This PNG images is loaded before\ncoprocessor fault and recovered");
+	EVE_Util_coprocessorFaultRecover(s_pHalContext);
+
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
 }
@@ -835,11 +791,134 @@ void SAMAPP_Utility_crcCheck()
     eve_printf_debug("current CRC number [0,1023) is 0x%x \r\n", memcrcRet);
     if (memcrcRet == crcExpected)
     {
-        eve_printf_debug("Crc return value is as expected");
+        eve_printf_debug("Crc return value is as expected\n");
         Draw_TextColor(s_pHalContext, "Crc value is as expected", (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
     }
     SAMAPP_DELAY;
 }
+
+/**
+* @brief API to demonstrate CMD_SKIPCOND
+*
+*/
+void SAMAPP_Utility_skipcond()
+{
+    Draw_Text(s_pHalContext, "Example for: Construct a command list with CMD_SKIPCOND");
+    uint32_t tag = 0;
+    uint32_t btnTag = 1;
+    uint32_t exitTag = 2;
+    bool pressed = 0;
+    bool exit = 0;
+    uint8_t txtPause[2][25] = { "PRESS TO CHANGE COLOR", "PRESSED" };
+
+    do
+    {
+        EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag);
+        //only change the button when a release happened
+        if ((tag & 0xFFFFFF) == btnTag)
+        {
+            pressed = 1;
+        }
+        else if ((tag & 0xFFFFFF) == exitTag)
+        {
+            exit = 1;
+        }
+        else
+        {
+            if (pressed)
+            {
+                pressed = 0;
+            }
+        }
+
+        Display_Start(s_pHalContext);
+
+        /*** Show a button ***/
+        EVE_CoCmd_skipCond(s_pHalContext, REG_TOUCH_TAG, NOTEQUAL, 0x1, 0xFFFFFF, 4 + 24); // colorRgb 4 bytes, CMD_SKIPCOND 24 bytes, so skip to the second colorRgb command if not ewual to 1
+        EVE_CoDl_colorRgb(s_pHalContext, 255, 0, 0); // red
+        EVE_CoCmd_skipCond(s_pHalContext, 0, ALWAYS, 0x0, 0x0, 4); // unconditional branch
+        EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0); // green
+        EVE_CoDl_tag(s_pHalContext, btnTag);
+        EVE_CoCmd_button(s_pHalContext, 160, 160, 600, 200, 31, 0, txtPause[pressed]);
+        /*** Show exit button ***/
+        EVE_CoDl_tag(s_pHalContext, exitTag);
+        EVE_CoDl_colorRgb(s_pHalContext, 255, 255, 255); // white
+        EVE_CoCmd_button(s_pHalContext, 160, 460, 300, 200, 31, 0, "EXIT");
+        /*** Done button ***/
+        Display_End(s_pHalContext);
+
+        EVE_sleep(10);
+    } while (!exit);
+}
+
+/**
+* @brief API to demonstrate CMD_WAITCOND
+*
+*/
+void SAMAPP_Utility_waitcond()
+{
+    Draw_Text(s_pHalContext, "Example for: Construct a command list with CMD_WAITCOND");
+
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 });
+    EVE_CoCmd_text(s_pHalContext, (uint16_t)(s_pHalContext->Width / 2), (uint16_t)(s_pHalContext->Height / 2), 31, OPT_CENTERX | OPT_FILL, "Now you will hear the music");
+    Display_End(s_pHalContext);
+    EVE_CoCmd_loadWav(s_pHalContext, RAM_G, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
+
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    // wait until the music play end
+    EVE_CoCmd_waitCond(s_pHalContext, REG_PLAYBACK_PLAY, EQUAL, 0x0, 0x1);
+    Draw_Text(s_pHalContext, "Music play done.");
+
+    //The file is done, mute the audio.
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+}
+
+void SAMAPP_Utility_interrupt()
+{
+    Draw_Text(s_pHalContext, "Example for: Interrupt driven rendering");
+
+    uint32_t pic_tag = 1;
+    uint32_t int_flags = 0;
+
+    /* Copy the display list */
+    Display_StartColor(s_pHalContext, (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoDl_vertexFormat(s_pHalContext, 2);
+    /* Send command screen saver */
+    EVE_CoDl_tagMask(s_pHalContext, 1);
+    EVE_CoDl_tag(s_pHalContext, pic_tag);
+    EVE_CoDl_begin(s_pHalContext, BITMAPS);
+    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR1, TEST_DIR "\\mandrill256.jpg", NULL, OPT_RGB565);
+    EVE_CoDl_macro(s_pHalContext, 0);
+    EVE_CoDl_end(s_pHalContext);
+    EVE_CoDl_tagMask(s_pHalContext, 0);
+    /* Display the text */
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), (int16_t)(s_pHalContext->Height / 2), 31, OPT_CENTER, "Touch the picture to exit ...");
+    EVE_CoDl_display(s_pHalContext);
+    EVE_CoCmd_screenSaver(s_pHalContext); //screen saver command will continuously update the macro0 with vertex2f command
+
+    EVE_CoCmd_regRead(s_pHalContext, REG_INT_FLAGS, &int_flags); // clear flags
+    EVE_CoCmd_regWrite(s_pHalContext, REG_INT_MASK, 1 << INT_TAG); // set int mask
+    EVE_CoCmd_regWrite(s_pHalContext, REG_INT_EN, 1); // enable int
+    EVE_Cmd_waitFlush(s_pHalContext);
+
+    while ((!EVE_Hal_getInterrupt(s_pHalContext)) 
+       || ((EVE_Hal_rd32(s_pHalContext, REG_INT_FLAGS) & (1 << INT_TAG)) != (1 << INT_TAG)) 
+       || (EVE_Hal_rd32(s_pHalContext, REG_TOUCH_TAG) != pic_tag))
+        ;
+
+    /* Send the stop command */
+    EVE_CoCmd_stop(s_pHalContext);
+    EVE_CoDl_vertexFormat(s_pHalContext, 4);
+    Draw_Text(s_pHalContext, "Tag touched interrupt detected");
+}
+
 
 void SAMAPP_Utility() {
     SAMAPP_Utility_wait();
@@ -856,6 +935,9 @@ void SAMAPP_Utility() {
     SAMAPP_Utility_screenRotate();
     SAMAPP_Utility_numberBases();
     SAMAPP_Utility_crcCheck();
+	SAMAPP_Utility_skipcond();
+	SAMAPP_Utility_waitcond();
+    SAMAPP_Utility_interrupt();
 }
 
 

@@ -1300,6 +1300,18 @@ void EVE_Hal_restoreSPI(EVE_HalContext *phost)
 	flush(phost);
 	setSPI(phost, phost->SpiChannels);
 }
+
+bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
+{
+	BOOL value = true;
+	if (FT4222_GPIO_Read(phost->GpioHandle, (GPIO_Port)GPIO_PORT2, &value) == FT4222_OK)
+	{
+		if (value == false)
+			return true;
+	}
+
+	return false;
+}
 ///@}
 
 /*********

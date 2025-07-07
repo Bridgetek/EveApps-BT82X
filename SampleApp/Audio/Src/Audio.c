@@ -337,7 +337,7 @@ void SAMAPP_Audio_playWavFromMediaFifo()
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
     EVE_CoCmd_playWav(s_pHalContext, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL, 0);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
 
     EVE_Cmd_waitFlush(s_pHalContext);
     //The file is done, mute the audio.
@@ -493,7 +493,7 @@ void SAMAPP_Audio_loadWavFromMediaFifo()
     Draw_Text(s_pHalContext, "Now you will hear the music");
 
     EVE_CoCmd_loadWav(s_pHalContext, RAM_G + mediafifolen, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL, 0);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);

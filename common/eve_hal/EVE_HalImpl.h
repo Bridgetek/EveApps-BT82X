@@ -99,6 +99,7 @@ void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls);
 /** Restore platform to previously configured EVE SPI channel mode */
 void EVE_Hal_restoreSPI(EVE_HalContext *phost);
 uint32_t EVE_Hal_currentFrequency(EVE_HalContext *phost);
+bool EVE_Hal_getInterrupt(EVE_HalContext *phost);
 ///@}
 
 

@@ -118,6 +118,8 @@ After a reset, flash will be in attached state (not in full speed).
 Coprocessor will be set to the latest API level. */
 bool EVE_Util_resetCoprocessor(EVE_HalContext *phost);
 
+void EVE_Util_coprocessorFaultRecover(EVE_HalContext *phost);
+
 /** Calls EVE_Util_bootup and EVE_Util_config using the default parameters */
 bool EVE_Util_bootupConfig(EVE_HalContext *phost);
 ///@}

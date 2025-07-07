@@ -91,9 +91,11 @@
 #define REG_EXTENT_Y1            (REG_CORE_R2 + 0x0048)
 #define REG_PLAY_CONTROL         (REG_CORE_R2 + 0x0050)
 ///@}
+
 /** @name Flash Interface Registers */
 ///@{
 #define REG_FLASH_SIZE           (REG_CORE_R2 + 0x0024)
+#define REG_FLASH_STATUS         (REG_CORE_R1 + 0x05D4)
 ///@}
 
 /** @name Swap Chain Registers */
@@ -235,12 +237,6 @@
 #define REG_TOUCH_CONFIG         (REG_CORE_R1 + 0x01B4)
 ///@}
 
-/** @name Flash Interface Registers */
-///@{
-#define REG_FLASH_STATUS         (REG_CORE_R1 + 0x05D4)
-
-///@}
-
 /** @name LVDSRX Core registers */
 ///@{
 #define REG_LVDSRX_CORE_ENABLE   (REG_CORE_R1 + 0x0670)
@@ -261,12 +257,12 @@
 
 /** @name LVDSTX system registers */
 ///@{
-#define REG_LVDSTX_EN              (REG_LVDSTX + 0x0000)
-#define REG_LVDSTX_PLLCFG          (REG_LVDSTX + 0x0004)
-#define REG_LVDSTX_CTRL_CH0        (REG_LVDSTX + 0x0014)
-#define REG_LVDSTX_CTRL_CH1        (REG_LVDSTX + 0x0018)
-#define REG_LVDSTX_STAT            (REG_LVDSTX + 0x001C)
-#define REG_LVDSTX_ERR_STAT        (REG_LVDSTX + 0x0020)
+#define REG_LVDSTX_EN            (REG_LVDSTX + 0x0000)
+#define REG_LVDSTX_PLLCFG        (REG_LVDSTX + 0x0004)
+#define REG_LVDSTX_CTRL_CH0      (REG_LVDSTX + 0x0014)
+#define REG_LVDSTX_CTRL_CH1      (REG_LVDSTX + 0x0018)
+#define REG_LVDSTX_STAT          (REG_LVDSTX + 0x001C)
+#define REG_LVDSTX_ERR_STAT      (REG_LVDSTX + 0x0020)
 ///@}
 
 /** @name System Registers */
@@ -464,6 +460,8 @@
 #define COLOR_RGB(red, green, blue) ((4UL << 24) | (((red)&255UL) << 16) | (((green)&255UL) << 8) | (((blue)&255UL) << 0))
 #define END()                       ((33UL << 24))
 #define LINE_WIDTH(width)           ((14UL << 24) | (((width)&4095UL) << 0))
+#define PALETTE_SOURCE(addr)        ((42UL << 24) | (((addr)&16777215UL) << 0))
+#define PALETTE_SOURCEH(addr)       ((50UL << 24) | (((addr)&255UL) << 0))
 #define POINT_SIZE(size)            ((13UL << 24) | (((size)&8191UL) << 0))
 #define RESTORE_CONTEXT()           ((35UL << 24))
 #define SAVE_CONTEXT()              ((34UL << 24))
@@ -477,8 +475,6 @@
 #define VERTEX_FORMAT(frac)         ((39UL << 24) | (((frac)&7UL) << 0))
 #define VERTEX_TRANSLATE_X(x)       ((43UL << 24) | (((x)&131071UL) << 0))
 #define VERTEX_TRANSLATE_Y(y)       ((44UL << 24) | (((y)&131071UL) << 0))
-#define PALETTE_SOURCE(addr)        ((42UL << 24) | (((addr)&16777215UL) << 0))
-#define PALETTE_SOURCEH(addr)       ((50UL << 24) | (((addr)&255UL) << 0))
 ///@}
 
 /** @name Drawing Actions */
@@ -487,6 +483,7 @@
 #define VERTEX2F(x, y)                ((1UL << 30) | (((x)&32767UL) << 15) | (((y)&32767UL) << 0))
 #define VERTEX2II(x, y, handle, cell) ((2UL << 30) | (((x)&511UL) << 21) | (((y)&511UL) << 12) | (((handle)&31UL) << 7) | (((cell)&127UL) << 0))
 ///@}
+
 /** @name Execution Control */
 ///@{
 #define CALL(dest)                    ((29UL << 24) | (((dest)&65535UL) << 0))
@@ -502,7 +499,7 @@
 ** Parameters **
 ****************/
 
-/**< @name for REG_DLSWAP */
+/** @name for REG_DLSWAP */
 ///@{
 #define DLSWAP_DONE       0UL
 #define DLSWAP_FRAME      2UL
@@ -548,6 +545,7 @@
 #define OPT_FS            8192UL /**< 0x2000 */
 #define OPT_NOHM          16384UL /**< 0x4000 */
 #define OPT_NOPOINTER     16384UL /**< 0x4000 */
+#define OPT_BASELINE      32768UL /**< 0x8000 */
 #define OPT_NOSECS        32768UL /**< 0x8000 */
 #define OPT_NOHANDS       49152UL /**< 0xC000 */
 ///@}
@@ -589,7 +587,7 @@
 #define ALPHA             5UL
 ///2}
 
-/** @name for ALPHA_FUNC */
+/** @name for ALPHA_FUNC, CMD_SKIPCOND, CMD_WAITCOND */
 ///@{
 #define NEVER             0UL
 #define LESS              1UL
@@ -760,6 +758,18 @@
 #define CHn_FRANGE_100_180         3UL
 #define CHn_PWDN_B_OFF             0UL
 #define CHn_PWDN_B_ON              1UL
+///@}
+
+/** @name for REG_INT_FLAGS and REG_INT_MASK */
+///@{
+#define INT_SWAP                   0UL
+#define INT_TOUCH                  1UL
+#define INT_TAG                    2UL
+#define INT_SOUND                  3UL
+#define INT_PLAYBACK               4UL
+#define INT_CMDEMPTY               5UL
+#define INT_CMDFLAG                6UL
+#define INT_CONV_COMPLETE          7UL
 ///@}
 
 // clang-format on

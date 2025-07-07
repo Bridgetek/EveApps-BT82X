@@ -1099,6 +1099,52 @@ void EVE_Hal_restoreSPI(EVE_HalContext *phost)
 #endif
 	/* no-op */
 }
+
+/**
+ * @brief get interrupt status from GPIO pin
+ * ADBUS5 is connected with interrupt pin which is low active
+ * 
+ * @param phost Pointer to Hal context
+ */
+bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
+{
+	uint8_t byOutputBuffer[3];
+	DWORD dwNumBytesToSend = 0;
+	DWORD dwNumBytesSent;
+	FT_STATUS status;
+
+#if 0 // ADBUS5 by default is set as an input pin
+	dwNumBytesToSend = 0;
+	byOutputBuffer[dwNumBytesToSend++] = 0x80; // Configure data bits low-byte of MPSSE port
+	byOutputBuffer[dwNumBytesToSend++] = 0x80; // value
+	byOutputBuffer[dwNumBytesToSend++] = 0x80; // direction: set ADBUS5 to input, keep ADBUS7 output since it is PD_N pin
+	status = FT_Write(phost->GpioHandle, byOutputBuffer, dwNumBytesToSend, &dwNumBytesSent);
+	if (dwNumBytesToSend != dwNumBytesSent)
+	{
+		return false;
+	}
+#endif
+
+	// read GPIO status
+	BYTE command = 0x81; // 0x81 = Read Low byte GPIO (ADBUS)
+	status = FT_Write(phost->GpioHandle, &command, 1, &dwNumBytesSent);
+	if (status != FT_OK)
+	{
+		return false;
+	}
+
+	// Read response
+	DWORD bytesRead;
+	BYTE inputBuffer[2];
+	status = FT_Read(phost->GpioHandle, inputBuffer, 1, &bytesRead);
+	if (status == FT_OK && bytesRead == 1)
+	{
+		if ((inputBuffer[0] & 0x20) == 0x0)
+			return true;
+	}
+
+	return false;
+}
 ///@}
 
 /*********

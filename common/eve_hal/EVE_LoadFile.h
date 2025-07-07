@@ -58,7 +58,7 @@ If transfered is set, the file may be streamed partially,
 and will be kept open until EVE_Util_closeFile is called, 
 and stop once the coprocessor has processed it.
 Filename may be omitted in subsequent calls */
-bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered, uint32_t opt);
+bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered);
 
 /** Load a file into RAM_G block by block, returns the number of bytes loaded at address
 The file will be kept open until EVE_Util_closeFile is called 
@@ -87,7 +87,7 @@ If transfered is set, the file may be streamed partially,
 and will be kept open until EVE_Util_closeFile is called, 
 and stop once the coprocessor has processed it.
 Filename may be omitted in subsequent calls  */
-bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered, uint32_t opt);
+bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered);
 
 /** Load a file into RAM_G block by block, returns the number of bytes loaded at address
 The file will be kept open until EVE_Util_closeFile is called 

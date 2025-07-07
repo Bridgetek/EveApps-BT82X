@@ -467,9 +467,9 @@ uint16_t EVE_Util_loadFileW(EVE_HalContext *phost, uint32_t address, uint32_t si
 #endif
 
 #ifdef _WIN32
-static bool loadMediaFile(EVE_HalContext *phost, const char *filename, const wchar_t *filenameW, uint32_t *transfered, uint32_t opt)
+static bool loadMediaFile(EVE_HalContext *phost, const char *filename, const wchar_t *filenameW, uint32_t *transfered)
 #else
-bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered, uin32_t opt)
+bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered)
 #endif
 {
 	FILE *afile;
@@ -559,8 +559,6 @@ bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_
 	}
 	if (!transfered)
 	{
-		if (opt == OPT_COMPLETEREG)
-			EVE_Hal_wr32(phost, REG_OBJECT_COMPLETE, 1);
 		fclose(afile); /* Close the opened file */
 	}
 	else if (remaining)
@@ -569,8 +567,6 @@ bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_
 	}
 	else
 	{
-		if (opt == OPT_COMPLETEREG)
-		    EVE_Hal_wr32(phost, REG_OBJECT_COMPLETE, 1);
 		EVE_Util_closeFile(phost);
 	}
 	return transfered ? EVE_Cmd_waitFlush(phost) : EVE_MediaFifo_waitFlush(phost, false);
@@ -578,14 +574,14 @@ bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_
 
 #ifdef _WIN32
 
-bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered, uint32_t opt)
+bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered)
 {
-	return loadMediaFile(phost, filename, NULL, transfered, opt);
+	return loadMediaFile(phost, filename, NULL, transfered);
 }
 
-bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered, uint32_t opt)
+bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered)
 {
-	return loadMediaFile(phost, NULL, filename, transfered, opt);
+	return loadMediaFile(phost, NULL, filename, transfered);
 }
 
 #endif
