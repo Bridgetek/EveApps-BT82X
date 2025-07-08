@@ -85,4 +85,15 @@ example:
 
 ![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
 
+## Version
+This version is v1.0.0_Beta
 
+## Release log
+```
+v1.0.0_Beta
+    - Introduced a new sample application demonstrating the use of LVDSRX
+    - Added sample code to showcase new commands and options introduced in BT820
+pre_release v0.1.0
+    - Initial release
+    - Added ten sample applications with FT4222 and MPSSE support for BT820
+```
