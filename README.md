@@ -93,6 +93,11 @@ This version is v1.0.0_Beta
 v1.0.0_Beta
     - Introduced a new sample application demonstrating the use of LVDSRX
     - Added sample code to showcase new commands and options introduced in BT820
+      Commands: CMD_SKIPCOND, CMD_WAITCOND
+      Options: OPT_COMPLETEREG
+    - Added interrupt driven rendering example
+    - Code cleanup and synced register/command names with BRT_AN_086 BT82X Series Programming Guide v1.1
+
 pre_release v0.1.0
     - Initial release
     - Added ten sample applications with FT4222 and MPSSE support for BT820
