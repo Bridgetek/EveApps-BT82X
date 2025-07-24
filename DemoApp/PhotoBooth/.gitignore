@@ -1,0 +1,9 @@
+__Flash.bin
+.vs
+.vscode
+Debug
+build
+Release
+*.user
+language.settings.xml
+.settings
