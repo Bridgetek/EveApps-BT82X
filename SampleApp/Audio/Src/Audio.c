@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,10 @@
  * SOFTWARE.
  */
 
-#include "Common.h"
 #include "Audio.h"
+#include "Common.h"
+#include "FileTransfer.h"
+#include "FlashHelper.h"
 
 #define pgm_read_byte(x) (*(x))
 
@@ -45,7 +47,7 @@ int main(int argc, char* argv[])
     LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
     EVE_Calibrate(s_pHalContext);
     Calibration_Save(s_pHalContext);
 #endif
@@ -73,7 +75,7 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
         LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
     }
@@ -81,10 +83,10 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-PROGMEM char SAMAPP_Snd_Array[5 * 58] =
+char SAMAPP_Snd_Array[5 * 58] =
 "Slce\0Sqrq\0Sinw\0Saww\0Triw\0Beep\0Alrm\0Warb\0Crsl\0Pp01\0Pp02\0Pp03\0Pp04\0Pp05\0Pp06\0Pp07\0Pp08\0Pp09\0Pp10\0Pp11\0Pp12\0Pp13\0Pp14\0Pp15\0Pp16\0DMF#\0DMF*\0DMF0\0DMF1\0DMF2\0DMF3\0DMF4\0DMF5\0DMF6\0DMF7\0DMF8\0DMF9\0Harp\0Xyph\0Tuba\0Glok\0Orgn\0Trmp\0Pian\0Chim\0MBox\0Bell\0Clck\0Swth\0Cowb\0Noth\0Hiht\0Kick\0Pop\0Clak\0Chak\0Mute\0uMut\0";
 
-PROGMEM char SAMAPP_Snd_TagArray[58] = { 0x63, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,
+char SAMAPP_Snd_TagArray[58] = { 0x63, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,
 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 0x23, 0x2a, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41, 0x42, 0x43,
 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x60,
@@ -133,7 +135,7 @@ void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char
             EVE_CoDl_vertex2f_4(s_pHalContext, ((j * wbutton) + wbutton - 2) * 16, ((hbutton * i) + hbutton - 2) * 16);
             EVE_CoDl_end(s_pHalContext);
 
-#if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
+#if defined(MSVC_PLATFORM)
             strcpy_s(StringArray, 8, pString);
 #endif
             EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
@@ -165,8 +167,8 @@ void SAMAPP_Audio_builtin()
     uint32_t freqtrack = 0;
     uint32_t currfreq = 0;
     uint32_t prevcurrfreq;
-    PROGMEM char* pString;
-    PROGMEM char* pTagArray;
+    char* pString;
+    char* pTagArray;
     char StringArray[8] = { 0 };
 
     Draw_Text(s_pHalContext, "Example for: Play built-in sound\n\n\nPlease touch on screen");

@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,7 @@
 */
 
 #include "EVE_HalImpl.h"
-#include "EVE_Platform.h"
 #if defined(FT4222_PLATFORM)
-
-#define POLLING_BYTES 10 /**< For QUAD mode */
 
 #define FT4222_TRANSFER_SIZE_MAX (0xFFFF)
 #define FT4222_WRITE_HEADER_SIZE (4)
@@ -44,9 +41,13 @@
 
 #define FT4222_LATENCY_TIME (2)
 
+#define POLLING_BYTES 8
+#define READ_TIMEOUT 5
+#define DATA_LENGTH 1024
+
 DWORD s_NumDevsD2XX;
 
-/** @name Init */
+/** @name INIT */
 ///@{
 /**
  * @brief Initialize HAL platform
@@ -107,64 +108,6 @@ size_t EVE_Hal_list()
 	s_NumDevsD2XX = 0;
 	FT_CreateDeviceInfoList(&s_NumDevsD2XX);
 	return s_NumDevsD2XX;
-}
-
-/**
- * @brief Get info of the specified device 
- * 
- * @param deviceInfo
- * @param deviceIdx
- */
-void EVE_Hal_info(EVE_DeviceInfo *deviceInfo, size_t deviceIdx)
-{
-	FT_DEVICE_LIST_INFO_NODE devInfo = { 0 };
-
-	memset(deviceInfo, 0, sizeof(EVE_DeviceInfo));
-	if (deviceIdx >= s_NumDevsD2XX)
-		return;
-
-	if (FT_GetDeviceInfoDetail((DWORD)deviceIdx,
-	        &devInfo.Flags, &devInfo.Type, &devInfo.ID, &devInfo.LocId,
-	        devInfo.SerialNumber, devInfo.Description, &devInfo.ftHandle)
-	    != FT_OK)
-		return;
-
-	strcpy_s(deviceInfo->SerialNumber, sizeof(deviceInfo->SerialNumber), devInfo.SerialNumber);
-	strcpy_s(deviceInfo->DisplayName, sizeof(deviceInfo->DisplayName), devInfo.Description);
-	if (!strcmp(devInfo.Description, "FT4222 A"))
-		deviceInfo->Host = EVE_HOST_FT4222;
-	deviceInfo->Opened = devInfo.Flags & FT_FLAGS_OPENED;
-}
-
-/**
- * @brief Check whether the context is the specified device 
- * 
- * @param phost Pointer to Hal context
- * @param deviceIdx
- * @return true True if ok
- * @return false False if error
- */
-bool EVE_Hal_isDevice(EVE_HalContext *phost, size_t deviceIdx)
-{
-	FT_DEVICE_LIST_INFO_NODE devInfo = { 0 };
-
-	if (!phost)
-		return false;
-	if (EVE_HOST != EVE_HOST_FT4222)
-		return false;
-	if (deviceIdx >= s_NumDevsD2XX)
-		return false;
-
-	if (!phost->SpiHandle)
-		return false;
-
-	if (FT_GetDeviceInfoDetail((DWORD)deviceIdx,
-	        &devInfo.Flags, &devInfo.Type, &devInfo.ID, &devInfo.LocId,
-	        devInfo.SerialNumber, devInfo.Description, &devInfo.ftHandle)
-	    != FT_OK)
-		return false;
-
-	return phost->SpiHandle == devInfo.ftHandle;
 }
 
 /**
@@ -592,25 +535,31 @@ static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t siz
 {
 	FT4222_STATUS status;
 
-	uint8_t hrdpkt[8] = { 0 }; // 3 byte addr + 2 or 1 byte dummy
-	uint8_t buff1[1024] = { 0 };
+	uint8_t hrdpkt[4] = { 0 };
+	if (size & 3)
+	{
+		size = (size + 3) & ~3UL;
+		eve_printf_debug("Data size should be align to 4 bytes\n");
+	}
 
 	while (size)
 	{
 		uint32_t sizeTransferred;
 		uint32_t bytesPerRead;
 		uint32_t addr = phost->SpiRamGAddr;
+		bool readyRecved = false;
+		uint8_t retry = 0;
+		uint8_t buff1[DATA_LENGTH + POLLING_BYTES] = { 0 };
 
-		/* Compose the HOST MEMORY READ packet */
 		hrdpkt[0] = (uint8_t)(addr >> 24) & 0xFF;
 		hrdpkt[1] = (uint8_t)(addr >> 16) & 0xFF;
 		hrdpkt[2] = (uint8_t)(addr >> 8) & 0xFF;
 		hrdpkt[3] = (uint8_t)(addr & 0xFF);
 
-		if (size <= FT4222_TRANSFER_SIZE_MAX)
+		if (size <= DATA_LENGTH)
 			bytesPerRead = size;
 		else
-			bytesPerRead = FT4222_TRANSFER_SIZE_MAX;
+			bytesPerRead = DATA_LENGTH;
 
 		if (phost->SpiChannels == EVE_SPI_SINGLE_CHANNEL)
 		{
@@ -631,59 +580,79 @@ static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t siz
 					phost->Status = EVE_STATUS_ERROR;
 				return false;
 			}
-			uint8_t buffer_readybyte;
-			uint8_t countTimout = 0;
-			do
-			{
-				FT4222_SPIMaster_SingleRead(phost->SpiHandle, &buffer_readybyte, 1, &sizeRead, FALSE); // Must pass FALSE to indicate CS maintaining ACTIVE
-				countTimout++;
-			} while ((buffer_readybyte != 0x01) && (countTimout < READ_TIMOUT));
 
-			status = FT4222_SPIMaster_SingleRead(
-			    phost->SpiHandle,
-			    buffer,
-			    bytesPerRead,
-			    &sizeRead,
-			    TRUE);
-
-			if ((status != FT4222_OK) || (sizeRead != bytesPerRead))
+			while (1)
 			{
-				eve_printf_debug("FT4222_SPIMaster_SingleRead failed,sizeTransferred is %d with status %d\n", sizeRead, status);
-				if (sizeRead != bytesPerRead)
-					phost->Status = EVE_STATUS_ERROR;
-				return false;
+				status = FT4222_SPIMaster_SingleRead(
+				    phost->SpiHandle,
+				    buff1,
+				    bytesPerRead + POLLING_BYTES,
+				    &sizeRead,
+				    TRUE);
+
+				if ((status != FT4222_OK) || (sizeRead != (POLLING_BYTES + bytesPerRead)))
+				{
+					eve_printf_debug("FT4222_SPIMaster_SingleRead failed, sizeTransferred is %d with status %d\n", sizeRead, status);
+					if (sizeRead != bytesPerRead)
+						phost->Status = EVE_STATUS_ERROR;
+					return false;
+				}
+
+				for (uint8_t i = 0; i < POLLING_BYTES; i++)
+				{
+					if (buff1[i] == 0x01)
+					{
+						readyRecved = true;
+						memcpy(buffer, &buff1[i + 1], bytesPerRead); /* Prepare the SFN to be modified */
+						sizeTransferred = bytesPerRead;
+						break;
+					}
+				}
+				if (readyRecved)
+					break;
+
+				retry++;
+				if (retry >= READ_TIMEOUT)
+					return false;
 			}
-
-			sizeTransferred = sizeRead;
 		}
 		else
 		{
-
-			status = FT4222_SPIMaster_MultiReadWrite(
-			    phost->SpiHandle,
-				buff1,
-			    hrdpkt,
-			    0,
-				4,
-			    POLLING_BYTES + bytesPerRead,
-			    &sizeTransferred);
-
-			if ((status != FT4222_OK) || (sizeTransferred != (POLLING_BYTES + bytesPerRead)))
+			while (1)
 			{
-				eve_printf_debug("FT4222_SPIMaster_MultiReadWrite failed, sizeTransferred is %d with status %d\n", sizeTransferred, status);
-				if (sizeTransferred != (POLLING_BYTES + bytesPerRead))
-					phost->Status = EVE_STATUS_ERROR;
-				return false;
-			}
+				status = FT4222_SPIMaster_MultiReadWrite(
+				    phost->SpiHandle,
+				    buff1,
+				    hrdpkt,
+				    0,
+				    4,
+				    POLLING_BYTES + bytesPerRead,
+				    &sizeTransferred);
 
-			for (uint8_t i = 0; i < POLLING_BYTES; i++)
-			{
-				if (buff1[i] == 0x01)
+				if ((status != FT4222_OK) || (sizeTransferred != (POLLING_BYTES + bytesPerRead)))
 				{
-					memcpy(buffer, &buff1[i + 1], bytesPerRead); /* Prepare the SFN to be modified */
-					sizeTransferred = bytesPerRead;
-					break;
+					eve_printf_debug("FT4222_SPIMaster_MultiReadWrite failed, sizeTransferred is %d with status %d\n", sizeTransferred, status);
+					if (sizeTransferred != (POLLING_BYTES + bytesPerRead))
+						phost->Status = EVE_STATUS_ERROR;
+					return false;
 				}
+
+				for (uint8_t i = 0; i < POLLING_BYTES; i++)
+				{
+					if (buff1[i] == 0x01)
+					{
+						readyRecved = true;
+						memcpy(buffer, &buff1[i + 1], bytesPerRead); /* Prepare the SFN to be modified */
+						sizeTransferred = bytesPerRead;
+						break;
+					}
+				}
+				if (readyRecved)
+					break;
+
+				retry++;
+				if (retry >= READ_TIMEOUT)
+					return false;
 			}
 		}
 
@@ -719,6 +688,11 @@ static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t siz
 static inline bool wrBuffer(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size)
 {
 	FT4222_STATUS status;
+	if (size & 3)
+	{
+		size = (size + 3) & ~3UL;
+		eve_printf_debug("Data size should be align to 4 bytes\n");
+	}
 
 	if (buffer && (size < (sizeof(phost->SpiWrBuf) - phost->SpiWrBufIndex - FT4222_WRITE_HEADER_SIZE)))
 	{
@@ -761,6 +735,11 @@ static inline bool wrBuffer(EVE_HalContext *phost, const uint8_t *buffer, uint32
 					bytesPerWrite = size + FT4222_WRITE_HEADER_SIZE;
 				else
 					bytesPerWrite = FT4222_TRANSFER_SIZE_MAX;
+				if (bytesPerWrite & 3)
+				{
+					bytesPerWrite = (bytesPerWrite + 3) & ~3UL;
+					eve_printf_debug("Data size should be align to 4 bytes\n");
+				}
 
 				if (buffer)
 				{
@@ -918,52 +897,6 @@ void EVE_Hal_flush(EVE_HalContext *phost)
 }
 
 /**
- * @brief Write 8 bits to Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @param value Value to write
- * @return uint8_t Number of bytes transfered
- */
-uint8_t EVE_Hal_transfer8(EVE_HalContext *phost, uint8_t value)
-{
-	if (phost->Status == EVE_STATUS_READING)
-	{
-		rdBuffer(phost, &value, 1);
-		return value;
-	}
-	else
-	{
-		wrBuffer(phost, &value, 1);
-		return 0;
-	}
-}
-
-/**
- * @brief Write 2 bytes to Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @param value Value to write
- * @return uint16_t Number of bytes transfered
- */
-uint16_t EVE_Hal_transfer16(EVE_HalContext *phost, uint16_t value)
-{
-	uint8_t buffer[2];
-	if (phost->Status == EVE_STATUS_READING)
-	{
-		rdBuffer(phost, buffer, 2);
-		return (uint16_t)buffer[0]
-		    | (uint16_t)buffer[1] << 8;
-	}
-	else
-	{
-		buffer[0] = value & 0xFF;
-		buffer[1] = value >> 8;
-		wrBuffer(phost, buffer, 2);
-		return 0;
-	}
-}
-
-/**
  * @brief Write 4 bytes to Coprocessor
  * 
  * @param phost Pointer to Hal context
@@ -1001,34 +934,6 @@ uint32_t EVE_Hal_transfer32(EVE_HalContext *phost, uint32_t value)
  * @param size Size of buffer
  */
 void EVE_Hal_transferMem(EVE_HalContext *phost, uint8_t *result, const uint8_t *buffer, uint32_t size)
-{
-	if (!size)
-		return;
-
-	if (result && buffer)
-	{
-		/* not implemented */
-		eve_debug_break();
-	}
-	else if (result)
-	{
-		rdBuffer(phost, result, size);
-	}
-	else if (buffer)
-	{
-		wrBuffer(phost, buffer, size);
-	}
-}
-
-/**
- * @brief Transfer a block data from program memory
- * 
- * @param phost Pointer to Hal context
- * @param result Buffer to get data transfered, NULL when write
- * @param buffer Buffer where data is transfered, NULL when read
- * @param size Size of buffer
- */
-void EVE_Hal_transferProgMem(EVE_HalContext *phost, uint8_t *result, eve_progmem_const uint8_t *buffer, uint32_t size)
 {
 	if (!size)
 		return;
@@ -1208,7 +1113,7 @@ void setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 }
 
 /**
- * @brief Toggle PD_N pin of FT800 board for a power cycle
+ * @brief Toggle PD_N pin of BT820 board for a power cycle
  * 
  * @param phost Pointer to Hal context
  * @param up Up or Down
@@ -1268,7 +1173,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
  * 
  * @param phost Pointer to Hal context
  * @param numchnls Number of channel
- * @param numdummy Number of dummy bytes
  */
 void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 {
@@ -1280,7 +1184,9 @@ void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 		return; // error
 
 	/* Switch EVE to multi channel SPI mode */
-	syscfg = EVE_Hal_rd32(phost, REG_SYS_CFG);
+	EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, REG_SYS_CFG);
+	syscfg = EVE_Hal_transfer32(phost, 0);
+	EVE_Hal_endTransfer(phost);
 	if (numchnls == EVE_SPI_DUAL_CHANNEL)
 	{
 		syscfg |= SPI_WIDTH_2bit;
@@ -1289,18 +1195,31 @@ void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 	{
 		syscfg |= SPI_WIDTH_4bit;
 	}
-	EVE_Hal_wr32(phost, REG_SYS_CFG, syscfg);
+	EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, REG_SYS_CFG);
+	EVE_Hal_transfer32(phost, syscfg);
+	EVE_Hal_endTransfer(phost);
 
 	/* Switch FT4222 to multi channel SPI mode */
 	setSPI(phost, numchnls);
 }
 
+/**
+ * @brief Restore platform to previously configured EVE SPI channel mode
+ * 
+ * @param phost Pointer to Hal context
+ */
 void EVE_Hal_restoreSPI(EVE_HalContext *phost)
 {
 	flush(phost);
 	setSPI(phost, phost->SpiChannels);
 }
 
+/**
+ * @brief Get interrupt status
+ * 
+ * @param phost Pointer to Hal context
+ * @return True on interrupt happened or otherwise
+ */
 bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
 {
 	BOOL value = true;
@@ -1311,26 +1230,6 @@ bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
 	}
 
 	return false;
-}
-///@}
-
-/*********
-** MISC **
-*********/
-
-/** @name MISC */
-///@{
-/**
- * @brief Display GPIO pins
- * 
- * @param phost Pointer to Hal context
- * @return true True if Ok
- * @return false False if error
- */
-bool EVE_UtilImpl_bootupDisplayGpio(EVE_HalContext *phost)
-{
-	/* no-op */
-	return true;
 }
 ///@}
 

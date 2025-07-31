@@ -1,0 +1,38 @@
+var a00005 =
+[
+    [ "__ALIGN_MASK", "a00005.html#a529df165c9f6126b08c710f8a195bd78", null ],
+    [ "ALIGN", "a00005.html#a9ac102be1cec0ce473aa3819ff297a26", null ],
+    [ "DDR_BITMAPS_STARTADDR", "a00005.html#aa3f868b08020bfd3c20a39f221bf3b78", null ],
+    [ "DDR_BITMAPS_STARTADDR1", "a00005.html#aca780ff6938172e838aafb692c7056aa", null ],
+    [ "DDR_BITMAPS_STARTADDR2", "a00005.html#a6b20cf8e3c22844364048cadc6ca69fe", null ],
+    [ "DDR_FRAMEBUFFER_STARTADDR", "a00005.html#ac60a38d23e0cf038f99334d824b6914b", null ],
+    [ "SC0_PTR0_STARTADDR", "a00005.html#a84c2f965105c21b8bcd92eefbfb2cb99", null ],
+    [ "SC0_PTR1_STARTADDR", "a00005.html#a89b478c4861e617009878d14bc25bca4", null ],
+    [ "SC1_PTR0_STARTADDR", "a00005.html#ab7df75d6485da6fdc297a5b4387f2abc", null ],
+    [ "SC1_PTR1_STARTADDR", "a00005.html#a77e45bf3c05557fbd8e816376b48db22", null ],
+    [ "SC2_PTR0_STARTADDR", "a00005.html#a7bf861b527f9003ff630072b4b5dec50", null ],
+    [ "SC2_PTR1_STARTADDR", "a00005.html#a3ece2d839e5558daa7b5c5aec6860f09", null ],
+    [ "Display_mode", "a00005.html#ab517d9a9abf923fffd4a012e3f2bf226", [
+      [ "MODE_PICTURE", "a00005.html#ab517d9a9abf923fffd4a012e3f2bf226a1dd8a0a669f04746d58be9bdd2d3d20e", null ],
+      [ "MODE_DIRECTVIDEO", "a00005.html#ab517d9a9abf923fffd4a012e3f2bf226ac319b4ebb96ae31a585310be6d28a548", null ],
+      [ "MODE_VIDEO", "a00005.html#ab517d9a9abf923fffd4a012e3f2bf226a25002d9a9aa7022e1669203986b881c3", null ],
+      [ "MODE_LVDSRX", "a00005.html#ab517d9a9abf923fffd4a012e3f2bf226a0a05da03acdfdf019d52c7efd6a1065c", null ]
+    ] ],
+    [ "Calibration_Restore", "a00005.html#a3751f18a213f5843e48da3a671c9ab5c", null ],
+    [ "Calibration_Save", "a00005.html#a114baa99aa7387c3a20473741be1fa12", null ],
+    [ "Display_End", "a00005.html#a825253ed3c80fba2c042f18bacaf242f", null ],
+    [ "Display_Start", "a00005.html#a370ff42d8cfab5793d5f9d8e427e80f7", null ],
+    [ "Display_StartColor", "a00005.html#a2aefd5896e14dd3d94f38ad8460d38b5", null ],
+    [ "Draw_Text", "a00005.html#a21c82724e72811b882ed2ba4a48a71b9", null ],
+    [ "Draw_TextColor", "a00005.html#ac1ca3fb67e9cf59d9a536d08f675fb44", null ],
+    [ "EVE_Calibrate", "a00005.html#a0b418fd3ae676b9b40b722223721b68d", null ],
+    [ "Flash_Init", "a00005.html#ad0a7438f051e7a730c610fb2633bc9e4", null ],
+    [ "Gpu_Hal_Dec2Ascii", "a00005.html#adfb784bd138be167e5e21ef0475527d3", null ],
+    [ "Gpu_Init", "a00005.html#a7e160a3c66c25458dd805ed837fb8001", null ],
+    [ "Gpu_Release", "a00005.html#a771d705be838e1f66f087adb2324acb9", null ],
+    [ "LVDS_Config", "a00005.html#a4c091cf2a5b50ff98b21233292e00a5c", null ],
+    [ "Play_Sound", "a00005.html#a4d0383dc32e0566d63725afadaa9e943", null ],
+    [ "Show_Diaglog_Info", "a00005.html#a4182404dd0aef5feff39fd8c52bc8c23", null ],
+    [ "Show_Diaglog_YesNo", "a00005.html#a9b5fcf0db3b6789b20e77e2c726faed2", null ],
+    [ "WelcomeScreen", "a00005.html#a9a03ee86056c3c2d0cbe32b31a2f3905", null ]
+];

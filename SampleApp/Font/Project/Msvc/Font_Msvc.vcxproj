@@ -19,8 +19,6 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_State.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_Widgets.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Hal.c" />
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMU.c" />
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMUC.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_FT4222.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_MPSSE.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_WIN32.c" />
@@ -49,13 +47,10 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_LoadFile.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_MediaFifo.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform.h" />
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_BT8XXEMU.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_FT4222.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_MPSSE.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_WIN32.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Util.h" />
-    <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\bt8xxemu.h" />
-    <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\bt8xxemu_inttypes.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\ftd2xx.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\LibFT4222.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\libMPSSE_spi.h" />

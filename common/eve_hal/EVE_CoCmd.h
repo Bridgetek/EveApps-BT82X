@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "EVE_HalDefs.h"
-#include "EVE_GpuDefs.h"
+#include "EVE_Cmd.h"
 
 /**********************
  *      MACROS
@@ -195,7 +194,7 @@ void EVE_CoCmd_watchdog(EVE_HalContext *phost, uint32_t init_val);
  *
  * @param phost Pointer to Hal context
  * @param result
- * @return uint32_t
+ * @return uint32_t output parameter; written with 0 on failure
  */
 uint32_t EVE_CoCmd_calibrate(EVE_HalContext *phost, uint32_t result);
 
@@ -331,7 +330,7 @@ void EVE_CoCmd_memWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t num);
 /**
  * @brief Send CMD_MEMWRITE, followed by a single 32-bit value.
  *
- * Convenience function to write one 32-bit value through the coprocessor.
+ * Convenience function to write one 32-bit value through the coprocessor. \n
  * Useful in combination with EVE_Cmd_waitRead32 to add synchronization points into the command buffer.
  *
  * @param phost Pointer to Hal context
@@ -391,7 +390,7 @@ void EVE_CoCmd_snapshot(EVE_HalContext *phost, uint32_t ptr);
  *
  * @param phost Pointer to Hal context
  * @param ptr Destination address
- * @param options
+ * @param options Command option
  */
 void EVE_CoCmd_inflate(EVE_HalContext *phost, uint32_t ptr, uint32_t options);
 
@@ -416,8 +415,8 @@ void EVE_CoCmd_mediaFifo(EVE_HalContext *phost, uint32_t ptr, uint32_t size);
 /**
  * @brief Send CMD_VIDEOSTART
  *
- * @param phost
- * @param options
+ * @param phost Pointer to Hal context
+ * @param options Command option
  */
 void EVE_CoCmd_videoStart(EVE_HalContext *phost, uint32_t options);
 /**
@@ -508,13 +507,18 @@ void EVE_CoCmd_flashDetach(EVE_HalContext *phost);
 uint32_t EVE_CoCmd_flashAttach(EVE_HalContext *phost);
 
 /**
-Enter fast flash state. Returns new FLASH_STATUS. Optional parameter `result` will contain any error code, 0 on success
-\n 0xE001 flash is not attached
-\n 0xE002 no header detected in sector 0 - is flash blank?
-\n 0xE003 sector 0 data failed integrity check
-\n 0xE004 device/blob mismatch - was correct blob loaded?
-\n 0xE005 failed full-speed test - check board wiring
-*/
+ * @brief Enter fast flash state. Returns new FLASH_STATUS. Optional parameter `result` will contain any error code, 0 on success
+ * 
+ * \n 0xE001 flash is not attached
+ * \n 0xE002 no header detected in sector 0 - is flash blank?
+ * \n 0xE003 sector 0 data failed integrity check
+ * \n 0xE004 device/blob mismatch - was correct blob loaded?
+ * \n 0xE005 failed full-speed test - check board wiring
+ * 
+ * @param phost Pointer to Hal context
+ * @param result Result
+ * @return uint32_t Returns new FLASH_STATUS
+ */
 uint32_t EVE_CoCmd_flashFast(EVE_HalContext *phost, uint32_t *result);
 
 /**
@@ -666,35 +670,12 @@ bool EVE_CoCmd_regRead(EVE_HalContext *phost, uint32_t ptr, uint32_t *result);
 void EVE_CoCmd_regWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t value);
 
 /**
- * @brief Inflates data from program memory to RAM_G
- *
- * @param phost Pointer to Hal context
- * @param dst Image address
- * @param src Desination on RAM_G
- * @param size size of `src` in bytes
- * @return Returns false on coprocessor fault
- */
-bool EVE_CoCmd_inflate_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_const uint8_t *src, uint32_t size);
-
-/**
  * @brief Get the first unallocated memory location
  *
  * @param phost Pointer to Hal context
  * @param result The first unallocated memory location
  */
 bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result);
-
-/**
- * @brief Load image from program memory
- *
- * @param phost Pointer to Hal context
- * @param dst Image address
- * @param src Desination on RAM_G
- * @param size size of `src` in bytes
- * @param format Output parameter format returns loaded bitmap format on success
- * @return bool Returns false on coprocessor fault
- */
-bool EVE_CoCmd_loadImage_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_const uint8_t *src, uint32_t size, uint32_t *format);
 
 /**
  * @brief Get the image properties decompressed by CMD_LOADIMAGE

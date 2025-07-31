@@ -1,0 +1,30 @@
+<map id="common/eve_hal/EVE_Platform_MPSSE.h" name="common/eve_hal/EVE_Platform_MPSSE.h">
+<area shape="rect" id="Node000001" title="EVE platform for MPSSE." alt="" coords="652,5,803,48"/>
+<area shape="rect" id="Node000002" href="$a00110.html" title="EVE platform for WIN32." alt="" coords="374,96,537,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="658,51,513,94,512,89,656,46"/>
+<area shape="rect" id="Node000012" href="$a00119.html" title=" " alt="" coords="789,171,857,197"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="732,48,739,84,755,121,772,142,792,160,789,164,768,146,750,124,734,85,726,49"/>
+<area shape="rect" id="Node000014" href="$a00125.html" title="MPSSE APIs." alt="" coords="765,96,881,123"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="754,47,798,84,795,88,750,51"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,171,92,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="375,126,107,173,106,167,374,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="116,171,176,197"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="394,126,192,172,191,167,393,121"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="200,171,263,197"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="417,126,278,170,277,165,415,121"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="286,171,355,197"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="433,126,359,165,356,160,430,121"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="379,171,443,197"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="450,125,429,159,424,156,445,122"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="467,171,528,197"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="465,122,485,156,481,159,460,125"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="552,171,617,197"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="479,121,550,160,547,165,476,126"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="641,171,698,197"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="493,121,628,166,626,171,492,126"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="722,171,764,197"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="520,121,606,140,708,167,706,172,605,145,519,126"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="782,245,865,272"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="826,198,826,230,820,230,820,198"/>
+<area shape="poly" id="edge14_Node000014_Node000012" title=" " alt="" coords="826,123,826,155,820,155,820,123"/>
+</map>

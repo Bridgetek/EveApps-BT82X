@@ -2,13 +2,13 @@
  * @file Common.h
  * @brief Common functions
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,17 +35,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-
-#include "EVE_Hal.h"
-#include "EVE_HalImpl.h"
-
-#include "FileTransfer.h"
-#include "Maths.h"
-#include "FlashHelper.h"
+#include "EVE_CoDl.h"
+#include "EVE_Util.h"
+#include "EVE_LoadFile.h"
+#include "EVE_MediaFifo.h"
 
 /**********************
  *  EXTERN VARIABLES
@@ -57,9 +50,6 @@
 /// Alignment
 #define __ALIGN_MASK(x,mask)                (((x)+(mask))&~(mask))
 #define ALIGN(x,a)                          __ALIGN_MASK(x, a - 1)
-
-#define PROGMEM eve_progmem
-#define PROGMEM_CONST eve_progmem_const
 
 // example for memory map for assets
 #define DDR_BITMAPS_STARTADDR (9 << 20)   /**< from 9M(size : 9M) */
@@ -75,10 +65,14 @@
 
 #define DDR_FRAMEBUFFER_STARTADDR (72 << 20) /**< from 72M(size : 9M) */
 
-#define MODE_PICTURE        1 /**< 1 */
-#define MODE_DIRECTVIDEO    2 /**< 2 */
-#define MODE_VIDEO          3 /**< 3 */
-#define MODE_LVDSRX         4 /**< 4 */
+typedef enum
+{
+	MODE_PICTURE = 1, /**< 1 */
+	MODE_DIRECTVIDEO, /**< 2 */
+	MODE_VIDEO,       /**< 3 */
+	MODE_LVDSRX       /**< 4 */
+} Display_mode;
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/

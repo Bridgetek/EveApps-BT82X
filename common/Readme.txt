@@ -18,7 +18,7 @@ sample application. It contains 3 folder:
 
 1. EVE_HAL: Contains the HAL (Hardware Abstraction Layer) source code, it provide 
 unique APIs to control hardware ICs from different host 
-platform (PC, Emulator...).
+platform (PC...).
 
 Platform's specific files are suffixed in the file name, for example:
 - EVE_HalImpl_FT4222.c: Source code specific for FT4222.

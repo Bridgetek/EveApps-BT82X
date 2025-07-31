@@ -1,15 +1,10 @@
 #ifndef APP_H_
 #define APP_H_
 
-#include "EVe_Platform.h"
+#include "Common.h"
 
 // Path to UI assets Folder
-#if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
-#else
-#define TEST_DIR                            "/EveApps/SampleApp/Utility/Test"
-#endif
-
 #define GET_CALIBRATION                     1
 
 /* sample app structure definitions */

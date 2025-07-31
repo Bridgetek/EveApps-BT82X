@@ -2,13 +2,13 @@
  * @file Maths.h
  * @brief Mathematic utilities
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "EVE_CoCmd.h"
 
 typedef struct Math_3d_Xyz {
 	double x, y, z;

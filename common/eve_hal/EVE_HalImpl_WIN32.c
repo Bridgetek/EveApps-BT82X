@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,41 +35,13 @@
 #endif
 
 #include "EVE_HalImpl.h"
-#include "EVE_Platform.h"
 #if defined(_WIN32)
 
-/************
-** UTILITY **
-************/
-
-/** @name UTILITY */
-///@{
-
-/**
- * @brief Get current system clock of Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @return uint32_t Frequency of Coprocessor
- */
-uint32_t EVE_Hal_currentFrequency(EVE_HalContext *phost)
-{
-	uint32_t t0;
-	uint32_t t1;
-
-	t0 = EVE_Hal_rd32(phost, REG_CLOCK); /* t0 read */
-	/* may not be precise */
-	EVE_sleep(15625 / 1000);
-
-	t1 = EVE_Hal_rd32(phost, REG_CLOCK); /* t1 read */
-	return ((t1 - t0) * 64); /* bitshift 6 places is the same as multiplying 64 */
-}
-///@}
-
 /*********
-** MISC **
+** INIT **
 *********/
 
-/** @name MISC */
+/** @name INIT */
 ///@{
 
 /**

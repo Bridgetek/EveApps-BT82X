@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "EVE_HalDefs.h"
+#include "EVE_Cmd.h"
 
 /**********************
  *      TYPEDEFS
@@ -74,17 +74,17 @@ typedef struct EVE_ConfigParameters
 } EVE_ConfigParameters;
 
 /** Display resolution presets.
-@note Also update `s_DisplayResolutions` and `s_DisplayNames` in EVE_Util.c around ln 50,
-as well as `EVE_Util_configDefaults` around ln 500, when adding display presets. */
+@note Also update `s_DisplayResolutions` and `s_DisplayNames` in EVE_Util.c around line 42,
+as well as `EVE_Util_configDefaults` around line 264, when adding display presets. */
 typedef enum EVE_DISPLAY_T
 {
 	EVE_DISPLAY_DEFAULT = 0, /**< 0 */
 
-	/** Landscape */
-	EVE_DISPLAY_FHD_1920x1080_60Hz, /**< Landscape */
-	EVE_DISPLAY_WUXGA_1920x1200_60Hz, /**< Landscape */
+	/* Landscape */
+	EVE_DISPLAY_FHD_1920x1080_60Hz, /**< 1 */
+	EVE_DISPLAY_WUXGA_1920x1200_60Hz, /**< 2 */
 
-	EVE_DISPLAY_NB,
+	EVE_DISPLAY_NB, /**< 3 */
 
 } EVE_DISPLAY_T;
 
@@ -94,44 +94,35 @@ typedef enum EVE_DISPLAY_T
 /** @name INIT AND SHUTDOWN */
 ///@{
 
-/** Get the default bootup parameters. */
+/* Get the default bootup parameters. */
 void EVE_Util_bootupDefaults(EVE_HalContext *phost, EVE_BootupParameters *bootup);
 
-/** Boot up the device. Obtains the chip Id. Sets up clock and SPI speed. */
+/* Boot up the device. Obtains the chip Id. Sets up clock and SPI speed. */
 bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup);
 
-/** Get the default configuration parameters for the specified display. */
+/* Get the default configuration parameters for the specified display. */
 void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config, EVE_DISPLAY_T display);
 
-/** Boot up the device. Configures the display, resets or initializes coprocessor state. */
+/* Boot up the device. Configures the display, resets or initializes coprocessor state. */
 bool EVE_Util_config(EVE_HalContext *phost, EVE_ConfigParameters *config);
 
-/** Complementary of bootup. Does not close the HAL context. */
+/* Complementary of bootup. Does not close the HAL context. */
 void EVE_Util_shutdown(EVE_HalContext *phost);
 
-/** Sets the display list to a blank cleared screen. */
+/* Sets the display list to a blank cleared screen. */
 void EVE_Util_clearScreen(EVE_HalContext *phost);
 
-/** Resets the coprocessor.
+/* Resets the coprocessor.
 To be used after a coprocessor fault, or to exit CMD_LOGO. 
 After a reset, flash will be in attached state (not in full speed).
 Coprocessor will be set to the latest API level. */
 bool EVE_Util_resetCoprocessor(EVE_HalContext *phost);
 
+/* Recover from the coprocessor fault */
 void EVE_Util_coprocessorFaultRecover(EVE_HalContext *phost);
 
-/** Calls EVE_Util_bootup and EVE_Util_config using the default parameters */
+/* Calls EVE_Util_bootup and EVE_Util_config using the default parameters */
 bool EVE_Util_bootupConfig(EVE_HalContext *phost);
-///@}
-
-/** @name INTERACTIVE SETUP */
-///@{
-
-#if defined(BT8XXEMU_PLATFORM)
-void EVE_Util_emulatorDefaults(EVE_HalParameters *params, void *emulatorParams, EVE_CHIPID_T chipId);
-void EVE_Util_emulatorFlashDefaults(EVE_HalParameters *params, const void *emulatorParams, void *flashParams, const eve_tchar_t *flashPath);
-#endif
-
 ///@}
 #endif /* #ifndef EVE_UTIL__H */
 

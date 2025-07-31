@@ -86,10 +86,16 @@ example:
 ![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
 
 ## Version
-This version is v1.0.0_Beta
+This version is v1.0.0_RC1
 
 ## Release log
 ```
+v1.0.0_RC1
+    - Refactored and organized codebase for Doxygen integration
+    - Added Doxygen documentation support for EveApps APIs
+    - Enhanced the QSPI read/write process
+    - Removed emulator support; emulation is no longer supported starting from BT820
+
 v1.0.0_Beta
     - Introduced a new sample application demonstrating the use of LVDSRX
     - Added sample code to showcase new commands and options introduced in BT820

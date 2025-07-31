@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
 */
 
 #include "EVE_Hal.h"
-#include "EVE_HalImpl.h"
 
 #include <string.h>
 
@@ -67,16 +66,6 @@ void EVE_Hal_release()
 
 /**
  * @brief Setup default parameters for Eve_Hal framework
- * 
- * @param parameters Pointer to EVE_HalParameters
- */
-void EVE_Hal_defaults(EVE_HalParameters *parameters)
-{
-	EVE_Hal_defaultsEx(parameters, -1);
-}
-
-/**
- * @brief Setup default parameters for Eve_Hal framework
  *
  * @param parameters Pointer to EVE_HalParameters
  * @param deviceIdx
@@ -85,6 +74,16 @@ void EVE_Hal_defaultsEx(EVE_HalParameters *parameters, size_t deviceIdx)
 {
 	memset(parameters, 0, sizeof(EVE_HalParameters));
 	eve_assert_do(EVE_HalImpl_defaults(parameters, deviceIdx));
+}
+
+/**
+ * @brief Setup default parameters for Eve_Hal framework
+ * 
+ * @param parameters Pointer to EVE_HalParameters
+ */
+void EVE_Hal_defaults(EVE_HalParameters *parameters)
+{
+	EVE_Hal_defaultsEx(parameters, -1);
 }
 
 /**
@@ -117,7 +116,13 @@ void EVE_Hal_close(EVE_HalContext *phost)
 	}
 
 #ifdef EVE_SUPPORT_MEDIAFIFO
-	EVE_Util_closeFile(phost);
+	//EVE_Util_closeFile(phost);
+	if (phost->LoadFileHandle)
+	{
+		fclose(phost->LoadFileHandle);
+		phost->LoadFileHandle = NULL;
+		phost->LoadFileRemaining = 0;
+	}
 #endif
 	EVE_HalImpl_close(phost);
 	memset(phost, 0, sizeof(EVE_HalContext));
@@ -141,39 +146,6 @@ void EVE_Hal_idle(EVE_HalContext *phost)
 
 /** @name TRANSFER HELPERS */
 ///@{
-
-/**
- * @brief Read 8 bits from Coprocessor's memory
- * 
- * @param phost Pointer to Hal context
- * @param addr Address to be read
- * @return uint8_t Data from Coprocessor
- */
-uint8_t EVE_Hal_rd8(EVE_HalContext *phost, uint32_t addr)
-{
-	uint8_t value;
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, addr);
-	value = EVE_Hal_transfer8(phost, 0);
-	EVE_Hal_endTransfer(phost);
-	return value;
-}
-
-/**
- * @brief Read 2 bytes from Coprocessor's memory
- * 
- * @param phost Pointer to Hal context
- * @param addr Address to be read
- * @return uint16_t Data from Coprocessor
- */
-uint16_t EVE_Hal_rd16(EVE_HalContext *phost, uint32_t addr)
-{
-	uint16_t value;
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, addr);
-	value = EVE_Hal_transfer16(phost, 0);
-	EVE_Hal_endTransfer(phost);
-	return value;
-}
-
 /**
  * @brief Read 4 bytes from Coprocessor's memory
  * 
@@ -202,34 +174,6 @@ void EVE_Hal_rdMem(EVE_HalContext *phost, uint8_t *result, uint32_t addr, uint32
 {
 	EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, addr);
 	EVE_Hal_transferMem(phost, result, NULL, size);
-	EVE_Hal_endTransfer(phost);
-}
-
-/**
- * @brief Write 1 bytes to Coprocessor's memory
- *
- * @param phost Pointer to Hal context
- * @param addr Address to be write
- * @param v Value to write
- */
-void EVE_Hal_wr8(EVE_HalContext *phost, uint32_t addr, uint8_t v)
-{
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, addr);
-	EVE_Hal_transfer32(phost, (uint32_t)v);
-	EVE_Hal_endTransfer(phost);
-}
-
-/**
- * @brief Write 2 bytes to Coprocessor's memory
- *
- * @param phost Pointer to Hal context
- * @param addr Address to be write
- * @param v Value to write
- */
-void EVE_Hal_wr16(EVE_HalContext *phost, uint32_t addr, uint16_t v)
-{
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, addr);
-	EVE_Hal_transfer32(phost, (uint32_t)v);
 	EVE_Hal_endTransfer(phost);
 }
 
@@ -263,21 +207,6 @@ void EVE_Hal_wrMem(EVE_HalContext *phost, uint32_t addr, const uint8_t *buffer, 
 }
 
 /**
- * @brief Write a buffer in ProgMem to Coprocessor's memory
- * 
- * @param phost Pointer to Hal context
- * @param addr Address to be write
- * @param buffer Data to be write
- * @param size Size of buffer
- */
-void EVE_Hal_wrProgMem(EVE_HalContext *phost, uint32_t addr, eve_progmem_const uint8_t *buffer, uint32_t size)
-{
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, addr);
-	EVE_Hal_transferProgMem(phost, NULL, buffer, size);
-	EVE_Hal_endTransfer(phost);
-}
-
-/**
  * @brief Write a string to Coprocessor's memory
  * 
  * @param phost Pointer to Hal context
@@ -304,6 +233,8 @@ void EVE_Hal_wrString(EVE_HalContext *phost, uint32_t addr, const char *str, uin
 
 /**
  * @brief set power state
+ * 
+ * @param phost Pointer to Hal context
  * @param state EVE power state
  */
 void EVE_Hal_SPICmd_pwr_state(EVE_HalContext *phost, EVE_PWR_STATE_T state)
@@ -334,11 +265,15 @@ void EVE_Hal_SPICmd_pwr_state(EVE_HalContext *phost, EVE_PWR_STATE_T state)
 
 /**
  * @brief Program System PLL frequency
- * @param val
+ * 
+ * @param phost Pointer to Hal context
+ * @param val Configuration value
+ * ~~~
  * -------------------------------------------------
  * |  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
  * | CKS |             NS                          |
  * -------------------------------------------------
+ * ~~~
  */
 void EVE_Hal_SPICmd_setpllsp1(EVE_HalContext *phost, EVE_CMD_SYS_PLL_FREQ val)
 {
@@ -349,11 +284,15 @@ void EVE_Hal_SPICmd_setpllsp1(EVE_HalContext *phost, EVE_CMD_SYS_PLL_FREQ val)
 
 /**
  * @brief Set system clock divider 
- * @param val
+ * 
+ * @param phost Pointer to Hal context
+ * @param val Configuration value
+ * ~~~
  * -------------------------------------------------
  * |  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
  * | rev |  0  |  0  |  1  |          freq         |
  * -------------------------------------------------
+ * ~~~
  */
 void EVE_Hal_SPICmd_sysclkdiv(EVE_HalContext *phost, EVE_CMD_SYS_CLK_DIV val)
 {
@@ -364,11 +303,15 @@ void EVE_Hal_SPICmd_sysclkdiv(EVE_HalContext *phost, EVE_CMD_SYS_CLK_DIV val)
 
 /**
  * @brief Set EVE boot sequence configuration 
- * @param val
+ * 
+ * @param phost Pointer to Hal context
+ * @param val Configuration value
+ * ~~~
  * ----------------------------------------------------
  * |  7  |  6  |  5  |  4     |  3  |  2  |  1  |  0  |
  * | DDR |touch|audio|watchdog| rev |      source     |
  * ----------------------------------------------------
+ * ~~~
  */
 void EVE_Hal_SPICmd_setbootcfg(EVE_HalContext *phost, EVE_CMD_BOOT_CFG val)
 {
@@ -379,11 +322,15 @@ void EVE_Hal_SPICmd_setbootcfg(EVE_HalContext *phost, EVE_CMD_BOOT_CFG val)
 
 /**
  * @brief controls the handling of the EVE boot sequence configuration
- * @param val
+ * 
+ * @param phost Pointer to Hal context
+ * @param val Configuration value
+ * ~~~
  * ----------------------------------------------------
  * |  7  |  6    |  5  |  4  |  3  |  2  |  1  |  0   |
  * |boot |DDRtype|GPREG|           rev         |enable|
  * ----------------------------------------------------
+ * ~~~
  */
 void EVE_Hal_SPICmd_bootcfgen(EVE_HalContext *phost, EVE_CMD_BOOT_CFG_EN val)
 {
@@ -394,11 +341,15 @@ void EVE_Hal_SPICmd_bootcfgen(EVE_HalContext *phost, EVE_CMD_BOOT_CFG_EN val)
 
 /**
  * @brief programs the DDR DRAM type 
- * @param val
+ * 
+ * @param phost Pointer to Hal context
+ * @param val Configuration value
+ * ~~~
  * -------------------------------------------------
  * |  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
  * |      speed      |   type    |      size       |
  * -------------------------------------------------
+ * ~~~
  */
 void EVE_Hal_SPICmd_setddrtype(EVE_HalContext *phost, EVE_CMD_DDR_TYPE val)
 {

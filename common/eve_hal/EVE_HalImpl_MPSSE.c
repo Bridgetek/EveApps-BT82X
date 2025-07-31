@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
 */
 
 #include "EVE_HalImpl.h"
-#include "EVE_Platform.h"
 #if defined(MPSSE_PLATFORM)
 
 #ifdef _WIN32
@@ -43,6 +42,10 @@
 
 #define LIBMPSSE_MAX_RD_BYTES_PER_CALL_IN_MULTI_CH 65535
 #define LIBMPSSE_MAX_WR_BYTES_PER_CALL_IN_MULTI_CH 65532 /**< 3 bytes for FT81x memory address to which data to be written */
+
+#define POLLING_BYTES 8 // 4 byte align
+#define READ_TIMEOUT 5
+#define DATA_LENGTH 1024
 
 /*********
 ** INIT **
@@ -91,55 +94,6 @@ size_t EVE_Hal_list()
 	s_NumChannels = 0;
 	SPI_GetNumChannels(&s_NumChannels);
 	return s_NumChannels;
-}
-
-/**
- * @brief Get info of the specified device
- *
- * @param deviceInfo
- * @param deviceIdx
- */
-void EVE_Hal_info(EVE_DeviceInfo *deviceInfo, size_t deviceIdx)
-{
-	FT_DEVICE_LIST_INFO_NODE chanInfo = { 0 };
-
-	memset(deviceInfo, 0, sizeof(EVE_DeviceInfo));
-	if (deviceIdx >= s_NumChannels)
-		return;
-
-	SPI_GetChannelInfo((uint32_t)deviceIdx, &chanInfo);
-
-	strcpy_s(deviceInfo->SerialNumber, sizeof(deviceInfo->SerialNumber), chanInfo.SerialNumber);
-	strcpy_s(deviceInfo->DisplayName, sizeof(deviceInfo->DisplayName), chanInfo.Description);
-	deviceInfo->Host = EVE_HOST_MPSSE;
-	deviceInfo->Opened = chanInfo.Flags & FT_FLAGS_OPENED;
-}
-
-/**
- * @brief Check whether the context is the specified device
- *
- * @param phost Pointer to Hal context
- * @param deviceIdx
- * @return true
- */
-bool EVE_Hal_isDevice(EVE_HalContext *phost, size_t deviceIdx)
-{
-	FT_DEVICE_LIST_INFO_NODE chanInfo = { 0 };
-
-	if (!phost)
-		return false;
-	if (EVE_HOST != EVE_HOST_MPSSE)
-		return false;
-	if (deviceIdx >= s_NumChannels)
-		return false;
-
-	if (!phost->SpiHandle)
-		return false;
-
-	if (!SPI_GetChannelInfo((uint32_t)deviceIdx, &chanInfo))
-		return false;
-
-	return phost->SpiHandle == chanInfo.ftHandle;
 }
 
 /**
@@ -385,28 +339,56 @@ static inline uint32_t incrementRamGAddr(EVE_HalContext *phost, uint32_t addr, u
  */
 static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t size)
 {
-	uint32_t sizeTransferred = 0;
 	uint32_t sizeRemaining = size;
-	uint8_t buffer_readybyte;
-	uint8_t countTimout = 0;
-	do
+	if (sizeRemaining & 3)
 	{
-		SPI_Read(phost->SpiHandle, &buffer_readybyte, 1, &sizeTransferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
-		countTimout++;
-	} while ((buffer_readybyte != 0x01) && (countTimout < READ_TIMOUT));
+		sizeRemaining = (sizeRemaining + 3) & ~3UL;
+		eve_printf_debug("Data size should be align to 4 bytes\n");
+	}
 
 	while (sizeRemaining)
 	{
-		FT_STATUS status = SPI_Read(phost->SpiHandle, buffer, min(0xFFFF, sizeRemaining), &sizeTransferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
+		uint32_t sizeTransferred = 0;
+		uint32_t bytesPerRead;
+		bool readyRecved = false;
+		uint8_t retry = 0;
+		uint8_t buff1[DATA_LENGTH + POLLING_BYTES] = { 0 };
+
+		if (sizeRemaining <= DATA_LENGTH)
+			bytesPerRead = sizeRemaining;
+		else
+			bytesPerRead = DATA_LENGTH;
+
+		while (1)
+		{
+			FT_STATUS status = SPI_Read(phost->SpiHandle, buff1, bytesPerRead + POLLING_BYTES, &sizeTransferred, SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES);
+			if ((status != FT_OK) || (sizeTransferred != (POLLING_BYTES + bytesPerRead)))
+			{
+				eve_printf_debug("SPI_Read failed, sizeTransferred is %d with status %d\n", sizeTransferred, status);
+				if (sizeTransferred != (POLLING_BYTES + bytesPerRead))
+					phost->Status = EVE_STATUS_ERROR;
+				return false;
+			}
+
+			for (uint8_t i = 0; i < POLLING_BYTES; i++)
+			{
+				if (buff1[i] == 0x01)
+				{
+					readyRecved = true;
+					memcpy(buffer, &buff1[i + 1], bytesPerRead); /* Prepare the SFN to be modified */
+					sizeTransferred = bytesPerRead;
+					break;
+				}
+			}
+			if (readyRecved)
+				break;
+
+			retry++;
+			if (retry >= READ_TIMEOUT)
+				return false;
+		}
 		sizeRemaining -= sizeTransferred;
 		buffer += sizeTransferred;
-
-		if (status != FT_OK || !sizeTransferred)
-		{
-			eve_printf_debug("%d SPI_Read failed, sizeTransferred is %d with status %d\n", __LINE__, sizeTransferred, (int)status);
-			phost->Status = EVE_STATUS_ERROR;
-			return false;
-		}
 	}
 
 	return true;
@@ -424,6 +406,11 @@ static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t siz
 static inline bool wrBuffer(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size)
 {
 #if defined(EVE_BUFFER_WRITES)
+	if (size & 3)
+	{
+		size = (size + 3) & ~3UL;
+		eve_printf_debug("Data size should be align to 4 bytes\n");
+	}
 	if (buffer && (size < (sizeof(phost->SpiWrBuf) - phost->SpiWrBufIndex)))
 	{
 		/* Write to buffer */
@@ -519,26 +506,6 @@ static inline bool wrBuffer(EVE_HalContext *phost, const uint8_t *buffer, uint32
 
 	return true;
 #endif
-}
-
-/**
- * @brief Write 8 bits to Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @param value Value to write
- * @return uint8_t Number of bytes transfered
- */
-static inline uint8_t transfer8(EVE_HalContext *phost, uint8_t value)
-{
-	if (phost->Status == EVE_STATUS_WRITING)
-	{
-		wrBuffer(phost, &value, sizeof(value));
-	}
-	else
-	{
-		rdBuffer(phost, &value, sizeof(value));
-	}
-	return value;
 }
 
 #if defined(EVE_BUFFER_WRITES)
@@ -690,43 +657,6 @@ void EVE_Hal_endTransfer(EVE_HalContext *phost)
 }
 
 /**
- * @brief Write 8 bits to Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @param value Value to write
- * @return uint8_t Number of bytes transfered
- */
-uint8_t EVE_Hal_transfer8(EVE_HalContext *phost, uint8_t value)
-{
-	return transfer8(phost, value);
-}
-
-/**
- * @brief Write 2 bytes to Coprocessor
- * 
- * @param phost Pointer to Hal context
- * @param value Value to write
- * @return uint16_t Number of bytes transfered
- */
-uint16_t EVE_Hal_transfer16(EVE_HalContext *phost, uint16_t value)
-{
-	uint8_t buffer[2];
-	if (phost->Status == EVE_STATUS_READING)
-	{
-		rdBuffer(phost, buffer, 2);
-		return (uint16_t)buffer[0]
-		    | (uint16_t)buffer[1] << 8;
-	}
-	else
-	{
-		buffer[0] = value & 0xFF;
-		buffer[1] = value >> 8;
-		wrBuffer(phost, buffer, 2);
-		return 0;
-	}
-}
-
-/**
  * @brief Write 4 bytes to Coprocessor
  * 
  * @param phost Pointer to Hal context
@@ -764,34 +694,6 @@ uint32_t EVE_Hal_transfer32(EVE_HalContext *phost, uint32_t value)
  * @param size Size of buffer
  */
 void EVE_Hal_transferMem(EVE_HalContext *phost, uint8_t *result, const uint8_t *buffer, uint32_t size)
-{
-	if (!size)
-		return;
-
-	if (result && buffer)
-	{
-		/* not implemented */
-		eve_debug_break();
-	}
-	else if (result)
-	{
-		rdBuffer(phost, result, size);
-	}
-	else if (buffer)
-	{
-		wrBuffer(phost, buffer, size);
-	}
-}
-
-/**
- * @brief Transfer a block data from program memory
- * 
- * @param phost Pointer to Hal context
- * @param result Buffer to get data transfered, NULL when write
- * @param buffer Buffer where data is transfered, NULL when read
- * @param size Size of buffer
- */
-void EVE_Hal_transferProgMem(EVE_HalContext *phost, uint8_t *result, eve_progmem_const uint8_t *buffer, uint32_t size)
 {
 	if (!size)
 		return;
@@ -946,7 +848,7 @@ static FT_STATUS EVE_HalImpl_passthroughGpio(EVE_HalContext *phost, uint8_t gpio
 }
 
 /**
- * @brief Toggle PD_N pin of FT800 board for a power cycle
+ * @brief Toggle PD_N pin of BT820 board for a power cycle
  * 
  * @param phost Pointer to Hal context
  * @param up Up or Down
@@ -1101,14 +1003,17 @@ void EVE_Hal_restoreSPI(EVE_HalContext *phost)
 }
 
 /**
- * @brief get interrupt status from GPIO pin
+ * @brief Get interrupt status
  * ADBUS5 is connected with interrupt pin which is low active
  * 
  * @param phost Pointer to Hal context
+ * @return True on interrupt happened or otherwise
  */
 bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
 {
+#if 0
 	uint8_t byOutputBuffer[3];
+#endif
 	DWORD dwNumBytesToSend = 0;
 	DWORD dwNumBytesSent;
 	FT_STATUS status;
@@ -1144,27 +1049,6 @@ bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
 	}
 
 	return false;
-}
-///@}
-
-/*********
-** MISC **
-*********/
-
-/** @name MISC */
-///@{
-
-/**
- * @brief Display GPIO pins
- * 
- * @param phost Pointer to Hal context
- * @return true True if Ok
- * @return false False if error
- */
-bool EVE_UtilImpl_bootupDisplayGpio(EVE_HalContext *phost)
-{
-	/* no-op */
-	return true;
 }
 ///@}
 

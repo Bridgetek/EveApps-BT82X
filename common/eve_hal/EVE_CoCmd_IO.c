@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * SOFTWARE.
 */
 
-#include "EVE_Platform.h"
+#include "EVE_CoCmd.h"
 
 void EVE_CoCmd_memWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t num)
 {
@@ -364,19 +364,6 @@ void EVE_CoCmd_regWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t value)
 	EVE_CoCmd_ddd(phost, CMD_REGWRITE, ptr, value);
 }
 
-bool EVE_CoCmd_inflate_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_const uint8_t *src, uint32_t size)
-{
-	if (!EVE_Cmd_waitFlush(phost))
-		return false; // Coprocessor must be ready
-	EVE_Cmd_startFunc(phost);
-	EVE_Cmd_wr32(phost, CMD_INFLATE);
-	EVE_Cmd_wr32(phost, dst);
-	EVE_Cmd_wr32(phost, 0); // options
-	EVE_Cmd_wrProgMem(phost, src, (size + 3) & ~0x3UL);
-	EVE_Cmd_endFunc(phost);
-	return EVE_Cmd_waitFlush(phost); // Resource failed to load
-}
-
 bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 {
 	uint32_t resAddr;
@@ -398,28 +385,6 @@ bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 			return false;
 		*result = EVE_Hal_rd32(phost, RAM_CMD + resAddr);
 	}
-	return true;
-}
-
-bool EVE_CoCmd_loadImage_progMem(EVE_HalContext *phost, uint32_t dst, eve_progmem_const uint8_t *src, uint32_t size, uint32_t *format)
-{
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_LOADIMAGE, dst))
-		return false;
-#endif
-
-	if (!EVE_Cmd_waitFlush(phost))
-		return false; // Coprocessor must be ready
-	EVE_Cmd_startFunc(phost);
-	EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
-	EVE_Cmd_wr32(phost, dst);
-	EVE_Cmd_wr32(phost, OPT_NODL);
-	EVE_Cmd_wrProgMem(phost, src, (size + 3) & ~0x3UL);
-	EVE_Cmd_endFunc(phost);
-	if (!EVE_Cmd_waitFlush(phost))
-		return false; // Image failed to load
-	if (format)
-		*format = EVE_Hal_rd32(phost, 0x3097e8);
 	return true;
 }
 

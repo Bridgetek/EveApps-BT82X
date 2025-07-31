@@ -1,0 +1,81 @@
+<map id="common/application/Maths.c" name="common/application/Maths.c">
+<area shape="rect" id="Node000001" title="Mathematic utilities." alt="" coords="511,5,648,48"/>
+<area shape="rect" id="Node000002" href="$a00005.html" title="Common functions." alt="" coords="753,96,835,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="636,46,747,88,745,93,634,51"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="149,768,210,795"/>
+<area shape="poly" id="edge41_Node000001_Node000022" title=" " alt="" coords="511,37,440,51,403,63,368,78,337,97,312,121,296,149,290,183,290,634,282,672,263,707,237,737,211,760,208,756,233,733,258,704,277,671,285,633,285,182,291,147,308,117,334,93,365,73,401,58,438,46,510,32"/>
+<area shape="rect" id="Node000035" href="$a00023.html" title="Mathematic utilities." alt="" coords="844,693,912,720"/>
+<area shape="poly" id="edge42_Node000001_Node000035" title=" " alt="" coords="582,49,582,183,582,558,589,595,609,625,638,649,674,667,714,681,755,690,829,700,829,706,754,696,712,686,671,672,635,653,605,628,584,597,577,559,577,183,577,49"/>
+<area shape="rect" id="Node000003" href="$a00047.html" title="EVE&#39;s co&#45;processor command." alt="" coords="617,171,713,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="773,126,702,165,699,160,770,121"/>
+<area shape="rect" id="Node000032" href="$a00116.html" title="EVE HAL framework utilities." alt="" coords="956,245,1043,272"/>
+<area shape="poly" id="edge35_Node000002_Node000032" title=" " alt="" coords="836,114,938,134,984,149,1002,158,1014,169,1021,184,1022,200,1015,231,1010,230,1017,200,1016,185,1009,172,999,163,982,154,936,139,835,119"/>
+<area shape="rect" id="Node000033" href="$a00089.html" title="Eve_Hal framework APIs for loading file." alt="" coords="736,171,852,197"/>
+<area shape="poly" id="edge37_Node000002_Node000033" title=" " alt="" coords="797,123,797,155,792,155,792,123"/>
+<area shape="rect" id="Node000034" href="$a00098.html" title="EVE&#39;s mediafifo controller." alt="" coords="876,171,1000,197"/>
+<area shape="poly" id="edge39_Node000002_Node000034" title=" " alt="" coords="820,121,900,161,898,166,818,126"/>
+<area shape="rect" id="Node000004" href="$a00035.html" title="EVE&#39;s co&#45;processor commands." alt="" coords="761,245,872,272"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="692,195,778,236,775,241,690,200"/>
+<area shape="rect" id="Node000005" href="$a00029.html" title="EVE&#39;s command read/write." alt="" coords="778,320,872,347"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="821,272,824,304,819,305,816,273"/>
+<area shape="rect" id="Node000006" href="$a00062.html" title="Main file to include the EVE HAL in your applications." alt="" coords="782,395,868,421"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="828,347,828,379,822,379,822,347"/>
+<area shape="rect" id="Node000007" href="$a00071.html" title="Eve_Hal framework APIs." alt="" coords="769,469,880,496"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="828,422,828,454,822,454,822,422"/>
+<area shape="rect" id="Node000008" href="$a00101.html" title="Platform selector." alt="" coords="730,544,845,571"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="821,498,803,532,798,529,816,495"/>
+<area shape="rect" id="Node000029" href="$a00068.html" title="Eve_Hal framework APIs." alt="" coords="869,544,983,571"/>
+<area shape="poly" id="edge30_Node000007_Node000029" title=" " alt="" coords="844,494,898,532,894,537,841,499"/>
+<area shape="rect" id="Node000009" href="$a00050.html" title="This file processes the input definitions." alt="" coords="963,693,1068,720"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="795,570,813,606,827,626,844,643,868,659,895,673,949,691,947,696,893,677,865,664,840,647,823,630,808,609,790,572"/>
+<area shape="rect" id="Node000015" href="$a00104.html" title="EVE platform for FT4222." alt="" coords="359,619,525,645"/>
+<area shape="poly" id="edge14_Node000008_Node000015" title=" " alt="" coords="730,573,518,618,517,612,729,568"/>
+<area shape="rect" id="Node000010" href="$a00083.html" title="Eve_Hal framework APIs." alt="" coords="984,768,1100,795"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1023,720,1035,753,1030,754,1018,721"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1192,843,1260,869"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1075,793,1181,834,1179,839,1073,798"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1002,843,1069,869"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1044,795,1041,827,1035,827,1038,795"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="914,843,978,869"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="1027,797,977,835,973,831,1024,793"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1093,843,1167,869"/>
+<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="1059,793,1105,831,1102,835,1056,797"/>
+<area shape="rect" id="Node000016" href="$a00110.html" title="EVE platform for WIN32." alt="" coords="408,693,572,720"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="453,644,476,679,471,682,448,647"/>
+<area shape="rect" id="Node000026" href="$a00119.html" title=" " alt="" coords="5,768,74,795"/>
+<area shape="poly" id="edge25_Node000015_Node000026" title=" " alt="" coords="359,639,278,645,192,655,116,672,87,683,67,695,56,708,49,722,43,753,38,752,44,720,52,705,63,691,84,678,114,667,191,650,277,640,358,634"/>
+<area shape="rect" id="Node000028" href="$a00122.html" title=" " alt="" coords="77,693,170,720"/>
+<area shape="poly" id="edge27_Node000015_Node000028" title=" " alt="" coords="387,649,186,694,185,689,386,643"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="651,768,737,795"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="527,718,645,760,643,765,525,723"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="848,768,908,795"/>
+<area shape="poly" id="edge17_Node000016_Node000018" title=" " alt="" coords="573,717,692,736,833,765,832,770,691,742,572,722"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="761,768,824,795"/>
+<area shape="poly" id="edge18_Node000016_Node000019" title=" " alt="" coords="548,718,747,765,745,770,547,723"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="235,768,303,795"/>
+<area shape="poly" id="edge19_Node000016_Node000020" title=" " alt="" coords="452,723,319,767,317,762,451,718"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="327,768,392,795"/>
+<area shape="poly" id="edge20_Node000016_Node000021" title=" " alt="" coords="469,723,397,762,395,758,466,718"/>
+<area shape="poly" id="edge21_Node000016_Node000022" title=" " alt="" coords="430,723,226,770,225,765,429,718"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="415,768,480,795"/>
+<area shape="poly" id="edge22_Node000016_Node000023" title=" " alt="" coords="485,722,465,756,460,753,480,719"/>
+<area shape="rect" id="Node000024" title=" " alt="" coords="504,768,562,795"/>
+<area shape="poly" id="edge23_Node000016_Node000024" title=" " alt="" coords="500,719,520,753,516,756,495,722"/>
+<area shape="rect" id="Node000025" title=" " alt="" coords="585,768,627,795"/>
+<area shape="poly" id="edge24_Node000016_Node000025" title=" " alt="" coords="512,718,574,757,571,762,509,723"/>
+<area shape="rect" id="Node000027" title=" " alt="" coords="34,843,117,869"/>
+<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="48,794,65,827,60,830,43,796"/>
+<area shape="poly" id="edge29_Node000028_Node000026" title=" " alt="" coords="111,723,67,760,64,756,107,719"/>
+<area shape="poly" id="edge28_Node000028_Node000027" title=" " alt="" coords="122,721,87,829,82,827,117,720"/>
+<area shape="rect" id="Node000030" href="$a00056.html" title="Defines EVE hardware values." alt="" coords="854,619,980,645"/>
+<area shape="poly" id="edge31_Node000029_Node000030" title=" " alt="" coords="927,572,923,604,918,603,922,571"/>
+<area shape="rect" id="Node000031" href="$a00053.html" title="Defines EVE hardware values." alt="" coords="1003,619,1121,645"/>
+<area shape="poly" id="edge33_Node000029_Node000031" title=" " alt="" coords="951,569,1026,609,1024,613,949,574"/>
+<area shape="poly" id="edge32_Node000030_Node000009" title=" " alt="" coords="936,644,988,682,985,686,932,648"/>
+<area shape="poly" id="edge34_Node000031_Node000009" title=" " alt="" coords="1056,647,1034,682,1029,679,1052,644"/>
+<area shape="poly" id="edge36_Node000032_Node000005" title=" " alt="" coords="970,275,871,316,868,311,968,270"/>
+<area shape="poly" id="edge38_Node000033_Node000004" title=" " alt="" coords="801,197,811,230,806,231,796,199"/>
+<area shape="poly" id="edge40_Node000034_Node000004" title=" " alt="" coords="918,200,853,239,850,235,916,196"/>
+<area shape="poly" id="edge44_Node000035_Node000013" title=" " alt="" coords="891,719,907,740,923,767,935,798,943,827,938,828,930,799,918,769,903,743,887,722"/>
+<area shape="poly" id="edge43_Node000035_Node000018" title=" " alt="" coords="881,721,881,752,876,752,876,721"/>
+</map>

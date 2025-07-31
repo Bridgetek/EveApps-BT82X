@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 */
 
 #include "EVE_LoadFile.h"
-#include "EVE_Platform.h"
+#include "EVE_MediaFifo.h"
 
 #include <stdio.h>
 
@@ -40,6 +40,7 @@
  * @param phost  Pointer to Hal context
  * @param address Address in RAM_G
  * @param filename File to load
+ * @param filenameW File to load
  * @return true True if ok
  * @return false False if error
  */
@@ -90,11 +91,28 @@ uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const cha
 
 #ifdef _WIN32
 
+/**
+ * @brief Load a raw file into RAM_G
+ * 
+ * @param phost Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param filename File to load
+ * @return true True if ok
+ * @return false False if error
+ */
 uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const char *filename)
 {
 	return loadRawFile(phost, address, filename, NULL);
 }
-
+/**
+ * @brief Load a raw file into RAM_G
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param filename File to load
+ * @return true True if ok
+ * @return false False if error
+ */
 uint32_t EVE_Util_loadRawFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename)
 {
 	return loadRawFile(phost, address, NULL, filename);
@@ -108,6 +126,7 @@ uint32_t EVE_Util_loadRawFileW(EVE_HalContext *phost, uint32_t address, const wc
  * @param phost  Pointer to Hal context
  * @param address Address to write
  * @param filename File to load
+ * @param filenameW File to load
  * @return true True if ok
  * @return false False if error
  */
@@ -166,12 +185,28 @@ bool EVE_Util_loadInflateFile(EVE_HalContext *phost, uint32_t address, const cha
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Load file into RAM_G by CMD_INFLATE
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address to write
+ * @param filename File to load
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadInflateFile(EVE_HalContext *phost, uint32_t address, const char *filename)
 {
 	return loadInflateFile(phost, address, filename, NULL);
 }
-
+/**
+ * @brief Load file into RAM_G by CMD_INFLATE
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address to write
+ * @param filename File to load
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadInflateFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename)
 {
 	return loadInflateFile(phost, address, NULL, filename);
@@ -185,7 +220,9 @@ bool EVE_Util_loadInflateFileW(EVE_HalContext *phost, uint32_t address, const wc
  * @param phost  Pointer to Hal context
  * @param address Address in RAM_G
  * @param filename File to load
+ * @param filenameW File to load
  * @param format Target format of image
+ * @param options Options
  * @return true True if ok
  * @return false False if error
  */
@@ -254,12 +291,31 @@ bool EVE_Util_loadImageFile(EVE_HalContext *phost, uint32_t address, const char 
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Load image into RAM_G
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param filename File to load
+ * @param format Target format of image
+ * @param options Options
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadImageFile(EVE_HalContext *phost, uint32_t address, const char *filename, uint32_t *format, uint32_t options)
 {
 	return loadImageFile(phost, address, filename, NULL, format, options);
 }
-
+/**
+ * @brief Load image into RAM_G
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param filename File to load
+ * @param format Target format of image
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadImageFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename, uint32_t *format)
 {
 	return loadImageFile(phost, address, NULL, filename, format, 0);
@@ -267,6 +323,16 @@ bool EVE_Util_loadImageFileW(EVE_HalContext *phost, uint32_t address, const wcha
 
 #endif
 
+/**
+ * @brief Load a file into the coprocessor FIFO
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param filenameW File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 #ifdef _WIN32
 static bool loadCmdFile(EVE_HalContext *phost, const char *filename, const wchar_t *filenameW, uint32_t *transfered)
 #else
@@ -317,12 +383,28 @@ bool EVE_Util_loadCmdFile(EVE_HalContext *phost, const char *filename, uint32_t 
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Load a file into the coprocessor FIFO
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadCmdFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered)
 {
 	return loadCmdFile(phost, filename, NULL, transfered);
 }
-
+/**
+ * @brief Load a file into the coprocessor FIFO
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadCmdFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered)
 {
 	return loadCmdFile(phost, NULL, filename, transfered);
@@ -330,6 +412,16 @@ bool EVE_Util_loadCmdFileW(EVE_HalContext *phost, const wchar_t *filename, uint3
 
 #endif
 
+/**
+ * @brief Read a file into a buffer, returns the number of bytes read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param buffer Read buffer
+ * @param size Read size
+ * @param filename File to read
+ * @param filenameW File to read
+ * @return read length
+ */
 #ifdef _WIN32
 static size_t readFile(EVE_HalContext *phost, uint8_t *buffer, size_t size, const char *filename, const wchar_t *filenameW)
 #else
@@ -363,12 +455,28 @@ size_t EVE_Util_readFile(EVE_HalContext *phost, uint8_t *buffer, size_t size, co
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Read a file into a buffer, returns the number of bytes read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param buffer Read buffer
+ * @param size Read size
+ * @param filename File to read
+ * @return read length
+ */
 size_t EVE_Util_readFile(EVE_HalContext *phost, uint8_t *buffer, size_t size, const char *filename)
 {
 	return readFile(phost, buffer, size, filename, NULL);
 }
-
+/**
+ * @brief Read a file into a buffer, returns the number of bytes read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param buffer Read buffer
+ * @param size Read size
+ * @param filename File to read
+ * @return read length
+ */
 size_t EVE_Util_readFileW(EVE_HalContext *phost, uint8_t *buffer, size_t size, const wchar_t *filename)
 {
 	return readFile(phost, buffer, size, NULL, filename);
@@ -376,6 +484,20 @@ size_t EVE_Util_readFileW(EVE_HalContext *phost, uint8_t *buffer, size_t size, c
 
 #endif
 
+/**
+ * @brief Load a file into RAM_G block by block, returns the number of bytes loaded at address
+ * 
+ * The file will be kept open until EVE_Util_closeFile is called \n
+ * If transfered is set, can skip some data when first time to read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param size Load size
+ * @param filename File to load
+ * @param filenameW File to load
+ * @param transfered transfered length
+ * @return load length
+ */
 #ifdef _WIN32
 static uint16_t loadFile(EVE_HalContext *phost, uint32_t address, uint32_t size, const char *filename, const wchar_t *filenameW, uint32_t *transfered)
 #else
@@ -453,12 +575,36 @@ uint16_t EVE_Util_loadFile(EVE_HalContext *phost, uint32_t address, uint32_t siz
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Load a file into RAM_G block by block, returns the number of bytes loaded at address
+ * 
+ * The file will be kept open until EVE_Util_closeFile is called \n
+ * If transfered is set, can skip some data when first time to read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param size Load size
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return load length
+ */
 uint16_t EVE_Util_loadFile(EVE_HalContext *phost, uint32_t address, uint32_t size, const char *filename, uint32_t *transfered)
 {
 	return loadFile(phost, address, size, filename, NULL, transfered);
 }
-
+/**
+ * @brief Load a file into RAM_G block by block, returns the number of bytes loaded at address
+ * 
+ * The file will be kept open until EVE_Util_closeFile is called \n
+ * If transfered is set, can skip some data when first time to read
+ * 
+ * @param phost  Pointer to Hal context
+ * @param address Address in RAM_G
+ * @param size Load size
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return load length
+ */
 uint16_t EVE_Util_loadFileW(EVE_HalContext *phost, uint32_t address, uint32_t size, const wchar_t *filename, uint32_t *transfered)
 {
 	return loadFile(phost, address, size, NULL, filename, transfered);
@@ -466,6 +612,21 @@ uint16_t EVE_Util_loadFileW(EVE_HalContext *phost, uint32_t address, uint32_t si
 
 #endif
 
+/**
+ * @brief Load a file into the media FIFO.
+ * 
+ * If transfered is set, the file may be streamed partially,
+ * and will be kept open until EVE_Util_closeFile is called, 
+ * and stop once the coprocessor has processed it.\n
+ * Filename may be omitted in subsequent calls
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param filenameW File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 #ifdef _WIN32
 static bool loadMediaFile(EVE_HalContext *phost, const char *filename, const wchar_t *filenameW, uint32_t *transfered)
 #else
@@ -573,12 +734,38 @@ bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_
 }
 
 #ifdef _WIN32
-
+/**
+ * @brief Load a file into the media FIFO.
+ * 
+ * If transfered is set, the file may be streamed partially,
+ * and will be kept open until EVE_Util_closeFile is called, 
+ * and stop once the coprocessor has processed it.\n
+ * Filename may be omitted in subsequent calls
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered)
 {
 	return loadMediaFile(phost, filename, NULL, transfered);
 }
-
+/**
+ * @brief Load a file into the media FIFO.
+ * 
+ * If transfered is set, the file may be streamed partially,
+ * and will be kept open until EVE_Util_closeFile is called, 
+ * and stop once the coprocessor has processed it.\n
+ * Filename may be omitted in subsequent calls
+ * 
+ * @param phost  Pointer to Hal context
+ * @param filename File to load
+ * @param transfered transfered length
+ * @return true True if ok
+ * @return false False if error
+ */
 bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered)
 {
 	return loadMediaFile(phost, NULL, filename, transfered);
@@ -586,6 +773,11 @@ bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uin
 
 #endif
 
+/**
+ * @brief Close opened file.
+ * 
+ * @param phost  Pointer to Hal context
+ */
 void EVE_Util_closeFile(EVE_HalContext *phost)
 {
     if (phost->LoadFileHandle)

@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,10 @@
 #ifndef EVE_PLATFORM_MPSSE__H
 #define EVE_PLATFORM_MPSSE__H
 
-#include "EVE_Config.h"
-#if defined(MPSSE_PLATFORM)
-
 #include "EVE_Platform_WIN32.h"
 #include "ftd2xx.h"
 #include "libMPSSE_spi.h"
 
-#endif
 #endif /* #ifndef EVE_PLATFORM_MPSSE__H */
 
 /* end of file */

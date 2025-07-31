@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@
 #ifndef EVE_PLATFORM_WIN32__H
 #define EVE_PLATFORM_WIN32__H
 
-#include "EVE_Config.h"
 #if defined(_WIN32)
 
 /* Disable legacy C functions under TCC */

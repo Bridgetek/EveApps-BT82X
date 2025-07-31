@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * SOFTWARE.
 */
 
-#include "EVE_Platform.h"
+#include "EVE_CoCmd.h"
 
 void EVE_CoCmd_bgColor(EVE_HalContext *phost, uint32_t c)
 {
@@ -154,7 +154,7 @@ bool EVE_CoCmd_bitmapTransform(EVE_HalContext *phost, int32_t x0, int32_t y0, in
 	{
 		if (!EVE_Cmd_waitFlush(phost))
 			return false;
-		*result = EVE_Hal_rd16(phost, RAM_CMD + resAddr);
+		*result = (uint16_t)EVE_Hal_rd32(phost, RAM_CMD + resAddr);
 	}
 	return true;
 }

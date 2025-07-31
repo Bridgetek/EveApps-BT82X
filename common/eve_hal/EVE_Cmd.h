@@ -3,8 +3,8 @@
  * @brief EVE's command read/write
  
  * This file defines the generic APIs of phost access layer for the BT820 or EVE compatible silicon.
- * Application shall access FT800 or EVE resources over these APIs,regardless of I2C or SPI protocol.
- * In addition, there are some helper functions defined for FT800 coprocessor engine as well as phost commands.
+ * Application shall access BT820 or EVE resources over these APIs,regardless of I2C or SPI protocol.
+ * In addition, there are some helper functions defined for coprocessor engine as well as phost commands.
  *
  * @author Bridgetek
  *
@@ -12,7 +12,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,17 +39,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "EVE_HalDefs.h"
+#include "EVE_Hal.h"
 
 /**********************
  *      MACROS
  **********************/
-#define EVE_CMD_STRING_MAX 511
 
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-/** COPROCESSOR CMD **/
+/* COPROCESSOR CMD */
 
 /** Get the current read pointer.
 Safe to use during ongoing command transaction */
@@ -62,7 +61,7 @@ uint32_t EVE_Cmd_wp(EVE_HalContext *phost);
 /** Get the currently available space.
 Updates cached available space.
 Safe to use during ongoing command transaction */
-uint16_t EVE_Cmd_space(EVE_HalContext *phost);
+uint32_t EVE_Cmd_space(EVE_HalContext *phost);
 
 /* Begin writing a function, keeps the transfer open. */
 /** @note While a command transaction is ongoing,
@@ -77,22 +76,11 @@ Waits if there is not enough space in the command buffer.
 Returns false in case a coprocessor fault occurred */
 bool EVE_Cmd_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size);
 
-/** Write a progmem buffer to the command buffer. 
-Waits if there is not enough space in the command buffer. 
-Returns false in case a coprocessor fault occurred */
-bool EVE_Cmd_wrProgMem(EVE_HalContext *phost, eve_progmem_const uint8_t *buffer, uint32_t size);
-
 /** Write a string to the command buffer, padded to 4 bytes. 
 Waits if there is not enough space in the command buffer. 
 Parameter `maxLength` can be set up to `EVE_CMD_STRING_MAX`.
 Returns false in case a coprocessor fault occurred */
 uint32_t EVE_Cmd_wrString(EVE_HalContext *phost, const char *str, uint32_t maxLength);
-
-/** Write a 8-bit value to the command buffer. 
-Uses a cache to write 4 bytes at once. 
-Waits if there is not enough space in the command buffer. 
-Returns false in case a coprocessor fault occurred */
-bool EVE_Cmd_wr8(EVE_HalContext *phost, uint8_t value);
 
 /** Write a 16-bit value to the command buffer. 
 Uses a cache to write 4 bytes at once. 

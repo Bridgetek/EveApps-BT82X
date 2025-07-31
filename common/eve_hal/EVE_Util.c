@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,9 @@
  * SOFTWARE.
 */
 
-#include "EVE_Platform.h"
+#include "EVE_Util.h"
 
-
-static eve_progmem_const uint8_t c_DlCodeBootup[12] = {
+static const uint8_t c_DlCodeBootup[12] = {
 	0, 0, 0, 2, // GPU instruction CLEAR_COLOR_RGB: BLUE, GREEN, RED, ID(0x02)
 	7, 0, 0, 38, // GPU instruction CLEAR: Tag/Stencil/Color, ID(0x26)
 	0, 0, 0, 0, // GPU instruction DISPLAY: ID(0x00)
@@ -55,7 +54,6 @@ static const uint16_t s_DisplayResolutions[EVE_DISPLAY_NB][4] = {
 static const char *s_HostDisplayNames[EVE_HOST_NB] = {
 	"<Unknown>",
 
-	"BT8XX Emulator",
 	"FT4222",
 	"MPSSE",
 };
@@ -69,15 +67,15 @@ static const char *s_HostDisplayNames[EVE_HOST_NB] = {
  */
 void EVE_Util_clearScreen(EVE_HalContext *phost)
 {
-	EVE_Hal_wrProgMem(phost, RAM_DL, c_DlCodeBootup, sizeof(c_DlCodeBootup));
-	EVE_Hal_wr8(phost, REG_DLSWAP, DLSWAP_FRAME);
+	EVE_Hal_wrMem(phost, RAM_DL, c_DlCodeBootup, sizeof(c_DlCodeBootup));
+	EVE_Hal_wr32(phost, REG_DLSWAP, DLSWAP_FRAME);
 }
 
 /**
- * @brief
+ * @brief Get the default bootup parameters
  *
- * @param phost  Pointer to Hal context
- * @param bootup
+ * @param phost Pointer to Hal context
+ * @param bootup Default bootup parameters
  */
 void EVE_Util_bootupDefaults(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 {
@@ -112,15 +110,15 @@ void EVE_Util_bootupDefaults(EVE_HalContext *phost, EVE_BootupParameters *bootup
 #endif
 
 /**
- * @brief
+ * @brief Confirm resolution support
  *
  * @param phost Pointer to Hal context
- * @param config
- * @param width
- * @param height
- * @param refreshRate
- * @param hsfWidth
- * @param freq
+ * @param config Configuration parameters
+ * @param width Screen width
+ * @param height Screen height
+ * @param refreshRate Screen refresh rate
+ * @param hsfWidth Screen HSF width
+ * @param freq Coprocess frequency
  * @return true True if successful
  * @return false False if error
  */
@@ -256,11 +254,11 @@ static bool configDefaultsEx(EVE_HalContext *phost, EVE_ConfigParameters *config
 }
 
 /**
- * @brief
+ * @brief Get the default configuration parameters for the specified display
  *
  * @param phost Pointer to Hal context
- * @param config
- * @param display
+ * @param config Configuration parameters
+ * @param display Display resolution presets
  */
 void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config, EVE_DISPLAY_T display)
 {
@@ -336,10 +334,10 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 #define EXTRACT_CHIPID(romChipId) EVE_extendedChipId(((romChipId) >> 16) & 0xFFFF)
 
 /**
- * @brief
+ * @brief Boot up the device. Obtains the chip Id. Sets up clock and SPI speed.
  *
  * @param phost Pointer to Hal context
- * @param bootup
+ * @param bootup Bootup paramters
  * @return true True if successful
  * @return false False if error
  */
@@ -420,7 +418,7 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 	eve_printf_debug("EVE chip id %lx %lx.%lx (EVE gen %i)\n", (unsigned long)EVE_shortChipId(EXTRACT_CHIPID(chipId)), (unsigned long)((chipId >> 16) & 0xFF), (unsigned long)((chipId >> 24) & 0xFF), EVE_gen(EXTRACT_CHIPID(chipId)));
 
 	/* Read Register ID to check if EVE is ready. */
-	while ((id = EVE_Hal_rd8(phost, REG_ID)) != 0x7C)
+	while ((id = (uint8_t)EVE_Hal_rd32(phost, REG_ID)) != 0x7C)
 	{
 		eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
 
@@ -437,7 +435,7 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		Bit 1 for touch engine,
 		Bit 2 for audio engine.
 	*/
-	while ((engineStatus = EVE_Hal_rd8(phost, REG_CPURESET)) != 0x00)
+	while ((engineStatus = (uint8_t)EVE_Hal_rd32(phost, REG_CPURESET)) != 0x00)
 	{
 		if (engineStatus & 0x01)
 		{
@@ -446,10 +444,6 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		if (engineStatus & 0x02)
 		{
 			eve_printf_debug("Touch engine is not ready\n");
-			if (EVE_HOST == EVE_HOST_BT8XXEMU)
-			{
-				EVE_Hal_wr8(phost, REG_CPURESET, 0);
-			}
 		}
 		if (engineStatus & 0x04)
 		{
@@ -497,10 +491,10 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 }
 
 /**
- * @brief
+ * @brief Boot up the device. Configures the display, resets or initializes coprocessor state.
  *
  * @param phost Pointer to Hal context
- * @param config
+ * @param config Configuration parameter
  * @return true True if successful
  * @return false False if error
  */
@@ -610,7 +604,7 @@ bool EVE_Util_config(EVE_HalContext *phost, EVE_ConfigParameters *config)
 }
 
 /**
- * @brief
+ * @brief Complementary of bootup. Does not close the HAL context.
  *
  * @param phost Pointer to Hal context
  */
@@ -638,7 +632,7 @@ void debugBackupRamG(EVE_HalContext *phost)
 	}
 }
 /**
- * @brief
+ * @brief Restore the last 128 bytes of RAM_G
  *
  * @param phost Pointer to Hal context
  */
@@ -687,7 +681,7 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 	phost->CmdFault = false;
 
 	/* Set REG_CPURESET to 0, to restart the coprocessor */
-	EVE_Hal_wr8(phost, REG_CPURESET, 0);
+	EVE_Hal_wr32(phost, REG_CPURESET, 0);
 	EVE_Hal_flush(phost);
 	EVE_sleep(100);
 	eve_assert((wr = EVE_Hal_rd32(phost, REG_CMD_WRITE)) == 0);
@@ -716,6 +710,11 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 	return ready;
 }
 
+/**
+ * @brief Recover from the coprocessor fault
+ * 
+ * @param phost Pointer to Hal context
+ */
 void EVE_Util_coprocessorFaultRecover(EVE_HalContext *phost)
 {
 	EVE_Hal_wr32(phost, REG_CMD_READ, 0);
@@ -761,81 +760,28 @@ bool EVE_Util_bootupConfig(EVE_HalContext *phost)
 	return true;
 }
 
-/**********************
-** INTERACTIVE SETUP **
-**********************/
-/** @name INTERACTIVE SETUP */
-///@{
-
-#if defined(BT8XXEMU_PLATFORM)
 /**
- * @brief Bootup Coprocessor
- *
- * @param params
- * @param emulatorParams
- * @param chipId
+ * @brief Get current system clock of Coprocessor
+ * 
+ * @param phost Pointer to Hal context
+ * @return uint32_t Frequency of Coprocessor
  */
-void EVE_Util_emulatorDefaults(EVE_HalParameters *params, void *emulatorParams, EVE_CHIPID_T chipId)
+uint32_t EVE_Util_currentFrequency(EVE_HalContext *phost)
 {
-	BT8XXEMU_EmulatorParameters *pEmulatorParams = emulatorParams;
+	uint32_t t0;
+	uint32_t t1;
+	uint32_t interval = 0;
 
-	BT8XXEMU_defaults(BT8XXEMU_VERSION_API, pEmulatorParams, EVE_shortChipId(chipId)); // TODO: should be pEmulatorParams->mode?
-	pEmulatorParams->Flags &= (~BT8XXEMU_EmulatorEnableDynamicDegrade & ~BT8XXEMU_EmulatorEnableRegPwmDutyEmulation);
+	t0 = EVE_Hal_rd32(phost, REG_CLOCK); /* t0 read */
+	/* may not be precise */
+	EVE_sleep(1000);
 
-	// TODO: emulatorParams.Log
-	params->EmulatorParameters = pEmulatorParams;
+	t1 = EVE_Hal_rd32(phost, REG_CLOCK); /* t1 read */
+
+	if (t1 > t0)
+		interval = t1 - t0;
+	else
+		interval = 0xFFFFFFFF - t0 + t1;
+	return (interval / 1000000);
 }
-
-/**
- * @brief
- *
- * @param params
- * @param emulatorParams
- * @param flashParams
- * @param flashPath
- */
-void EVE_Util_emulatorFlashDefaults(EVE_HalParameters *params, const void *emulatorParams, void *flashParams, const eve_tchar_t *flashPath)
-{
-	const BT8XXEMU_EmulatorParameters *pEmulatorParams = emulatorParams;
-	BT8XXEMU_FlashParameters *pFlashParams = flashParams;
-
-	if (!flashPath || !flashPath[0])
-		return;
-
-	BT8XXEMU_Flash_defaults(BT8XXEMU_VERSION_API, pFlashParams);
-	wcscpy_s(pFlashParams->DataFilePath, _countof(pFlashParams->DataFilePath), flashPath);
-#if defined(_DEBUG)
-	pFlashParams->StdOut = 1;
-#endif
-
-#ifdef EVE_FLASH_SIZE
-	pFlashParams->SizeBytes = EVE_FLASH_SIZE * 1024 * 1024;
-#else
-	pFlashParams->SizeBytes = 2 * 1024 * 1024;
-#ifdef _WIN32
-#pragma warning(push)
-#pragma warning(disable : 4996)
-	FILE *f = _wfopen(flashPath, L"rb");
-#pragma warning(pop)
-#else
-	FILE *f = fopen(flashPath, "rb");
-#endif
-	if (f)
-	{
-		fseek(f, 0, SEEK_END);
-		int64_t flashSize = ftell(f);
-		fclose(f);
-		while (pFlashParams->SizeBytes < flashSize)
-			pFlashParams->SizeBytes *= 2;
-	}
-#endif
-
-	// TODO: flashParams.Log
-	params->EmulatorFlashParameters = pFlashParams;
-}
-
-#endif
-
-///@}
-
 /* end of file */

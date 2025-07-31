@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,11 @@
  * SOFTWARE.
  */
 
-#include "Common.h"
 #include "Primitives.h"
+#include "Common.h"
+#include "FileTransfer.h"
+#include "FlashHelper.h"
+#include "Maths.h"
 
 #define SAMAPP_DELAY EVE_sleep(3000)
 
@@ -45,7 +48,7 @@ int main(int argc, char* argv[])
     LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
     EVE_Calibrate(s_pHalContext);
     Calibration_Save(s_pHalContext);
 #endif
@@ -71,7 +74,7 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
         LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
     }

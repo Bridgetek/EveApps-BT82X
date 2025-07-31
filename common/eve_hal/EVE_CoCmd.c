@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 */
 
 
-#include "EVE_Platform.h"
+#include "EVE_CoCmd.h"
 
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 #include <stdio.h> /* memset */
@@ -322,13 +322,13 @@ void EVE_CoCmd_setRotate(EVE_HalContext *phost, uint32_t r)
 	/* Update cached width and height based on rotation */
 	if (swapXY)
 	{
-		phost->Width = EVE_Hal_rd16(phost, REG_VSIZE);
-		phost->Height = EVE_Hal_rd16(phost, REG_HSIZE);
+		phost->Width = EVE_Hal_rd32(phost, REG_VSIZE);
+		phost->Height = EVE_Hal_rd32(phost, REG_HSIZE);
 	}
 	else
 	{
-		phost->Width = EVE_Hal_rd16(phost, REG_HSIZE);
-		phost->Height = EVE_Hal_rd16(phost, REG_VSIZE);
+		phost->Width = EVE_Hal_rd32(phost, REG_HSIZE);
+		phost->Height = EVE_Hal_rd32(phost, REG_VSIZE);
 	}
 
 	/* Command */

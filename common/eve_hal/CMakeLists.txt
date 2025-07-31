@@ -22,13 +22,6 @@ IF (WIN32)
     LibFT4222
     ftd2xx
   )
-ELSEIF(UNIX)
-  TARGET_LINK_LIBRARIES(eve_hal
-    # libMPSSE
-    ft4222
-    # ftd2xx
-    # bt8xxemu
-  )
 ENDIF()
 
 IF (WIN32)

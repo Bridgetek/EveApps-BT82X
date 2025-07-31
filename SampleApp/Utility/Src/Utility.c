@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,9 @@
  * SOFTWARE.
  */
 
-#include "Common.h"
 #include "Utility.h"
+#include "FileTransfer.h"
+#include "FlashHelper.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
 
@@ -45,7 +46,7 @@ int main(int argc, char* argv[])
     LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
     EVE_Calibrate(s_pHalContext);
     Calibration_Save(s_pHalContext);
 #endif
@@ -72,7 +73,7 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
         LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if !defined(BT8XXEMU_PLATFORM) && GET_CALIBRATION == 1
+#if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
     }
@@ -234,7 +235,7 @@ void SAMAPP_Utility_callListWithAlignment()
     EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 4 * 4, 160 << 16 | 160); //y | x coordinate of button
     EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 5 * 4, 200 << 16 | 324); //h | w
     EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 6 * 4, 0 << 16 | 31); //options | Font handle
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 7 * 4, 'T' << 24 | 'E' << 16 | 'S' << 8 | 'T');
+    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 7 * 4, 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T');
 
     EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 8 * 4, '\0' << 24 | '\0' << 16 | '\0' << 8 | '\0');
 

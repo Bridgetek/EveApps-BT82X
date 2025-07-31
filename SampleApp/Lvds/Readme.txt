@@ -34,7 +34,7 @@
             - Connect PC with EVE platform via FT4222 or MPSSE
             - Connect power to EVE platform
 
-        3.1.3 Connect LVDS input
+        3.1.2 Connect LVDS input
 
     3.2 DOWNLOAD ASSETS
         3.2.1 Use EAB to program the board with the flash.bin file located in the Flash folder if needed.

@@ -11,7 +11,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,11 @@
 #ifndef EVE_GPU_DEFS__H
 #define EVE_GPU_DEFS__H
 
+/*********************
+ *      INCLUDES
+ *********************/
+#include "EVE_Config.h"
+
 /* Definitions used for BT820 coprocessor command buffer */
 #define EVE_DL_SIZE                   (16 * 1024UL) /**< 16kB Display List buffer size */
 #define EVE_CMD_FIFO_SIZE             ((16) * 1024UL) /**< 16kB coprocessor FIFO size */
@@ -52,7 +57,6 @@
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
 #define FREQUENCY                72000000UL
-#define READ_TIMOUT              500
 
 /**************
 ** Addresses **
@@ -426,73 +430,68 @@
 
 /** @name Setting Graphics State */
 ///@{
-#define ALPHA_FUNC(func, ref)       ((9UL << 24) | (((func)&7UL) << 8) | (((ref)&255UL) << 0))
-#define BEGIN(prim)                 ((31UL << 24) | (((prim)&15UL) << 0))
-#define BITMAP_EXT_FORMAT(format)   ((46UL << 24) | (((format)&65535UL) << 0))
-#define BITMAP_HANDLE(handle)       ((5UL << 24) | (((handle)&63UL) << 0))
-#define BITMAP_LAYOUT(format, linestride, height)  ((7UL << 24) | (((format)&31UL) << 19) | (((linestride)&1023UL) << 9) | (((height)&511UL) << 0))
-#define BITMAP_LAYOUT_H(linestride, height)        ((40UL << 24) | (((linestride)&7UL) << 2) | (((height)&3UL) << 0))
-#define BITMAP_SIZE(filter, wrapx, wrapy, width, height)   ((8UL << 24) | (((filter)&1UL) << 20) | (((wrapx)&1UL) << 19) | (((wrapy)&1UL) << 18) | (((width)&511UL) << 9) | (((height)&511UL) << 0))
-#define BITMAP_SIZE_H(width, height)               ((41UL << 24) | (((width)&3UL) << 2) | (((height)&3UL) << 0))
-#define BITMAP_SOURCE(addr)         ((1UL << 24) | (((addr)&16777215UL) << 0))
-#define BITMAP_SOURCEH(addr)        ((49UL << 24) | (((addr)&255UL) << 0))
-#define BITMAP_ADDR_MASK            16777215UL /**< 0x00FFFFFF*/
-#define BITMAP_SWIZZLE(r, g, b, a)                 ((47UL << 24) | (((r)&7UL) << 9) | (((g)&7UL) << 6) | (((b)&7UL) << 3) | (((a)&7UL) << 0))
-#define BITMAP_TRANSFORM_A_EXT(p, v)               ((21UL << 24) | (((p)&1UL) << 17) | (((v)&131071UL) << 0))
-#define BITMAP_TRANSFORM_B_EXT(p, v)               ((22UL << 24) | (((p)&1UL) << 17) | (((v)&131071UL) << 0))
-#define BITMAP_TRANSFORM_D_EXT(p, v)               ((24UL << 24) | (((p)&1UL) << 17) | (((v)&131071UL) << 0))
-#define BITMAP_TRANSFORM_E_EXT(p, v)               ((25UL << 24) | (((p)&1UL) << 17) | (((v)&131071UL) << 0))
-#define BITMAP_TRANSFORM_A(a)       BITMAP_TRANSFORM_A_EXT(0, a)
-#define BITMAP_TRANSFORM_B(b)       BITMAP_TRANSFORM_B_EXT(0, b)
-#define BITMAP_TRANSFORM_D(d)       BITMAP_TRANSFORM_D_EXT(0, d)
-#define BITMAP_TRANSFORM_E(e)       BITMAP_TRANSFORM_E_EXT(0, e)
-#define BITMAP_TRANSFORM_C(c)       ((23UL << 24) | (((c)&16777215UL) << 0))
-#define BITMAP_TRANSFORM_F(f)       ((26UL << 24) | (((f)&16777215UL) << 0))
-#define BITMAP_ZORDER(o)            ((51UL << 24) | (((o)&255UL) << 0))
-#define BLEND_FUNC(src, dst)        ((11UL << 24) | (((src)&7UL) << 3) | (((dst)&7UL) << 0))
-#define CELL(cell)                  ((6UL << 24) | (((cell)&127UL) << 0))
-#define CLEAR_COLOR_A(alpha)        ((15UL << 24) | (((alpha)&255UL) << 0))
-#define CLEAR_COLOR_RGB(red, green, blue)         ((2UL << 24) | (((red)&255UL) << 16) | (((green)&255UL) << 8) | (((blue)&255UL) << 0))
-#define CLEAR_STENCIL(s)            ((17UL << 24) | (((s)&255UL) << 0))
-#define CLEAR_TAG(s)                ((18UL << 24) | (((s)&16777215UL) << 0))
-#define COLOR_A(alpha)              ((16UL << 24) | (((alpha)&255UL) << 0))
-#define COLOR_MASK(r, g, b, a)      ((32UL << 24) | (((r)&1UL) << 3) | (((g)&1UL) << 2) | (((b)&1UL) << 1) | (((a)&1UL) << 0))
-#define COLOR_RGB(red, green, blue) ((4UL << 24) | (((red)&255UL) << 16) | (((green)&255UL) << 8) | (((blue)&255UL) << 0))
-#define END()                       ((33UL << 24))
-#define LINE_WIDTH(width)           ((14UL << 24) | (((width)&4095UL) << 0))
-#define PALETTE_SOURCE(addr)        ((42UL << 24) | (((addr)&16777215UL) << 0))
-#define PALETTE_SOURCEH(addr)       ((50UL << 24) | (((addr)&255UL) << 0))
-#define POINT_SIZE(size)            ((13UL << 24) | (((size)&8191UL) << 0))
-#define RESTORE_CONTEXT()           ((35UL << 24))
-#define SAVE_CONTEXT()              ((34UL << 24))
-#define SCISSOR_SIZE(width, height) ((28UL << 24) | (((width)&4095UL) << 12) | (((height)&4095UL) << 0))
-#define SCISSOR_XY(x, y)            ((27UL << 24) | (((x)&2047UL) << 11) | (((y)&2047UL) << 0))
-#define STENCIL_FUNC(func, ref, mask)             ((10UL << 24) | (((func)&7UL) << 16) | (((ref)&255UL) << 8) | (((mask)&255UL) << 0))
-#define STENCIL_MASK(mask)          ((19UL << 24) | (((mask)&255UL) << 0))
-#define STENCIL_OP(sfail, spass)    ((12UL << 24) | (((sfail)&7UL) << 3) | (((spass)&7UL) << 0))
-#define TAG(s)                      ((3UL << 24) | (((s)&16777215UL) << 0))
-#define TAG_MASK(mask)              ((20UL << 24) | (((mask)&1UL) << 0))
-#define VERTEX_FORMAT(frac)         ((39UL << 24) | (((frac)&7UL) << 0))
-#define VERTEX_TRANSLATE_X(x)       ((43UL << 24) | (((x)&131071UL) << 0))
-#define VERTEX_TRANSLATE_Y(y)       ((44UL << 24) | (((y)&131071UL) << 0))
+#define ALPHA_FUNC(func, ref)       ((0x09 << 24) | (((func) & 0x7) << 8) | (((ref) & 0xFF) << 0))
+#define BEGIN(prim)                 ((0x1F << 24) | ((prim) & 0xF))
+#define BITMAP_EXT_FORMAT(format)   ((0x2E << 24) | ((format) & 0xFFFF))
+#define BITMAP_HANDLE(handle)       ((0x05 << 24) | ((handle) & 0x3F))
+#define BITMAP_LAYOUT(format, linestride, height)  ((0x07 << 24) | (((format) & 0x1F) << 19) | (((linestride) & 0x3FF) << 9) | ((height) & 0x1FF))
+#define BITMAP_LAYOUT_H(linestride, height)        ((0x28 << 24) | (((linestride) & 0x3) << 2) | ((height) & 0x3))
+#define BITMAP_SIZE(filter, wrapx, wrapy, width, height)   ((0x08 << 24) | (((filter) & 0x1) << 20) | (((wrapx) & 0x1) << 19) | (((wrapy) & 0x1) << 18) | (((width) & 0x1FF) << 9) | ((height) & 0x1FF))
+#define BITMAP_SIZE_H(width, height)               ((0x29 << 24) | (((width) & 0x3) << 2) | ((height) & 0x3))
+#define BITMAP_SOURCE(addr)         ((0x01 << 24) | ((addr) & 0xFFFFFF))
+#define BITMAP_SOURCEH(addr)        ((0x31 << 24) | ((addr) & 0xFF))
+#define BITMAP_SWIZZLE(r, g, b, a)  ((0x2F << 24) | (((r) & 0x7) << 9) | (((g) & 0x7) << 6) | (((b) & 0x7) << 3) | ((a) & 0x7))
+#define BITMAP_TRANSFORM_A(p, v)    ((0x15 << 24) | (((p) & 0x1) << 17) | ((v) & 0x1FFFF))
+#define BITMAP_TRANSFORM_B(p, v)    ((0x16 << 24) | (((p) & 0x1) << 17) | ((v) & 0x1FFFF))
+#define BITMAP_TRANSFORM_C(c)       ((0x17 << 24) | ((c) & 0xFFFFFF))
+#define BITMAP_TRANSFORM_D(p, v)    ((0x18 << 24) | (((p) & 0x1) << 17) | ((v) & 0x1FFFF))
+#define BITMAP_TRANSFORM_E(p, v)    ((0x19 << 24) | (((p) & 0x1) << 17) | ((v) & 0x1FFFF))
+#define BITMAP_TRANSFORM_F(f)       ((0x1A << 24) | ((f) & 0xFFFFFF))
+#define BITMAP_ZORDER(o)            ((0x33 << 24) | ((o) & 0xFF))
+#define BLEND_FUNC(src, dst)        ((0x0B << 24) | (((src) & 0x7) << 3) | ((dst) & 0x7))
+#define CELL(cell)                  ((0x06 << 24) | ((cell) & 0x7F))
+#define CLEAR_COLOR_A(alpha)        ((0x0F << 24) | ((alpha) & 0xFF))
+#define CLEAR_COLOR_RGB(red, green, blue)         ((0x02 << 24) | (((red) & 0xFF) << 16) | (((green) & 0xFF) << 8) | ((blue) & 0xFF))
+#define CLEAR_STENCIL(s)            ((0x11 << 24) | ((s) & 0xFF))
+#define CLEAR_TAG(s)                ((0x12 << 24) | ((s) & 0xFFFFFF))
+#define COLOR_A(alpha)              ((0x10 << 24) | ((alpha) & 0xFF))
+#define COLOR_MASK(r, g, b, a)      ((0x20 << 24) | (((r) & 0x1) << 3) | (((g) & 0x1) << 2) | (((b) & 0x1) << 1) | ((a) & 0x1))
+#define COLOR_RGB(red, green, blue) ((0x04 << 24) | (((red) & 0xFF) << 16) | (((green) & 0xFF) << 8) | ((blue) & 0xFF))
+#define END()                       ((0x21 << 24))
+#define LINE_WIDTH(width)           ((0x0E << 24) | ((width) & 0xFFF))
+#define PALETTE_SOURCE(addr)        ((0x2A << 24) | ((addr) & 0xFFFFFF))
+#define PALETTE_SOURCEH(addr)       ((0x32 << 24) | ((addr) & 0xFF))
+#define POINT_SIZE(size)            ((0x0D << 24) | ((size) & 0x1FFF))
+#define RESTORE_CONTEXT()           ((0x23 << 24))
+#define SAVE_CONTEXT()              ((0x22 << 24))
+#define SCISSOR_SIZE(width, height) ((0x1C << 24) | (((width) & 0xFFF) << 12) | ((height) & 0xFFF))
+#define SCISSOR_XY(x, y)            ((0x1B << 24) | (((x) & 0x7FF) << 11) | ((y) & 0x7FF))
+#define STENCIL_FUNC(func, ref, mask)             ((0x0A << 24) | (((func) & 0xF) << 16) | (((ref) & 0xFF) << 8) | ((mask) & 0xFF))
+#define STENCIL_MASK(mask)          ((0x13 << 24) | ((mask) & 0xFF))
+#define STENCIL_OP(sfail, spass)    ((0x0C << 24) | (((sfail) & 0x7) << 3) | ((spass) & 0x7))
+#define TAG(s)                      ((0x03 << 24) | ((s) & 0xFFFFFF))
+#define TAG_MASK(mask)              ((0x14 << 24) | ((mask) & 0x1))
+#define VERTEX_FORMAT(frac)         ((0x27 << 24) | ((frac) & 0x7))
+#define VERTEX_TRANSLATE_X(x)       ((0x2B << 24) | ((x) & 0x1FFFF))
+#define VERTEX_TRANSLATE_Y(y)       ((0x2C << 24) | ((y) & 0x1FFFF))
 ///@}
 
 /** @name Drawing Actions */
 ///@{
-#define CLEAR(c, s, t)                ((38UL << 24) | (((c)&1UL) << 2) | (((s)&1UL) << 1) | (((t)&1UL) << 0))
-#define VERTEX2F(x, y)                ((1UL << 30) | (((x)&32767UL) << 15) | (((y)&32767UL) << 0))
-#define VERTEX2II(x, y, handle, cell) ((2UL << 30) | (((x)&511UL) << 21) | (((y)&511UL) << 12) | (((handle)&31UL) << 7) | (((cell)&127UL) << 0))
+#define CLEAR(c, s, t)                ((0x26 << 24) | (((c) & 0x1) << 2) | (((s) & 0x1) << 1) | ((t) & 0x1))
+#define VERTEX2F(x, y)                ((0x01 << 30) | (((x) & 0x7FFF) << 15) | ((y) & 0x7FFF))
+#define VERTEX2II(x, y, handle, cell) ((0x02 << 30) | (((x) & 0x1FF) << 21) | (((y) & 0x1FF) << 12) | (((handle) & 0x1F) << 7) | ((cell) & 0x7F))
 ///@}
 
 /** @name Execution Control */
 ///@{
-#define CALL(dest)                    ((29UL << 24) | (((dest)&65535UL) << 0))
-#define DISPLAY()                     ((0UL << 24))
-#define JUMP(dest)                    ((30UL << 24) | (((dest)&65535UL) << 0))
-#define MACRO(m)                      ((37UL << 24) | (((m)&1UL) << 0))
-#define NOP()                         ((45UL << 24))
-#define REGION(y, h, dest)            ((52UL << 24) | (((y)&63UL) << 18) | (((h)&63UL) << 12) | (((dest)&4095UL) << 0))
-#define RETURN()                      ((36UL << 24))
+#define CALL(dest)                    ((0x1D << 24) | ((dest) & 0xFFFF))
+#define DISPLAY()                     ((0x0 << 24))
+#define JUMP(dest)                    ((0x1E << 24) | ((dest) & 0xFFFF))
+#define MACRO(m)                      ((0x25 << 24) | ((m) & 0x1))
+#define NOP()                         ((0x2D << 24))
+#define REGION(y, h, dest)            ((0x34 << 24) | (((y) & 0x3F) << 18) | (((h) & 0x3F) << 12) | ((dest) & 0xFFF))
+#define RETURN()                      ((0x24 << 24))
 ///@}
 
 /***************
@@ -585,7 +584,7 @@
 #define GREEN             3UL
 #define BLUE              4UL
 #define ALPHA             5UL
-///2}
+///@}
 
 /** @name for ALPHA_FUNC, CMD_SKIPCOND, CMD_WAITCOND */
 ///@{

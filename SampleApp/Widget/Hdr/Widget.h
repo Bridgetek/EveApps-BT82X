@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,18 +29,13 @@
  * SOFTWARE.
  */
 
+#include "Common.h"
+
 #ifndef APP_H_
 #define APP_H_
 
-#include "EVE_Platform.h"
-
 // Path to UI assets Folder
-#if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
-#else
-#define TEST_DIR                            "/EveApps/SampleApp/Widget/Test"
-#endif
-
 #define GET_CALIBRATION                     1
 
 /* sample app structure definitions */

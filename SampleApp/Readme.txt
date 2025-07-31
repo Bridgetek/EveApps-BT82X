@@ -19,13 +19,14 @@
 the basic procedures to configure Eve. It is in tutorial fashion for users to examine the 
 individual functions.  
 
-   It contains 10 projects for different groups of Eve functionality.
+   It contains 11 projects for different groups of Eve functionality.
 
 2. FOLDER Structure
     ├───Animation     | Sample usage for animation functionality
     ├───Bitmap        | Sample usage for bitmap drawing
     ├───Flash         | Sample usage for flash usage
     ├───Font          | Sample usage for font functionality
+    ├───Lvds          | Sample usage for LVDSRX
     ├───Primitives    | Sample usage for primitives graphics drawing
     ├───Sound         | Sample usage for sound functionality
     ├───Touch         | Sample usage for touch  functionality

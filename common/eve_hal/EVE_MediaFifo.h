@@ -2,17 +2,17 @@
  * @file EVE_MediaFifo.h
  * @brief EVE's mediafifo controller
  *
- * This file defines the generic APIs of phost access layer for the FT800 or EVE compatible silicon.
- * Application shall access FT800 or EVE resources over these APIs,regardless of I2C or SPI protocol.
- * In addition, there are some helper functions defined for FT800 coprocessor engine as well as phost commands.
+ * This file defines the generic APIs of phost access layer for the BT820 or EVE compatible silicon.
+ * Application shall access BT820 or EVE resources over these APIs,regardless of I2C or SPI protocol.
+ * In addition, there are some helper functions defined for BT820 coprocessor engine as well as phost commands.
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,11 @@
 
 #ifndef EVE_MEDIAFIFO__H
 #define EVE_MEDIAFIFO__H
-#include "EVE_HalDefs.h"
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "EVE_CoCmd.h"
 
 /**************************
 ** COPROCESSOR MEDIAFIFO **
@@ -43,24 +47,24 @@
 
 #ifdef EVE_SUPPORT_MEDIAFIFO
 
-/** Set the media FIFO. 
+/* Set the media FIFO. 
 Returns false in case a coprocessor fault occurred */
 bool EVE_MediaFifo_set(EVE_HalContext *phost, uint32_t address, uint32_t size);
 
-/** Closes the current media FIFO.
+/* Closes the current media FIFO.
 Indication for HAL only */
 void EVE_MediaFifo_close(EVE_HalContext *phost);
 
-/** Get the current read pointer. */
+/* Get the current read pointer. */
 uint32_t EVE_MediaFifo_rp(EVE_HalContext *phost);
 
-/** Get the current write pointer. */
+/* Get the current write pointer. */
 uint32_t EVE_MediaFifo_wp(EVE_HalContext *phost);
 
-/** Get the currently available space. */
+/* Get the currently available space. */
 uint32_t EVE_MediaFifo_space(EVE_HalContext *phost);
 
-/** Write a buffer to the media FIFO. 
+/* Write a buffer to the media FIFO. 
 Waits if there is not enough space in the media FIFO. 
 Returns false in case a coprocessor fault occurred.
 If the transfered pointer is set, the write may exit early 
@@ -68,12 +72,12 @@ if the coprocessor function has finished, and the
 transfered amount will be set. */
 bool EVE_MediaFifo_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size, uint32_t *transfered);
 
-/** Wait for the media FIFO to fully empty. 
+/* Wait for the media FIFO to fully empty. 
 When checking if a file is fully processed, EVE_Cmd_waitFlush must be called.
 Returns false in case a coprocessor fault occurred, or in case the coprocessor is done processing */
 bool EVE_MediaFifo_waitFlush(EVE_HalContext *phost, bool orCmdFlush);
 
-/** Wait for the media FIFO to have at least the requested amount of free space.
+/* Wait for the media FIFO to have at least the requested amount of free space.
 Returns 0 in case a coprocessor fault occurred, or in case the coprocessor is done processing */
 uint32_t EVE_MediaFifo_waitSpace(EVE_HalContext *phost, uint32_t size, bool orCmdFlush);
 

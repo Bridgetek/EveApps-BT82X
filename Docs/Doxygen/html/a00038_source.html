@@ -1,0 +1,1086 @@
+<!-- HTML header for doxygen 1.9.3-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EveApps-BT82X Project: common/eve_hal/EVE_CoCmd_IO.c Source File</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div style="z-index:3; width: 100vw; height: 100px; left: 0px;" > 
+  <a href="index.html" ><svg style="z-index:2; height: 80%; width: auto; float: left;"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 704.8667 213.38667"
+     height="213.38667"
+     width="704.8667"
+     xml:space="preserve"
+     id="svg2"
+     version="1.1">
+    <metadata
+       id="metadata8">
+      <rdf:RDF>
+        <cc:Work
+           rdf:about="">
+          <dc:format>image/svg+xml</dc:format>
+          <dc:type
+             rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        </cc:Work>
+      </rdf:RDF>
+    </metadata>
+    <defs
+       id="defs6" />
+    <g
+       transform="matrix(1.3333333,0,0,-1.3333333,0,213.38667)"
+       id="g10">
+      <g
+         transform="scale(0.1)"
+         id="g12">
+        <path
+           id="path14"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="M 783.457,192.039 192.074,783.426 c -9.261,9.258 -9.261,24.285 -0.015,33.527 l 591.382,591.377 c 4.664,4.67 10.688,6.99 16.711,7 v 114.7 c -35.582,-0.01 -71.16,-13.46 -98.05,-40.35 L 110.719,898.293 C 56.8047,844.379 56.7734,756.047 110.734,702.086 L 702.117,110.699 C 729.066,83.75 764.609,70.2813 800.152,70.2813 V 185.129 c -6.047,0.012 -12.097,2.32 -16.695,6.91" />
+        <path
+           id="path16"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="M 791.809,1281.92 318.488,808.598 c -4.621,-4.621 -4.636,-12.168 -0.015,-16.789 l 473.336,-473.34 c 2.296,-2.297 5.32,-3.438 8.343,-3.438 v 970.349 c -3.023,-0.01 -6.043,-1.16 -8.343,-3.46" />
+        <path
+           id="path18"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="M 179.672,1059.81 81.3398,1158.14 0,1076.8 l 98.332,-98.331 81.34,81.341" />
+        <path
+           id="path20"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 327.094,1207.23 -98.332,98.33 -81.34,-81.33 98.332,-98.34 81.34,81.34" />
+        <path
+           id="path22"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 474.516,1354.65 -98.332,98.33 -81.34,-81.34 98.332,-98.32 81.34,81.33" />
+        <path
+           id="path24"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 621.922,1502.06 -98.332,98.33 -81.324,-81.32 98.332,-98.34 81.324,81.33" />
+        <path
+           id="path26"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="M 98.3516,621.934 0,523.59 81.3398,442.25 179.691,540.602 98.3516,621.934" />
+        <path
+           id="path28"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 245.754,474.531 -98.348,-98.351 81.34,-81.34 98.348,98.351 -81.34,81.34" />
+        <path
+           id="path30"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 393.191,327.09 -98.347,-98.34 81.34,-81.34 98.347,98.34 -81.34,81.34" />
+        <path
+           id="path32"
+           style="fill:#ed1c24;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="M 442.246,81.3398 523.59,0 621.938,98.3516 540.598,179.691 442.246,81.3398" />
+        <path
+           id="path34"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1264.65,213.852 h 9.29 c 16.51,0 22.19,6.199 22.19,26.828 0,20.64 -5.68,26.57 -22.19,26.57 h -9.29 c -1.04,0 -1.54,-0.52 -1.54,-1.551 v -50.301 c 0,-1.027 0.5,-1.546 1.54,-1.546 z m 9.29,77.128 c 15.22,0 20.37,4.641 20.37,23.989 0,19.351 -5.15,24.25 -20.37,24.25 h -9.29 c -1.04,0 -1.54,-0.52 -1.54,-1.559 v -45.129 c 0,-1.031 0.5,-1.551 1.54,-1.551 z m -38.42,70.68 c 0,1.551 1.01,2.57 2.58,2.57 h 38.41 c 31.48,0 45.41,-14.191 45.41,-45.378 0,-21.672 -7.47,-32.25 -20.36,-37.93 v -0.524 c 13.15,-3.859 22.44,-16.757 22.44,-39.976 0,-38.953 -17.04,-51.582 -51.1,-51.582 h -34.8 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path36"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1482.31,312.129 c 0,20.641 -6.72,27.09 -22.19,27.09 h -9.04 c -1.03,0 -1.54,-0.52 -1.54,-1.559 v -51.058 c 0,-1.043 0.51,-1.551 1.54,-1.551 h 9.04 c 15.47,0 22.19,6.187 22.19,27.078 z m 6.18,-123.289 c -1.54,0 -2.32,0.512 -2.83,1.801 l -21.43,69.91 h -4.36 -8.79 c -1.03,0 -1.54,-0.52 -1.54,-1.551 v -67.59 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -22.44 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25 c 0,1.551 1.01,2.57 2.58,2.57 h 35.34 c 31.19,0 50.03,-13.671 50.03,-52.101 0,-22.957 -7.73,-37.391 -20.91,-44.879 l 24.77,-75.84 c 0.53,-1.289 0,-2.57 -1.29,-2.57 h -23.98" />
+        <path
+           id="path38"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1610.71,361.66 c 0,1.551 1,2.57 2.57,2.57 h 22.44 c 1.54,0 2.58,-1.019 2.58,-2.57 V 191.41 c 0,-1.539 -1.04,-2.57 -2.58,-2.57 h -22.44 c -1.57,0 -2.57,1.031 -2.57,2.57 v 170.25" />
+        <path
+           id="path40"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1771.09,213.852 h 11.11 c 9.79,0 15.47,3.878 18.55,12.648 2.07,6.449 3.1,14.949 3.1,50.039 0,35.07 -1.03,43.59 -3.1,50.043 -3.08,8.77 -8.76,12.637 -18.55,12.637 h -11.11 c -1.04,0 -1.54,-0.52 -1.54,-1.559 V 215.398 c 0,-1.027 0.5,-1.546 1.54,-1.546 z m -29.13,147.808 c 0,1.551 1.01,2.57 2.58,2.57 h 40.48 c 22.97,0 36.38,-9.281 42.56,-28.109 3.11,-9.539 4.39,-21.422 4.39,-59.582 0,-38.18 -1.28,-50.039 -4.39,-59.578 -6.18,-18.832 -19.59,-28.121 -42.56,-28.121 h -40.48 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path42"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1929.43,276.539 c 0,48.742 0.78,54.941 3.36,62.68 5.68,17.269 19.86,27.332 41.52,27.332 25.26,0 40.77,-13.403 43.59,-41 0.25,-1.563 -0.78,-2.84 -2.07,-3.09 l -20.87,-3.609 c -1.57,-0.274 -2.6,0.5 -2.86,2.046 -1.28,13.672 -7.21,20.641 -17.54,20.641 -7.47,0 -13.4,-3.879 -15.22,-9.809 -1.54,-4.902 -1.79,-6.949 -1.79,-55.191 0,-48.238 0.25,-50.309 1.79,-55.199 1.82,-5.942 8.25,-9.801 15.47,-9.801 7.5,0 13.94,3.859 15.76,9.801 1.28,4.39 1.79,6.961 1.79,39.461 0,1.039 -0.51,1.551 -1.54,1.551 h -13.69 c -1.53,0 -2.57,1.027 -2.57,2.578 v 19.082 c 0,1.547 1.04,2.59 2.57,2.59 h 39.23 c 1.54,0 2.58,-1.043 2.58,-2.59 v -7.742 c 0,-48.489 -0.79,-54.668 -3.36,-62.418 -5.68,-17.282 -19.87,-27.34 -41.27,-27.34 -21.66,0 -35.84,10.058 -41.52,27.34 -2.58,7.75 -3.36,13.929 -3.36,62.687" />
+        <path
+           id="path44"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 2118.71,361.66 c 0,1.551 1.01,2.57 2.58,2.57 h 22.44 c 1.54,0 2.57,-1.019 2.57,-2.57 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -22.44 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path46"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 2249.97,361.66 c 0,1.551 1.01,2.57 2.57,2.57 h 27.34 c 2.07,0 3.11,-0.769 3.61,-2.57 L 2316,240.422 h 1.29 V 361.66 c 0,1.551 1.03,2.57 2.57,2.57 h 19.09 c 1.53,0 2.57,-1.019 2.57,-2.57 V 191.41 c 0,-1.539 -1.04,-2.57 -2.57,-2.57 h -25.55 c -2.04,0 -3.08,0.769 -3.61,2.57 l -34.05,121.238 h -1.54 V 191.41 c 0,-1.539 -1.04,-2.57 -2.57,-2.57 h -19.09 c -1.56,0 -2.57,1.031 -2.57,2.57 v 170.25" />
+        <path
+           id="path48"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 2442.08,276.539 c 0,48.742 0.78,54.941 3.36,62.68 5.68,17.269 19.86,27.332 41.52,27.332 25.27,0 40.77,-13.403 43.59,-41 0.25,-1.563 -0.78,-2.84 -2.07,-3.09 l -20.87,-3.609 c -1.57,-0.274 -2.6,0.5 -2.85,2.046 -1.29,13.672 -7.22,20.641 -17.55,20.641 -7.47,0 -13.4,-3.879 -15.22,-9.809 -1.54,-4.902 -1.79,-6.949 -1.79,-55.191 0,-48.238 0.25,-50.309 1.79,-55.199 1.82,-5.942 8.25,-9.801 15.47,-9.801 7.5,0 13.94,3.859 15.76,9.801 1.28,4.39 1.79,6.961 1.79,39.461 0,1.039 -0.51,1.551 -1.54,1.551 h -13.68 c -1.54,0 -2.58,1.027 -2.58,2.578 v 19.082 c 0,1.547 1.04,2.59 2.58,2.59 h 39.22 c 1.54,0 2.58,-1.043 2.58,-2.59 v -7.742 c 0,-48.489 -0.79,-54.668 -3.36,-62.418 -5.68,-17.282 -19.87,-27.34 -41.27,-27.34 -21.66,0 -35.84,10.058 -41.52,27.34 -2.58,7.75 -3.36,13.929 -3.36,62.687" />
+        <path
+           id="path50"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3596.01,188.84 c -1.54,0 -2.58,1.031 -2.58,2.57 v 146.25 c 0,1.039 -0.5,1.559 -1.54,1.559 h -26.83 c -1.54,0 -2.57,1.031 -2.57,2.57 v 19.871 c 0,1.551 1.03,2.57 2.57,2.57 h 84.36 c 1.54,0 2.58,-1.019 2.58,-2.57 v -19.871 c 0,-1.539 -1.04,-2.57 -2.58,-2.57 h -26.83 c -1.04,0 -1.54,-0.52 -1.54,-1.559 V 191.41 c 0,-1.539 -1.04,-2.57 -2.57,-2.57 h -22.47" />
+        <path
+           id="path52"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3745.59,361.66 c 0,1.551 1.01,2.57 2.57,2.57 h 71.97 c 1.54,0 2.57,-1.019 2.57,-2.57 v -19.871 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -45.41 c -1.04,0 -1.54,-0.52 -1.54,-1.559 V 291.5 c 0,-1.039 0.5,-1.559 1.54,-1.559 h 39.22 c 1.54,0 2.58,-1.019 2.58,-2.57 V 267.5 c 0,-1.539 -1.04,-2.57 -2.58,-2.57 h -39.22 c -1.04,0 -1.54,-0.52 -1.54,-1.551 v -47.981 c 0,-1.027 0.5,-1.546 1.54,-1.546 h 45.41 c 1.54,0 2.57,-1.02 2.57,-2.571 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -71.97 c -1.56,0 -2.57,1.031 -2.57,2.57 v 170.25" />
+        <path
+           id="path54"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3917.05,276.539 c 0,48.742 1.04,55.973 3.36,63.191 5.4,16.758 18.3,26.821 39.73,26.821 25.01,0 40.74,-12.879 42.28,-42.039 0.28,-1.551 -0.25,-2.84 -1.79,-3.09 l -20.9,-3.613 c -1.54,-0.27 -2.83,0.523 -2.83,2.32 -0.78,14.961 -5.93,21.41 -16,21.41 -7.73,0 -11.87,-3.359 -13.94,-9.809 -1.29,-4.128 -1.79,-7.742 -1.79,-55.191 0,-47.469 0.5,-51.078 1.79,-55.199 2.07,-6.449 6.21,-9.801 13.94,-9.801 10.07,0 15.22,6.441 16,21.41 0,1.801 1.29,2.571 2.83,2.321 l 20.9,-3.61 c 1.54,-0.269 2.07,-1.551 1.79,-3.109 -1.54,-29.141 -17.27,-42.039 -42.28,-42.039 -21.43,0 -34.33,10.058 -39.73,26.84 -2.32,7.218 -3.36,14.429 -3.36,63.187" />
+        <path
+           id="path56"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4096.29,361.66 c 0,1.551 1.01,2.57 2.58,2.57 h 22.44 c 1.53,0 2.57,-1.019 2.57,-2.57 v -69.129 c 0,-1.031 0.5,-1.551 1.54,-1.551 h 29.66 c 1.03,0 1.56,0.52 1.56,1.551 v 69.129 c 0,1.551 1.04,2.57 2.58,2.57 h 22.44 c 1.54,0 2.57,-1.019 2.57,-2.57 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -22.44 c -1.54,0 -2.58,1.031 -2.58,2.57 v 73 c 0,1.039 -0.53,1.551 -1.56,1.551 h -29.66 c -1.04,0 -1.54,-0.512 -1.54,-1.551 v -73 c 0,-1.539 -1.04,-2.57 -2.57,-2.57 h -22.44 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path58"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4287.87,361.66 c 0,1.551 1.01,2.57 2.58,2.57 h 27.33 c 2.07,0 3.11,-0.769 3.61,-2.57 l 32.51,-121.238 h 1.29 V 361.66 c 0,1.551 1.04,2.57 2.58,2.57 h 19.08 c 1.54,0 2.57,-1.019 2.57,-2.57 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -25.55 c -2.04,0 -3.08,0.769 -3.61,2.57 l -34.05,121.238 h -1.54 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -19.08 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path60"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4539.55,221.34 c 1.57,4.89 1.82,6.961 1.82,55.199 0,48.242 -0.25,50.289 -1.82,55.191 -1.79,5.93 -7.47,9.809 -14.69,9.809 -7.47,0 -13.15,-3.879 -14.97,-9.809 -1.54,-4.902 -1.79,-6.949 -1.79,-55.191 0,-48.238 0.25,-50.309 1.79,-55.199 1.82,-5.942 7.5,-9.801 14.97,-9.801 7.22,0 12.9,3.859 14.69,9.801 z m -56.21,-7.488 c -2.57,7.75 -3.36,13.929 -3.36,62.687 0,48.742 0.79,54.941 3.36,62.68 5.68,17.269 19.87,27.332 41.52,27.332 21.41,0 35.59,-10.063 41.27,-27.332 2.58,-7.739 3.36,-13.938 3.36,-62.68 0,-48.758 -0.78,-54.937 -3.36,-62.687 -5.68,-17.282 -19.86,-27.34 -41.27,-27.34 -21.65,0 -35.84,10.058 -41.52,27.34" />
+        <path
+           id="path62"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4670.05,361.66 c 0,1.551 1.01,2.57 2.58,2.57 h 22.44 c 1.53,0 2.57,-1.019 2.57,-2.57 V 215.398 c 0,-1.027 0.5,-1.546 1.54,-1.546 h 45.41 c 1.54,0 2.57,-1.02 2.57,-2.571 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -71.96 c -1.57,0 -2.58,1.031 -2.58,2.57 v 170.25" />
+        <path
+           id="path64"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4892.6,221.34 c 1.54,4.89 1.8,6.961 1.8,55.199 0,48.242 -0.26,50.289 -1.8,55.191 -1.81,5.93 -7.49,9.809 -14.71,9.809 -7.47,0 -13.15,-3.879 -14.97,-9.809 -1.54,-4.902 -1.79,-6.949 -1.79,-55.191 0,-48.238 0.25,-50.309 1.79,-55.199 1.82,-5.942 7.5,-9.801 14.97,-9.801 7.22,0 12.9,3.859 14.71,9.801 z m -56.23,-7.488 c -2.58,7.75 -3.36,13.929 -3.36,62.687 0,48.742 0.78,54.941 3.36,62.68 5.67,17.269 19.86,27.332 41.52,27.332 21.4,0 35.59,-10.063 41.27,-27.332 2.57,-7.739 3.36,-13.938 3.36,-62.68 0,-48.758 -0.79,-54.937 -3.36,-62.687 -5.68,-17.282 -19.87,-27.34 -41.27,-27.34 -21.66,0 -35.85,10.058 -41.52,27.34" />
+        <path
+           id="path66"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 5019.97,276.539 c 0,48.742 0.78,54.941 3.36,62.68 5.68,17.269 19.86,27.332 41.52,27.332 25.27,0 40.77,-13.403 43.59,-41 0.26,-1.563 -0.78,-2.84 -2.07,-3.09 l -20.87,-3.609 c -1.57,-0.274 -2.6,0.5 -2.85,2.046 -1.29,13.672 -7.22,20.641 -17.55,20.641 -7.47,0 -13.4,-3.879 -15.22,-9.809 -1.54,-4.902 -1.79,-6.949 -1.79,-55.191 0,-48.238 0.25,-50.309 1.79,-55.199 1.82,-5.942 8.26,-9.801 15.47,-9.801 7.5,0 13.94,3.859 15.76,9.801 1.28,4.39 1.79,6.961 1.79,39.461 0,1.039 -0.51,1.551 -1.54,1.551 h -13.68 c -1.54,0 -2.58,1.027 -2.58,2.578 v 19.082 c 0,1.547 1.04,2.59 2.58,2.59 h 39.22 c 1.54,0 2.58,-1.043 2.58,-2.59 v -7.742 c 0,-48.489 -0.78,-54.668 -3.36,-62.418 -5.68,-17.282 -19.86,-27.34 -41.27,-27.34 -21.66,0 -35.84,10.058 -41.52,27.34 -2.58,7.75 -3.36,13.929 -3.36,62.687" />
+        <path
+           id="path68"
+           style="fill:#231f20;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 5227.81,188.84 c -1.57,0 -2.58,1.031 -2.58,2.57 v 69.391 l -33.55,100.859 c -0.5,1.551 0,2.57 2.07,2.57 h 22.7 c 1.82,0 2.57,-0.769 3.1,-2.57 l 19.59,-67.84 h 0.78 l 19.08,67.84 c 0.54,1.801 1.29,2.57 3.11,2.57 h 22.19 c 2.04,0 2.57,-1.019 2.04,-2.57 L 5252.82,260.801 V 191.41 c 0,-1.539 -1.03,-2.57 -2.57,-2.57 h -22.44" />
+        <path
+           id="path70"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1413.48,632.223 h 53.35 c 44.63,0 55.52,13.054 55.52,72.929 v 58.786 c 0,58.789 -13.07,71.855 -55.52,71.855 h -53.35 z m 0,332.027 h 43.56 c 52.24,0 58.76,17.418 58.76,69.67 v 47.89 c 0,51.16 -6.52,68.59 -58.76,68.59 h -43.56 z m -180.7,321.13 h 266.71 c 156.74,0 197.03,-32.66 197.03,-190.5 0,-103.419 -7.61,-168.739 -117.57,-187.247 v -2.168 c 112.12,-8.719 130.64,-88.184 130.64,-183.985 0,-165.46 -38.11,-224.25 -180.72,-224.25 h -296.09 v 788.15" />
+        <path
+           id="path72"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1809.81,1052.41 h 154.57 v -55.508 h 2.18 c 21.77,51.158 47.9,64.228 109.96,64.228 57.69,0 93.62,-14.16 94.68,-82.735 V 828.168 h -134.97 v 82.738 c 0,17.414 -15.25,21.766 -32.65,21.766 -18.53,0 -32.66,-6.531 -32.66,-29.391 V 497.23 h -161.11 v 555.18" />
+        <path
+           id="path74"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 2233.32,1052.41 h 161.11 V 497.23 h -161.11 z m 0,232.97 h 161.11 v -128.46 h -161.11 v 128.46" />
+        <path
+           id="path76"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 2664.41,647.457 c 0,-20.676 13.07,-30.484 37.02,-30.484 23.95,0 37.02,9.808 37.02,30.484 v 254.731 c 0,20.691 -13.07,30.484 -37.02,30.484 -23.95,0 -37.02,-9.793 -37.02,-30.484 z M 2496.78,949 c 0,86 52.24,112.13 120.82,112.13 57.69,0 92.53,-20.69 118.66,-57.7 h 2.19 v 281.95 h 161.1 V 497.23 h -153.49 v 57.7 h -2.19 c -31.56,-57.7 -59.87,-66.399 -117.57,-66.399 -97.96,0 -129.52,38.098 -129.52,151.305 V 949" />
+        <path
+           id="path78"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3163.07,640.926 c 0,-23.953 10.89,-32.653 40.26,-32.653 29.41,0 40.3,8.7 40.3,32.653 v 265.629 c 0,23.937 -10.89,32.652 -40.3,32.652 -29.37,0 -40.26,-8.715 -40.26,-32.652 z m -161.11,274.332 c 0,95.802 42.45,145.872 117.55,145.872 63.15,0 99.07,-13.07 133.91,-59.88 h 2.18 v 51.16 h 149.14 V 448.238 c 0,-126.269 -70.77,-155.668 -217.72,-155.668 -127.36,0 -167.65,50.09 -167.65,123.02 v 29.39 h 141.52 V 433 c 0,-17.41 11.97,-25.039 41.35,-25.039 29.41,0 41.39,7.629 41.39,37.019 v 99.059 h -2.19 c -25.04,-33.738 -62.06,-51.16 -109.96,-51.16 -101.23,0 -129.52,62.051 -129.52,136.07 v 286.309" />
+        <path
+           id="path80"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3663.89,837.961 h 89.25 v 81.644 c 0,22.86 -7.61,32.668 -44.62,32.668 -37.02,0 -44.63,-9.808 -44.63,-32.668 z m -167.63,46.809 c 0,149.15 74.01,176.36 212.26,176.36 176.35,0 212.28,-66.411 212.28,-153.497 V 735.637 h -256.91 v -93.621 c 0,-29.395 6.54,-38.094 47.9,-38.094 31.56,0 45.72,6.519 45.72,39.183 v 26.122 h 163.29 v -31.563 c 0,-116.484 -48.99,-149.133 -212.28,-149.133 -138.25,0 -212.26,27.207 -212.26,176.344 V 884.77" />
+        <path
+           id="path82"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 3986.19,1052.41 h 45.72 v 144.79 h 161.11 v -144.79 h 93.62 V 930.492 h -93.62 V 652.898 c 0,-28.3 6.52,-42.457 41.35,-42.457 14.16,0 28.32,2.18 41.39,3.274 V 492.879 c -30.47,-1.09 -68.58,-4.348 -102.33,-4.348 -97.98,0 -141.52,37 -141.52,121.91 v 320.051 h -45.72 v 121.918" />
+        <path
+           id="path84"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4512.02,837.961 h 89.26 v 81.644 c 0,22.86 -7.61,32.668 -44.63,32.668 -37.02,0 -44.63,-9.808 -44.63,-32.668 z m -167.63,46.809 c 0,149.15 74.01,176.36 212.26,176.36 176.36,0 212.28,-66.411 212.28,-153.497 V 735.637 h -256.91 v -93.621 c 0,-29.395 6.55,-38.094 47.9,-38.094 31.56,0 45.72,6.519 45.72,39.183 v 26.122 h 163.29 v -31.563 c 0,-116.484 -48.99,-149.133 -212.28,-149.133 -138.25,0 -212.26,27.207 -212.26,176.344 V 884.77" />
+        <path
+           id="path86"
+           style="fill:#0A25F3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 4860.46,1285.38 h 161.11 V 848.844 h 2.18 l 72.91,203.566 h 158.96 L 5172.88,808.566 5281.72,497.23 h -171.99 l -85.98,274.333 h -2.18 V 497.23 h -161.11 v 788.15" />
+      </g>
+    </g>
+  </svg></a>
+  </br>
+  <div style="float: left; height: 100%;">  
+    <div style="float: left; margin-left: 50px; font-family: 'Fugaz One', cursive;overflow: hidden; font-size: 20px;">
+    Brteve's API for EveApps-BT82X
+    </div>  
+    <div style="padding-top:10px; float: left; margin-left: 50px; font-family: 'Fugaz One', cursive;overflow: hidden; font-size: 12px;">
+    Version 0.0.1
+    </div>
+    <div style="padding-top:10px; clear: both; margin-left: 50px; font-size: 14px;">
+    This folder contains the necessary files to use Eve device.</br>
+    </div>
+  </div>
+</div>
+  </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generated by Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('a00038_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">EVE_CoCmd_IO.c</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="a00038.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#include &quot;<a class="code" href="a00035.html">EVE_CoCmd.h</a>&quot;</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="}">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="a00035.html#a86041bb1f79a6a24058a7f5255a7e13f">   34</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a86041bb1f79a6a24058a7f5255a7e13f">EVE_CoCmd_memWrite</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>{</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#a4e8340225cdf1611bab27efb5a5ee33a">CMD_MEMWRITE</a>, ptr, num);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>}</div>
+</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="a00035.html#a7eb3b891981437300cf9e42c3507d1a0">   39</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a7eb3b891981437300cf9e42c3507d1a0">EVE_CoCmd_memWrite32</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> value)</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>{</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#a4e8340225cdf1611bab27efb5a5ee33a">CMD_MEMWRITE</a>, ptr, 4, value);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>}</div>
+</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="a00035.html#a6d29a74be215f235ba4588542def10fb">   44</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a6d29a74be215f235ba4588542def10fb">EVE_CoCmd_memSet</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> value, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#acb9406afc1dea788863e8a5164686c45">CMD_MEMSET</a>, ptr, value, num);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
+</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="foldopen" id="foldopen00049" data-start="{" data-end="}">
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="a00035.html#a6ead1a94df6c25c4fc8a8d44e7bc03cc">   49</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a6ead1a94df6c25c4fc8a8d44e7bc03cc">EVE_CoCmd_memZero</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>{</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#a065a7d86170d7b86ce17df5692dd3aee">CMD_MEMZERO</a>, ptr, num);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="a00035.html#a130192819a1084d160915dce10289cfa">   54</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a130192819a1084d160915dce10289cfa">EVE_CoCmd_memCpy</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dest, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>{</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#a894705cc099d425474cba2224c1dada7">CMD_MEMCPY</a>, dest, src, num);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="foldopen" id="foldopen00059" data-start="{" data-end="}">
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="a00035.html#a0fd9da84ffc12143a80b399086b2bcab">   59</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a0fd9da84ffc12143a80b399086b2bcab">EVE_CoCmd_append</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>{</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#ab1cd5a709866d022b038cd9dabd5eac5">CMD_APPEND</a>, ptr, num);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="foldopen" id="foldopen00064" data-start="{" data-end="}">
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="a00035.html#a4de477fe699bdcc41128f65a1fd32ea9">   64</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a4de477fe699bdcc41128f65a1fd32ea9">EVE_CoCmd_snapshot</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr)</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>{</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a8a5d236aa49da54c097423ef919000e6">CMD_SNAPSHOT</a>, ptr);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>}</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="a00035.html#adcf586d99e3145fdb82c6920bfb7e593">   69</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#adcf586d99e3145fdb82c6920bfb7e593">EVE_CoCmd_inflate</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>{</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#a5d27545489d22eb819edd11f9cf29d9d">CMD_INFLATE</a>, ptr, options);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>}</div>
+</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="foldopen" id="foldopen00074" data-start="{" data-end="}">
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="a00035.html#afbe9d4aecc96c9cc211533e733a661d3">   74</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#afbe9d4aecc96c9cc211533e733a661d3">EVE_CoCmd_loadImage</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>{</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#aa9e67c0ce8704dd8aaf3962d390d0b42">CMD_LOADIMAGE</a>, ptr, options);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}</div>
+</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="a00035.html#ad934786dd80476f473e62aa8042e607a">   79</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#ad934786dd80476f473e62aa8042e607a">EVE_CoCmd_mediaFifo</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> size)</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>{</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#ac631112b2ce4392fccacbb7902c5e164">CMD_MEDIAFIFO</a>, ptr, size);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>}</div>
+</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="foldopen" id="foldopen00084" data-start="{" data-end="}">
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="a00035.html#a9282861f875e7013891ca6f189e79325">   84</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a9282861f875e7013891ca6f189e79325">EVE_CoCmd_videoStart</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>{</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a1b56aa4b0dcd5f2e8bfdfc0c2bd99da6">CMD_VIDEOSTART</a>, options);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>}</div>
+</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="foldopen" id="foldopen00089" data-start="{" data-end="}">
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="a00035.html#a22cc397ecb9fea0219234407f069bf83">   89</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a22cc397ecb9fea0219234407f069bf83">EVE_CoCmd_videoFrame</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr)</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>{</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#a34298b6bf9f360e9002d0e55fd6a6214">CMD_VIDEOFRAME</a>, dst, ptr);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>}</div>
+</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="foldopen" id="foldopen00094" data-start="{" data-end="}">
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="a00035.html#ad4732d787bba1631bd0d31a27f3e2f09">   94</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#ad4732d787bba1631bd0d31a27f3e2f09">EVE_CoCmd_playVideo</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>{</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#abe55fef203434750ad116c4c9b7b1c7c">CMD_PLAYVIDEO</a>, options);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">if</span> (options &amp; (<a class="code hl_define" href="a00053.html#a1735316cd9f0676395e1d4e6662de6c5">OPT_FLASH</a> | <a class="code hl_define" href="a00053.html#ab224c4903505cb35412c7c7e3df85d1b">OPT_MEDIAFIFO</a>))</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <span class="comment">/* WORKAROUND: CMD_PLAYVIDEO completes immediately,</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment">        but the command following it does not.</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment">        Write a CMD_NOP command to behave as documented */</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <a class="code hl_function" href="a00032.html#a0f2ddf0a279394709d820ac82e7ac924">EVE_CoCmd_nop</a>(phost);</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    }</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>}</div>
+</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="foldopen" id="foldopen00107" data-start="{" data-end="}">
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="a00035.html#a5459b92848e35c22a977240b1817445d">  107</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a5459b92848e35c22a977240b1817445d">EVE_CoCmd_flashErase</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost)</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>{</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <a class="code hl_function" href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a>(phost, <a class="code hl_define" href="a00053.html#a4f0ca0363ceed8969906f3be1e3b535f">CMD_FLASHERASE</a>);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>}</div>
+</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="a00035.html#af2d143ba3207f89facb70e0fe26abc69">  112</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#af2d143ba3207f89facb70e0fe26abc69">EVE_CoCmd_flashErase_flush</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost)</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>{</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// Coprocessor must be ready</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <a class="code hl_function" href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a>(phost, <a class="code hl_define" href="a00053.html#a4f0ca0363ceed8969906f3be1e3b535f">CMD_FLASHERASE</a>);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>}</div>
+</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="foldopen" id="foldopen00122" data-start="{" data-end="}">
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="a00035.html#a66e082c909b51580a363c9c38649db1a">  122</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a66e082c909b51580a363c9c38649db1a">EVE_CoCmd_flashWrite</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>{</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#acb7f01a7074f086799e283d6af12a21a">CMD_FLASHWRITE</a>, ptr, num);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>}</div>
+</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="foldopen" id="foldopen00127" data-start="{" data-end="}">
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno"><a class="line" href="a00035.html#a94d7828340771143ea13efc7bc0873ad">  127</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a94d7828340771143ea13efc7bc0873ad">EVE_CoCmd_flashRead</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dest, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>{</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#a7c8a6c8911bd1d02baddc44842a74ac7">CMD_FLASHREAD</a>, dest, src, num);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>}</div>
+</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="foldopen" id="foldopen00132" data-start="{" data-end="}">
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="a00035.html#a513a22d86bb375a26a2a6314112656cd">  132</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#a513a22d86bb375a26a2a6314112656cd">EVE_CoCmd_flashRead_flush</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dest, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>{</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// Coprocessor must be ready</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#a7c8a6c8911bd1d02baddc44842a74ac7">CMD_FLASHREAD</a>, dest, src, num);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>}</div>
+</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span> </div>
+<div class="foldopen" id="foldopen00142" data-start="{" data-end="}">
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="a00035.html#a777669b6bd6c1a5bd8813fb1ff32734b">  142</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a777669b6bd6c1a5bd8813fb1ff32734b">EVE_CoCmd_flashUpdate</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dest, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>{</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#ac22870b523d56fb582d08023b3486906">CMD_FLASHUPDATE</a>, dest, src, num);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>}</div>
+</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="foldopen" id="foldopen00147" data-start="{" data-end="}">
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno"><a class="line" href="a00035.html#ab7b53ba4d49e58d34fd7853dacc225b5">  147</a></span> <span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#ab7b53ba4d49e58d34fd7853dacc225b5">EVE_CoCmd_flashDetach</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost)</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>{</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <a class="code hl_function" href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a>(phost, <a class="code hl_define" href="a00053.html#a2ca6df57dfb170284bbdcc9ffd47b067">CMD_FLASHDETACH</a>);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>}</div>
+</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="foldopen" id="foldopen00152" data-start="{" data-end="}">
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="a00035.html#ad787c24bca50f35190a20f2b8c6bacb5">  152</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#ad787c24bca50f35190a20f2b8c6bacb5">EVE_CoCmd_flashAttach</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost)</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>{</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> flashStatus;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>); <span class="comment">// Coprocessor must be ready</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    flashStatus = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">if</span> (flashStatus != <a class="code hl_define" href="a00053.html#ae59e8a6047d4df8708f499188869dfc1">FLASH_STATUS_DETACHED</a>)</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        <span class="keywordflow">return</span> flashStatus; <span class="comment">// Only attach when detached</span></div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <a class="code hl_function" href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a>(phost, <a class="code hl_define" href="a00053.html#a6da733b0c7068ece21b85396330aeca4">CMD_FLASHATTACH</a>);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost); <span class="comment">// Wait for command completion</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>); <span class="comment">// Return current status</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>}</div>
+</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="foldopen" id="foldopen00165" data-start="{" data-end="}">
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno"><a class="line" href="a00035.html#a61a9805ca479c0ef9900f6abfd9506c2">  165</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#a61a9805ca479c0ef9900f6abfd9506c2">EVE_CoCmd_flashFast</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *result)</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>{</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> flashStatus;</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    {</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>            *result = 0xE000;</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>);</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    } <span class="comment">// Coprocessor must be ready</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    flashStatus = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    <span class="keywordflow">if</span> (flashStatus &lt; <a class="code hl_define" href="a00053.html#a62f19baeef897f87adf955d8012655f6">FLASH_STATUS_BASIC</a>)</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    {</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>            *result = 0xE001;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        <span class="keywordflow">return</span> flashStatus;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    }</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    <span class="keywordflow">if</span> (flashStatus &gt; <a class="code hl_define" href="a00053.html#a62f19baeef897f87adf955d8012655f6">FLASH_STATUS_BASIC</a>)</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    {</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>            *result = 0;</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keywordflow">return</span> flashStatus;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    } <span class="comment">// Only enter fast mode when attached</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a6b87ab86bc66843064d084c47221f24c">CMD_FLASHFAST</a>, 0))</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        <span class="keywordflow">return</span> flashStatus;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a6b87ab86bc66843064d084c47221f24c">CMD_FLASHFAST</a>);</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 4); <span class="comment">// Get the address where the coprocessor will write the result</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost); <span class="comment">// Wait for command completion</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        *result = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr); <span class="comment">// Fetch result</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a>); <span class="comment">// Return current status</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>}</div>
+</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
+<div class="foldopen" id="foldopen00205" data-start="{" data-end="}">
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno"><a class="line" href="a00035.html#a27a7a31e9db2b39f36705e9dbf4ceee1">  205</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a27a7a31e9db2b39f36705e9dbf4ceee1">EVE_CoCmd_flashSpiDesel</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost)</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>{</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <a class="code hl_function" href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a>(phost, <a class="code hl_define" href="a00053.html#aa89c227dbb818209628b49bb4f2acfc1">CMD_FLASHSPIDESEL</a>);</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>}</div>
+</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="foldopen" id="foldopen00210" data-start="{" data-end="}">
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno"><a class="line" href="a00035.html#a914ad1920cbf114699946e42ddd0c6f8">  210</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a914ad1920cbf114699946e42ddd0c6f8">EVE_CoCmd_flashSpiTx</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>{</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a561dcf9b8cc86449f715fc1afd3773f2">CMD_FLASHSPITX</a>, num);</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>}</div>
+</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="foldopen" id="foldopen00215" data-start="{" data-end="}">
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno"><a class="line" href="a00035.html#a01213bc4c6ed37250097e8cbe2ab0733">  215</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a01213bc4c6ed37250097e8cbe2ab0733">EVE_CoCmd_flashSpiRx</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>{</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#acdcf3cadb86c4662c2ae0fdc1f87e7ca">CMD_FLASHSPIRX</a>, ptr, num);</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>}</div>
+</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span> </div>
+<div class="foldopen" id="foldopen00220" data-start="{" data-end="}">
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno"><a class="line" href="a00035.html#a367acc86542619fd0776e157aa4c1cdc">  220</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a367acc86542619fd0776e157aa4c1cdc">EVE_CoCmd_flashSource</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr)</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>{</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a8895e9b23050c847b5054b7fc77593bc">CMD_FLASHSOURCE</a>, ptr);</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>}</div>
+</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
+<div class="foldopen" id="foldopen00225" data-start="{" data-end="}">
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno"><a class="line" href="a00035.html#a5056a3a9ff90846d56204f442f2f0d7d">  225</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a5056a3a9ff90846d56204f442f2f0d7d">EVE_CoCmd_appendF</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>{</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#aaff099ec464bcadcdf21e2c7c06fcca6">CMD_APPENDF</a>, ptr, num);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>}</div>
+</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="foldopen" id="foldopen00230" data-start="{" data-end="}">
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno"><a class="line" href="a00035.html#a811ad1cf31edf71343b9218d9e2f50f7">  230</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#a811ad1cf31edf71343b9218d9e2f50f7">EVE_CoCmd_loadImage_flash</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *format)</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>{</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a8895e9b23050c847b5054b7fc77593bc">CMD_FLASHSOURCE</a>, src))</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#aa9e67c0ce8704dd8aaf3962d390d0b42">CMD_LOADIMAGE</a>, dst))</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// Coprocessor must be ready</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a8895e9b23050c847b5054b7fc77593bc">CMD_FLASHSOURCE</a>);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, src);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#aa9e67c0ce8704dd8aaf3962d390d0b42">CMD_LOADIMAGE</a>);</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, dst);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a1735316cd9f0676395e1d4e6662de6c5">OPT_FLASH</a> | <a class="code hl_define" href="a00053.html#a37f793d8ac3af5f518d024727ce9f710">OPT_NODL</a>);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// Image failed to load</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    <span class="keywordflow">if</span> (format)</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        *format = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, 0x3097e8);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>}</div>
+</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
+<div class="foldopen" id="foldopen00255" data-start="{" data-end="}">
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno"><a class="line" href="a00035.html#a0d5417ad404426da2ec0809ffb32dc00">  255</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a0d5417ad404426da2ec0809ffb32dc00">EVE_CoCmd_flashProgram</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> src, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num)</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>{</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#ac5cd9d74dbee9219f9d82aa60f8b5d80">CMD_FLASHPROGRAM</a>, dst, src, num);</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>}</div>
+</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
+<div class="foldopen" id="foldopen00260" data-start="{" data-end="}">
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno"><a class="line" href="a00035.html#adb03b1d2a9faa1fa50fe6b6e0d03f2dc">  260</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#adb03b1d2a9faa1fa50fe6b6e0d03f2dc">EVE_CoCmd_animFrame</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#aa343fa3b3d06292b959ffdd4c4703b06">int16_t</a> x, <a class="code hl_typedef" href="a00086.html#aa343fa3b3d06292b959ffdd4c4703b06">int16_t</a> y, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> aoptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> frame)</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>{</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, CMD_ANIMFRAMERAM, 0))</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#ade6217aed89b2f12440dd756bc20d147">CMD_ANIMFRAME</a>);</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    <a class="code hl_function" href="a00026.html#a03fdc979f1f641462149abb3723336aa">EVE_Cmd_wr16</a>(phost, x);</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <a class="code hl_function" href="a00026.html#a03fdc979f1f641462149abb3723336aa">EVE_Cmd_wr16</a>(phost, y);</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, aoptr);</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, frame);</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>}</div>
+</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="foldopen" id="foldopen00276" data-start="{" data-end="}">
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno"><a class="line" href="a00035.html#a0e30c3f37bb6c614079bb949991e04cd">  276</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a0e30c3f37bb6c614079bb949991e04cd">EVE_CoCmd_animStart</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a32f2e37ee053cf2ce8ca28d1f74630e5">int32_t</a> ch, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> aoptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> loop)</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>{</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <a class="code hl_function" href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a>(phost, <a class="code hl_define" href="a00053.html#a16ed017be094b3b7d2d30ed52ab22041">CMD_ANIMSTART</a>, ch, aoptr, loop);</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>}</div>
+</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span> </div>
+<div class="foldopen" id="foldopen00281" data-start="{" data-end="}">
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno"><a class="line" href="a00035.html#a874e97af6b5182e5193bb5e88efd58d3">  281</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a874e97af6b5182e5193bb5e88efd58d3">EVE_CoCmd_animStop</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a32f2e37ee053cf2ce8ca28d1f74630e5">int32_t</a> ch)</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>{</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a653e76f748e322ce83e238f22d09be13">CMD_ANIMSTOP</a>, ch);</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>}</div>
+</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="foldopen" id="foldopen00286" data-start="{" data-end="}">
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno"><a class="line" href="a00035.html#a91ca8835eca909acc640930bb0d7c5aa">  286</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a91ca8835eca909acc640930bb0d7c5aa">EVE_CoCmd_animXY</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a32f2e37ee053cf2ce8ca28d1f74630e5">int32_t</a> ch, <a class="code hl_typedef" href="a00086.html#aa343fa3b3d06292b959ffdd4c4703b06">int16_t</a> x, <a class="code hl_typedef" href="a00086.html#aa343fa3b3d06292b959ffdd4c4703b06">int16_t</a> y)</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>{</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a89c3962d987957522c4009771cec978f">CMD_ANIMXY</a>, d0))</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a89c3962d987957522c4009771cec978f">CMD_ANIMXY</a>);</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, ch);</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <a class="code hl_function" href="a00026.html#a03fdc979f1f641462149abb3723336aa">EVE_Cmd_wr16</a>(phost, x);</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    <a class="code hl_function" href="a00026.html#a03fdc979f1f641462149abb3723336aa">EVE_Cmd_wr16</a>(phost, y);</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>}</div>
+</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
+<div class="foldopen" id="foldopen00301" data-start="{" data-end="}">
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno"><a class="line" href="a00035.html#a79793dfa0ab96154ebb3e196bb1021f2">  301</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a79793dfa0ab96154ebb3e196bb1021f2">EVE_CoCmd_animDraw</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a32f2e37ee053cf2ce8ca28d1f74630e5">int32_t</a> ch)</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>{</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a0f0b3eb886f744ec8aeef3a82588d843">CMD_ANIMDRAW</a>, ch);</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>}</div>
+</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
+<div class="foldopen" id="foldopen00306" data-start="{" data-end="}">
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno"><a class="line" href="a00035.html#a7e591e3aa3bbf7792a77949b4c124cd7">  306</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a7e591e3aa3bbf7792a77949b4c124cd7">EVE_CoCmd_runAnim</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> waitmask, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> play)</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>{</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#acbff10dfe6f88807e17902576a69f5c6">CMD_RUNANIM</a>, waitmask, play);</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>}</div>
+</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
+<div class="foldopen" id="foldopen00311" data-start="{" data-end="}">
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno"><a class="line" href="a00035.html#a1abe648492fd9183b8da641d5c2b4935">  311</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#a1abe648492fd9183b8da641d5c2b4935">EVE_CoCmd_memCrc</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *result)</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>{</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#af796b80715aa34103782de8013190e67">CMD_MEMCRC</a>, 0))</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#af796b80715aa34103782de8013190e67">CMD_MEMCRC</a>);</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, ptr);</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, num);</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 4);</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>    <span class="comment">/* Read result */</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    {</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>        *result = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr);</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    }</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>}</div>
+</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
+<div class="foldopen" id="foldopen00337" data-start="{" data-end="}">
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno"><a class="line" href="a00035.html#a78fb67f7487716fa631b62aae9c5ee58">  337</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#a78fb67f7487716fa631b62aae9c5ee58">EVE_CoCmd_regRead</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *result)</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>{</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#aaa309768c79e2c3d7eae948be83e3399">CMD_REGREAD</a>, 0))</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span> </div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#aaa309768c79e2c3d7eae948be83e3399">CMD_REGREAD</a>);</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, ptr);</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 4);</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span> </div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    <span class="comment">/* Read result */</span></div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    {</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        *result = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr);</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    }</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>}</div>
+</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span> </div>
+<div class="foldopen" id="foldopen00362" data-start="{" data-end="}">
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno"><a class="line" href="a00035.html#a4d3026bb5781316df042275da56ea34b">  362</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a4d3026bb5781316df042275da56ea34b">EVE_CoCmd_regWrite</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> value)</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>{</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#afc33d9a8964211432417e1b9bf0c6e51">CMD_REGWRITE</a>, ptr, value);</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>}</div>
+</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
+<div class="foldopen" id="foldopen00367" data-start="{" data-end="}">
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno"><a class="line" href="a00035.html#ad93631fa3ef09c13bf5ecbb387f1c2d2">  367</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#ad93631fa3ef09c13bf5ecbb387f1c2d2">EVE_CoCmd_getPtr</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *result)</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>{</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span> </div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#aa6393a7f6c1bc38d6a511f075dd23ebb">CMD_GETPTR</a>, 0))</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span> </div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#aa6393a7f6c1bc38d6a511f075dd23ebb">CMD_GETPTR</a>);</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 4); <span class="comment">// move write pointer to result location</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span> </div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="comment">/* Read result */</span></div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <span class="keywordflow">if</span> (result)</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>    {</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>        *result = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr);</div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>    }</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>}</div>
+</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
+<div class="foldopen" id="foldopen00391" data-start="{" data-end="}">
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno"><a class="line" href="a00035.html#a02d96dbcdaa3cf0db65f1b50403c3fa5">  391</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#a02d96dbcdaa3cf0db65f1b50403c3fa5">EVE_CoCmd_getProps</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *ptr, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *w, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *h)</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>{</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span> </div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a7c6d81a98ade592b169c499e3a5b7268">CMD_GETPROPS</a>, 0))</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span> </div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a7c6d81a98ade592b169c499e3a5b7268">CMD_GETPROPS</a>);</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 12);</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span> </div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    <span class="comment">/* Read result */</span></div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    <span class="keywordflow">if</span> (ptr || w || h)</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    {</div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>        <span class="keywordflow">if</span> (ptr)</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>            *ptr = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr);</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>        <span class="keywordflow">if</span> (w)</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>            *w = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 4);</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>        <span class="keywordflow">if</span> (h)</div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>            *h = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 8);</div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    }</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>}</div>
+</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span> </div>
+<div class="foldopen" id="foldopen00420" data-start="{" data-end="}">
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno"><a class="line" href="a00035.html#ade983b95c84128025ab3ed1f46efcfd5">  420</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="a00038.html#ade983b95c84128025ab3ed1f46efcfd5">EVE_CoCmd_getImage</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *source, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *fmt, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *w, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *h, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *palette)</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>{</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> resAddr;</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span> </div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#aa66eccbf747d288454ba843a6abd27a8">CMD_GETIMAGE</a>, 0))</div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span> </div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#aa66eccbf747d288454ba843a6abd27a8">CMD_GETIMAGE</a>);</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>    resAddr = <a class="code hl_function" href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a>(phost, 4 * 5);</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span> </div>
+<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>    <span class="comment">/* Read result */</span></div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>    <span class="keywordflow">if</span> (source || fmt || w || h || palette)</div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>    {</div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>        <span class="keywordflow">if</span> (source)</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>            *source = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr);</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>        <span class="keywordflow">if</span> (fmt)</div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>            *fmt = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 4);</div>
+<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>        <span class="keywordflow">if</span> (w)</div>
+<div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>            *w = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 8);</div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>        <span class="keywordflow">if</span> (h)</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>            *h = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 12);</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>        <span class="keywordflow">if</span> (palette)</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>            *palette = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + resAddr + 16);</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    }</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>}</div>
+</div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span> </div>
+<div class="foldopen" id="foldopen00453" data-start="{" data-end="}">
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno"><a class="line" href="a00035.html#a44249960f1591fbc7a3b0545cdc39d84">  453</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#a44249960f1591fbc7a3b0545cdc39d84">EVE_CoCmd_fssource</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> result)</div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span>{</div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> wp;</div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span> </div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a44407cb2390958461bf4a1563e6364a1">CMD_FSSOURCE</a>, 0))</div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a44407cb2390958461bf4a1563e6364a1">CMD_FSSOURCE</a>);</div>
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span>    <a class="code hl_function" href="a00026.html#ac19e54eef4209b40f13dc79728e4ee96">EVE_Cmd_wrString</a>(phost, file, <a class="code hl_define" href="a00071.html#afb254ac926ccaa5d106dce051b16a43a">EVE_CMD_STRING_MAX</a>);</div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, 7);</div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span> </div>
+<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>    <span class="comment">/* Wait for the result */</span></div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>    wp = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a>) &amp; <a class="code hl_define" href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a>;</div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + ((<a class="code hl_define" href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a> - 4) &amp; (wp - 4)));</div>
+<div class="line"><a id="l00472" name="l00472"></a><span class="lineno">  472</span>}</div>
+</div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span> </div>
+<div class="foldopen" id="foldopen00474" data-start="{" data-end="}">
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno"><a class="line" href="a00035.html#ac614cf982a724a93bb214c7e1551f401">  474</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#ac614cf982a724a93bb214c7e1551f401">EVE_CoCmd_fsread</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> result)</div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>{</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> wp;</div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span> </div>
+<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#ab6654d22dc903fb44a07461b66608c72">CMD_FSREAD</a>, 0))</div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00483" name="l00483"></a><span class="lineno">  483</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#ab6654d22dc903fb44a07461b66608c72">CMD_FSREAD</a>);</div>
+<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, dst);</div>
+<div class="line"><a id="l00485" name="l00485"></a><span class="lineno">  485</span>    <a class="code hl_function" href="a00026.html#ac19e54eef4209b40f13dc79728e4ee96">EVE_Cmd_wrString</a>(phost, file, <a class="code hl_define" href="a00071.html#afb254ac926ccaa5d106dce051b16a43a">EVE_CMD_STRING_MAX</a>);</div>
+<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, 7);</div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span> </div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>    <span class="comment">/* Wait for the result */</span></div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span>    wp = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a>) &amp; <a class="code hl_define" href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a>;</div>
+<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + ((<a class="code hl_define" href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a> - 4) &amp; (wp - 4)));</div>
+<div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span>}</div>
+</div>
+<div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span> </div>
+<div class="foldopen" id="foldopen00496" data-start="{" data-end="}">
+<div class="line"><a id="l00496" name="l00496"></a><span class="lineno"><a class="line" href="a00035.html#a4a41f07eb09dc432efa7e3d82ad8b7bf">  496</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a4a41f07eb09dc432efa7e3d82ad8b7bf">EVE_CoCmd_fsoption</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span>{</div>
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a04ccbfec41ec6dbf63af845c654db666">CMD_FSOPTION</a>, options);</div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>}</div>
+</div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span> </div>
+<div class="foldopen" id="foldopen00501" data-start="{" data-end="}">
+<div class="line"><a id="l00501" name="l00501"></a><span class="lineno"><a class="line" href="a00035.html#a8f46eb2235d1fc5c6779755b09d13c23">  501</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#a8f46eb2235d1fc5c6779755b09d13c23">EVE_CoCmd_fssize</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> size)</div>
+<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>{</div>
+<div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> wp;</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span> </div>
+<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#ad17e054f40aec4b37296a87d0644dd9e">CMD_FSSIZE</a>, 0))</div>
+<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#ad17e054f40aec4b37296a87d0644dd9e">CMD_FSSIZE</a>);</div>
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>    <a class="code hl_function" href="a00026.html#ac19e54eef4209b40f13dc79728e4ee96">EVE_Cmd_wrString</a>(phost, file, <a class="code hl_define" href="a00071.html#afb254ac926ccaa5d106dce051b16a43a">EVE_CMD_STRING_MAX</a>);</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, 7);</div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span> </div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    <span class="comment">/* Wait for the result */</span></div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>    wp = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a>) &amp; <a class="code hl_define" href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a>;</div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + ((<a class="code hl_define" href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a> - 4) &amp; (wp - 4)));</div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>}</div>
+</div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span> </div>
+<div class="foldopen" id="foldopen00522" data-start="{" data-end="}">
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno"><a class="line" href="a00035.html#a2423d19404ff5f01735089c1e5f544cd">  522</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#a2423d19404ff5f01735089c1e5f544cd">EVE_CoCmd_fsdir</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> num, <span class="keyword">const</span> <span class="keywordtype">char</span> *path, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> result)</div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>{</div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> wp;</div>
+<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span> </div>
+<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a666dbeab017556aeb9523264b4d0c7fa">CMD_FSDIR</a>, 0))</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a666dbeab017556aeb9523264b4d0c7fa">CMD_FSDIR</a>);</div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, dst);</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, num);</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>    <a class="code hl_function" href="a00026.html#ac19e54eef4209b40f13dc79728e4ee96">EVE_Cmd_wrString</a>(phost, path, <a class="code hl_define" href="a00071.html#afb254ac926ccaa5d106dce051b16a43a">EVE_CMD_STRING_MAX</a>);</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, 7);</div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span> </div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>    <span class="comment">/* Wait for the result */</span></div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>    wp = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a>) &amp; <a class="code hl_define" href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a>;</div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + ((<a class="code hl_define" href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a> - 4) &amp; (wp - 4)));</div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>}</div>
+</div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span> </div>
+<div class="foldopen" id="foldopen00545" data-start="{" data-end="}">
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno"><a class="line" href="a00035.html#a8fbd572142fd978b4f5d85fef86eb247">  545</a></span><a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_function" href="a00038.html#a8fbd572142fd978b4f5d85fef86eb247">EVE_CoCmd_sdattach</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> result)</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>{</div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>    <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> wp;</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span> </div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span><span class="preprocessor">#if EVE_CMD_HOOKS</span></div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span>    <span class="keywordflow">if</span> (phost-&gt;CoCmdHook &amp;&amp; phost-&gt;CoCmdHook(phost, <a class="code hl_define" href="a00053.html#a1743d57c423b6f51a27c2d2070ff5ed4">CMD_SDATTACH</a>, 0))</div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span> </div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>    <a class="code hl_function" href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a>(phost);</div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, <a class="code hl_define" href="a00053.html#a1743d57c423b6f51a27c2d2070ff5ed4">CMD_SDATTACH</a>);</div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, options);</div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>    <a class="code hl_function" href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a>(phost, result);</div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>    <a class="code hl_function" href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a>(phost);</div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span> </div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    <span class="comment">/* Wait for the result */</span></div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a>(phost))</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>    wp = <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a>) &amp; <a class="code hl_define" href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a>;</div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a>(phost, <a class="code hl_define" href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a> + ((<a class="code hl_define" href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a> - 4) &amp; (wp - 4)));</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>}</div>
+</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span> </div>
+<div class="foldopen" id="foldopen00567" data-start="{" data-end="}">
+<div class="line"><a id="l00567" name="l00567"></a><span class="lineno"><a class="line" href="a00035.html#a2708b75ffb3bb837c19afdcfa0a50f24">  567</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a2708b75ffb3bb837c19afdcfa0a50f24">EVE_CoCmd_playWav</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>{</div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>    <a class="code hl_function" href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a>(phost, <a class="code hl_define" href="a00053.html#a554b2034f415a0e5a8c41941d3901272">CMD_PLAYWAV</a>, options);</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>}</div>
+</div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span> </div>
+<div class="foldopen" id="foldopen00572" data-start="{" data-end="}">
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno"><a class="line" href="a00035.html#a55356a6619573b27f63fa51e88d9ecf6">  572</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#a55356a6619573b27f63fa51e88d9ecf6">EVE_CoCmd_loadWav</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>{</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#a5a5dcc3947355f08cfb62159a6128023">CMD_LOADWAV</a>, dst, options);</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>}</div>
+</div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span> </div>
+<div class="foldopen" id="foldopen00577" data-start="{" data-end="}">
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno"><a class="line" href="a00035.html#af1404bc960047b74494dda27b26e76fc">  577</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="a00038.html#af1404bc960047b74494dda27b26e76fc">EVE_CoCmd_loadAsset</a>(<a class="code hl_struct" href="a00198.html">EVE_HalContext</a> *phost, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> dst, <a class="code hl_typedef" href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> options)</div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>{</div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>    <a class="code hl_function" href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a>(phost, <a class="code hl_define" href="a00053.html#afcc9cf0e76dc383e9a09cb8e1f9c55f5">CMD_LOADASSET</a>, dst, options);</div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>}</div>
+</div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span> </div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span><span class="comment">/* end of file */</span></div>
+<div class="ttc" id="aa00026_html_a03fdc979f1f641462149abb3723336aa"><div class="ttname"><a href="a00026.html#a03fdc979f1f641462149abb3723336aa">EVE_Cmd_wr16</a></div><div class="ttdeci">bool EVE_Cmd_wr16(EVE_HalContext *phost, uint16_t value)</div><div class="ttdoc">Write 2 bytes to Coprocessor&#39;s command fifo.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00264">EVE_Cmd.c:264</a></div></div>
+<div class="ttc" id="aa00026_html_a27d29108f8349a05a17d68ebcd0ae4a7"><div class="ttname"><a href="a00026.html#a27d29108f8349a05a17d68ebcd0ae4a7">EVE_Cmd_startFunc</a></div><div class="ttdeci">void EVE_Cmd_startFunc(EVE_HalContext *phost)</div><div class="ttdoc">Begin writing a function, keeps the transfer open.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00203">EVE_Cmd.c:203</a></div></div>
+<div class="ttc" id="aa00026_html_a516f292751168322a7be9448e8d2835a"><div class="ttname"><a href="a00026.html#a516f292751168322a7be9448e8d2835a">EVE_Cmd_endFunc</a></div><div class="ttdeci">void EVE_Cmd_endFunc(EVE_HalContext *phost)</div><div class="ttdoc">End writing a function, closes the transfer.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00215">EVE_Cmd.c:215</a></div></div>
+<div class="ttc" id="aa00026_html_a64cc60594602c2286ce507c7b7bc4126"><div class="ttname"><a href="a00026.html#a64cc60594602c2286ce507c7b7bc4126">EVE_Cmd_wr32</a></div><div class="ttdeci">bool EVE_Cmd_wr32(EVE_HalContext *phost, uint32_t value)</div><div class="ttdoc">Write 4 bytes to Coprocessor&#39;s command fifo.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00292">EVE_Cmd.c:292</a></div></div>
+<div class="ttc" id="aa00026_html_abf3e5b22d4b676ac6fb97c522b487e1c"><div class="ttname"><a href="a00026.html#abf3e5b22d4b676ac6fb97c522b487e1c">EVE_Cmd_waitFlush</a></div><div class="ttdeci">bool EVE_Cmd_waitFlush(EVE_HalContext *phost)</div><div class="ttdoc">Wait till Command FIFO buffer empty.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00417">EVE_Cmd.c:417</a></div></div>
+<div class="ttc" id="aa00026_html_ac19e54eef4209b40f13dc79728e4ee96"><div class="ttname"><a href="a00026.html#ac19e54eef4209b40f13dc79728e4ee96">EVE_Cmd_wrString</a></div><div class="ttdeci">uint32_t EVE_Cmd_wrString(EVE_HalContext *phost, const char *str, uint32_t maxLength)</div><div class="ttdoc">Write a string into Coprocessor&#39;s command fifo.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00247">EVE_Cmd.c:247</a></div></div>
+<div class="ttc" id="aa00026_html_ac7281fd1d6d592dc945963db3874b36f"><div class="ttname"><a href="a00026.html#ac7281fd1d6d592dc945963db3874b36f">EVE_Cmd_moveWp</a></div><div class="ttdeci">uint32_t EVE_Cmd_moveWp(EVE_HalContext *phost, uint16_t bytes)</div><div class="ttdoc">Move the write pointer forward by the specified number of bytes. Returns the previous write pointer.</div><div class="ttdef"><b>Definition</b> <a href="a00026_source.html#l00322">EVE_Cmd.c:322</a></div></div>
+<div class="ttc" id="aa00032_html_a04818bbde77552021b598301acca0e84"><div class="ttname"><a href="a00032.html#a04818bbde77552021b598301acca0e84">EVE_CoCmd_dd</a></div><div class="ttdeci">void EVE_CoCmd_dd(EVE_HalContext *phost, uint32_t cmd, uint32_t d0)</div><div class="ttdef"><b>Definition</b> <a href="a00032_source.html#l00053">EVE_CoCmd.c:53</a></div></div>
+<div class="ttc" id="aa00032_html_a0e4803af88e8a9c30750b0266b63a04c"><div class="ttname"><a href="a00032.html#a0e4803af88e8a9c30750b0266b63a04c">EVE_CoCmd_d</a></div><div class="ttdeci">void EVE_CoCmd_d(EVE_HalContext *phost, uint32_t cmd)</div><div class="ttdef"><b>Definition</b> <a href="a00032_source.html#l00043">EVE_CoCmd.c:43</a></div></div>
+<div class="ttc" id="aa00032_html_a0f2ddf0a279394709d820ac82e7ac924"><div class="ttname"><a href="a00032.html#a0f2ddf0a279394709d820ac82e7ac924">EVE_CoCmd_nop</a></div><div class="ttdeci">void EVE_CoCmd_nop(EVE_HalContext *phost)</div><div class="ttdoc">Send CMD_NOP.</div><div class="ttdef"><b>Definition</b> <a href="a00032_source.html#l00260">EVE_CoCmd.c:260</a></div></div>
+<div class="ttc" id="aa00032_html_a65d2fb907fa044ff65463419578b4250"><div class="ttname"><a href="a00032.html#a65d2fb907fa044ff65463419578b4250">EVE_CoCmd_dddd</a></div><div class="ttdeci">void EVE_CoCmd_dddd(EVE_HalContext *phost, uint32_t cmd, uint32_t d0, uint32_t d1, uint32_t d2)</div><div class="ttdef"><b>Definition</b> <a href="a00032_source.html#l00080">EVE_CoCmd.c:80</a></div></div>
+<div class="ttc" id="aa00032_html_ae1cfdc169db63bdfe2fe53ea20def448"><div class="ttname"><a href="a00032.html#ae1cfdc169db63bdfe2fe53ea20def448">EVE_CoCmd_ddd</a></div><div class="ttdeci">void EVE_CoCmd_ddd(EVE_HalContext *phost, uint32_t cmd, uint32_t d0, uint32_t d1)</div><div class="ttdef"><b>Definition</b> <a href="a00032_source.html#l00066">EVE_CoCmd.c:66</a></div></div>
+<div class="ttc" id="aa00035_html"><div class="ttname"><a href="a00035.html">EVE_CoCmd.h</a></div><div class="ttdoc">EVE&#39;s co-processor commands.</div></div>
+<div class="ttc" id="aa00038_html_a01213bc4c6ed37250097e8cbe2ab0733"><div class="ttname"><a href="a00038.html#a01213bc4c6ed37250097e8cbe2ab0733">EVE_CoCmd_flashSpiRx</a></div><div class="ttdeci">void EVE_CoCmd_flashSpiRx(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_FLASHSPIRX.</div><div class="ttdef"><b>Definition</b> <a href="#l00215">EVE_CoCmd_IO.c:215</a></div></div>
+<div class="ttc" id="aa00038_html_a02d96dbcdaa3cf0db65f1b50403c3fa5"><div class="ttname"><a href="a00038.html#a02d96dbcdaa3cf0db65f1b50403c3fa5">EVE_CoCmd_getProps</a></div><div class="ttdeci">bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint32_t *h)</div><div class="ttdoc">Get the image properties decompressed by CMD_LOADIMAGE.</div><div class="ttdef"><b>Definition</b> <a href="#l00391">EVE_CoCmd_IO.c:391</a></div></div>
+<div class="ttc" id="aa00038_html_a0d5417ad404426da2ec0809ffb32dc00"><div class="ttname"><a href="a00038.html#a0d5417ad404426da2ec0809ffb32dc00">EVE_CoCmd_flashProgram</a></div><div class="ttdeci">void EVE_CoCmd_flashProgram(EVE_HalContext *phost, uint32_t dst, uint32_t src, uint32_t num)</div><div class="ttdoc">Send CMD_FLASHPROGRAM.</div><div class="ttdef"><b>Definition</b> <a href="#l00255">EVE_CoCmd_IO.c:255</a></div></div>
+<div class="ttc" id="aa00038_html_a0e30c3f37bb6c614079bb949991e04cd"><div class="ttname"><a href="a00038.html#a0e30c3f37bb6c614079bb949991e04cd">EVE_CoCmd_animStart</a></div><div class="ttdeci">void EVE_CoCmd_animStart(EVE_HalContext *phost, int32_t ch, uint32_t aoptr, uint32_t loop)</div><div class="ttdoc">Send CMD_ANIMSTARTRAM.</div><div class="ttdef"><b>Definition</b> <a href="#l00276">EVE_CoCmd_IO.c:276</a></div></div>
+<div class="ttc" id="aa00038_html_a0fd9da84ffc12143a80b399086b2bcab"><div class="ttname"><a href="a00038.html#a0fd9da84ffc12143a80b399086b2bcab">EVE_CoCmd_append</a></div><div class="ttdeci">void EVE_CoCmd_append(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_APPEND.</div><div class="ttdef"><b>Definition</b> <a href="#l00059">EVE_CoCmd_IO.c:59</a></div></div>
+<div class="ttc" id="aa00038_html_a130192819a1084d160915dce10289cfa"><div class="ttname"><a href="a00038.html#a130192819a1084d160915dce10289cfa">EVE_CoCmd_memCpy</a></div><div class="ttdeci">void EVE_CoCmd_memCpy(EVE_HalContext *phost, uint32_t dest, uint32_t src, uint32_t num)</div><div class="ttdoc">Send CMD_MEMCPY.</div><div class="ttdef"><b>Definition</b> <a href="#l00054">EVE_CoCmd_IO.c:54</a></div></div>
+<div class="ttc" id="aa00038_html_a1abe648492fd9183b8da641d5c2b4935"><div class="ttname"><a href="a00038.html#a1abe648492fd9183b8da641d5c2b4935">EVE_CoCmd_memCrc</a></div><div class="ttdeci">bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_t *result)</div><div class="ttdoc">Send CMD_MEMCRC.</div><div class="ttdef"><b>Definition</b> <a href="#l00311">EVE_CoCmd_IO.c:311</a></div></div>
+<div class="ttc" id="aa00038_html_a22cc397ecb9fea0219234407f069bf83"><div class="ttname"><a href="a00038.html#a22cc397ecb9fea0219234407f069bf83">EVE_CoCmd_videoFrame</a></div><div class="ttdeci">void EVE_CoCmd_videoFrame(EVE_HalContext *phost, uint32_t dst, uint32_t ptr)</div><div class="ttdoc">CMD_VIDEOFRAME.</div><div class="ttdef"><b>Definition</b> <a href="#l00089">EVE_CoCmd_IO.c:89</a></div></div>
+<div class="ttc" id="aa00038_html_a2423d19404ff5f01735089c1e5f544cd"><div class="ttname"><a href="a00038.html#a2423d19404ff5f01735089c1e5f544cd">EVE_CoCmd_fsdir</a></div><div class="ttdeci">uint32_t EVE_CoCmd_fsdir(EVE_HalContext *phost, uint32_t dst, uint32_t num, const char *path, uint32_t result)</div><div class="ttdoc">Send CMD_FSDIR.</div><div class="ttdef"><b>Definition</b> <a href="#l00522">EVE_CoCmd_IO.c:522</a></div></div>
+<div class="ttc" id="aa00038_html_a2708b75ffb3bb837c19afdcfa0a50f24"><div class="ttname"><a href="a00038.html#a2708b75ffb3bb837c19afdcfa0a50f24">EVE_CoCmd_playWav</a></div><div class="ttdeci">void EVE_CoCmd_playWav(EVE_HalContext *phost, uint32_t options)</div><div class="ttdoc">Send CMD_PLAYWAV.</div><div class="ttdef"><b>Definition</b> <a href="#l00567">EVE_CoCmd_IO.c:567</a></div></div>
+<div class="ttc" id="aa00038_html_a27a7a31e9db2b39f36705e9dbf4ceee1"><div class="ttname"><a href="a00038.html#a27a7a31e9db2b39f36705e9dbf4ceee1">EVE_CoCmd_flashSpiDesel</a></div><div class="ttdeci">void EVE_CoCmd_flashSpiDesel(EVE_HalContext *phost)</div><div class="ttdoc">Send CMD_FLASHSPIDESEL.</div><div class="ttdef"><b>Definition</b> <a href="#l00205">EVE_CoCmd_IO.c:205</a></div></div>
+<div class="ttc" id="aa00038_html_a367acc86542619fd0776e157aa4c1cdc"><div class="ttname"><a href="a00038.html#a367acc86542619fd0776e157aa4c1cdc">EVE_CoCmd_flashSource</a></div><div class="ttdeci">void EVE_CoCmd_flashSource(EVE_HalContext *phost, uint32_t ptr)</div><div class="ttdoc">Send CMD_FLASHSOURCE.</div><div class="ttdef"><b>Definition</b> <a href="#l00220">EVE_CoCmd_IO.c:220</a></div></div>
+<div class="ttc" id="aa00038_html_a44249960f1591fbc7a3b0545cdc39d84"><div class="ttname"><a href="a00038.html#a44249960f1591fbc7a3b0545cdc39d84">EVE_CoCmd_fssource</a></div><div class="ttdeci">uint32_t EVE_CoCmd_fssource(EVE_HalContext *phost, const char *file, uint32_t result)</div><div class="ttdoc">Send CMD_FSSOURCE.</div><div class="ttdef"><b>Definition</b> <a href="#l00453">EVE_CoCmd_IO.c:453</a></div></div>
+<div class="ttc" id="aa00038_html_a4a41f07eb09dc432efa7e3d82ad8b7bf"><div class="ttname"><a href="a00038.html#a4a41f07eb09dc432efa7e3d82ad8b7bf">EVE_CoCmd_fsoption</a></div><div class="ttdeci">void EVE_CoCmd_fsoption(EVE_HalContext *phost, uint32_t options)</div><div class="ttdoc">Send CMD_FSOPTION.</div><div class="ttdef"><b>Definition</b> <a href="#l00496">EVE_CoCmd_IO.c:496</a></div></div>
+<div class="ttc" id="aa00038_html_a4d3026bb5781316df042275da56ea34b"><div class="ttname"><a href="a00038.html#a4d3026bb5781316df042275da56ea34b">EVE_CoCmd_regWrite</a></div><div class="ttdeci">void EVE_CoCmd_regWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t value)</div><div class="ttdoc">Send CMD_REGWRITE.</div><div class="ttdef"><b>Definition</b> <a href="#l00362">EVE_CoCmd_IO.c:362</a></div></div>
+<div class="ttc" id="aa00038_html_a4de477fe699bdcc41128f65a1fd32ea9"><div class="ttname"><a href="a00038.html#a4de477fe699bdcc41128f65a1fd32ea9">EVE_CoCmd_snapshot</a></div><div class="ttdeci">void EVE_CoCmd_snapshot(EVE_HalContext *phost, uint32_t ptr)</div><div class="ttdoc">Send CMD_SNAPSHOT.</div><div class="ttdef"><b>Definition</b> <a href="#l00064">EVE_CoCmd_IO.c:64</a></div></div>
+<div class="ttc" id="aa00038_html_a5056a3a9ff90846d56204f442f2f0d7d"><div class="ttname"><a href="a00038.html#a5056a3a9ff90846d56204f442f2f0d7d">EVE_CoCmd_appendF</a></div><div class="ttdeci">void EVE_CoCmd_appendF(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_APPENDF.</div><div class="ttdef"><b>Definition</b> <a href="#l00225">EVE_CoCmd_IO.c:225</a></div></div>
+<div class="ttc" id="aa00038_html_a513a22d86bb375a26a2a6314112656cd"><div class="ttname"><a href="a00038.html#a513a22d86bb375a26a2a6314112656cd">EVE_CoCmd_flashRead_flush</a></div><div class="ttdeci">bool EVE_CoCmd_flashRead_flush(EVE_HalContext *phost, uint32_t dest, uint32_t src, uint32_t num)</div><div class="ttdoc">Read from Flash to RAM_G.</div><div class="ttdef"><b>Definition</b> <a href="#l00132">EVE_CoCmd_IO.c:132</a></div></div>
+<div class="ttc" id="aa00038_html_a5459b92848e35c22a977240b1817445d"><div class="ttname"><a href="a00038.html#a5459b92848e35c22a977240b1817445d">EVE_CoCmd_flashErase</a></div><div class="ttdeci">void EVE_CoCmd_flashErase(EVE_HalContext *phost)</div><div class="ttdoc">Send CMD_FLASHERASE.</div><div class="ttdef"><b>Definition</b> <a href="#l00107">EVE_CoCmd_IO.c:107</a></div></div>
+<div class="ttc" id="aa00038_html_a55356a6619573b27f63fa51e88d9ecf6"><div class="ttname"><a href="a00038.html#a55356a6619573b27f63fa51e88d9ecf6">EVE_CoCmd_loadWav</a></div><div class="ttdeci">void EVE_CoCmd_loadWav(EVE_HalContext *phost, uint32_t dst, uint32_t options)</div><div class="ttdoc">Send CMD_LOADWAV.</div><div class="ttdef"><b>Definition</b> <a href="#l00572">EVE_CoCmd_IO.c:572</a></div></div>
+<div class="ttc" id="aa00038_html_a61a9805ca479c0ef9900f6abfd9506c2"><div class="ttname"><a href="a00038.html#a61a9805ca479c0ef9900f6abfd9506c2">EVE_CoCmd_flashFast</a></div><div class="ttdeci">uint32_t EVE_CoCmd_flashFast(EVE_HalContext *phost, uint32_t *result)</div><div class="ttdoc">Enter fast flash state. Returns new FLASH_STATUS. Optional parameter result will contain any error co...</div><div class="ttdef"><b>Definition</b> <a href="#l00165">EVE_CoCmd_IO.c:165</a></div></div>
+<div class="ttc" id="aa00038_html_a66e082c909b51580a363c9c38649db1a"><div class="ttname"><a href="a00038.html#a66e082c909b51580a363c9c38649db1a">EVE_CoCmd_flashWrite</a></div><div class="ttdeci">void EVE_CoCmd_flashWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_FLASHWRITE. This command must be followed by the data to write.</div><div class="ttdef"><b>Definition</b> <a href="#l00122">EVE_CoCmd_IO.c:122</a></div></div>
+<div class="ttc" id="aa00038_html_a6d29a74be215f235ba4588542def10fb"><div class="ttname"><a href="a00038.html#a6d29a74be215f235ba4588542def10fb">EVE_CoCmd_memSet</a></div><div class="ttdeci">void EVE_CoCmd_memSet(EVE_HalContext *phost, uint32_t ptr, uint32_t value, uint32_t num)</div><div class="ttdoc">Send CMD_MEMSET.</div><div class="ttdef"><b>Definition</b> <a href="#l00044">EVE_CoCmd_IO.c:44</a></div></div>
+<div class="ttc" id="aa00038_html_a6ead1a94df6c25c4fc8a8d44e7bc03cc"><div class="ttname"><a href="a00038.html#a6ead1a94df6c25c4fc8a8d44e7bc03cc">EVE_CoCmd_memZero</a></div><div class="ttdeci">void EVE_CoCmd_memZero(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_MEMZERO.</div><div class="ttdef"><b>Definition</b> <a href="#l00049">EVE_CoCmd_IO.c:49</a></div></div>
+<div class="ttc" id="aa00038_html_a777669b6bd6c1a5bd8813fb1ff32734b"><div class="ttname"><a href="a00038.html#a777669b6bd6c1a5bd8813fb1ff32734b">EVE_CoCmd_flashUpdate</a></div><div class="ttdeci">void EVE_CoCmd_flashUpdate(EVE_HalContext *phost, uint32_t dest, uint32_t src, uint32_t num)</div><div class="ttdoc">Send CMD_FLASHUPDATE. This command must be followed by the data to write.</div><div class="ttdef"><b>Definition</b> <a href="#l00142">EVE_CoCmd_IO.c:142</a></div></div>
+<div class="ttc" id="aa00038_html_a78fb67f7487716fa631b62aae9c5ee58"><div class="ttname"><a href="a00038.html#a78fb67f7487716fa631b62aae9c5ee58">EVE_CoCmd_regRead</a></div><div class="ttdeci">bool EVE_CoCmd_regRead(EVE_HalContext *phost, uint32_t ptr, uint32_t *result)</div><div class="ttdoc">Send CMD_REGREAD.</div><div class="ttdef"><b>Definition</b> <a href="#l00337">EVE_CoCmd_IO.c:337</a></div></div>
+<div class="ttc" id="aa00038_html_a79793dfa0ab96154ebb3e196bb1021f2"><div class="ttname"><a href="a00038.html#a79793dfa0ab96154ebb3e196bb1021f2">EVE_CoCmd_animDraw</a></div><div class="ttdeci">void EVE_CoCmd_animDraw(EVE_HalContext *phost, int32_t ch)</div><div class="ttdoc">Send CMD_ANIMDRAW.</div><div class="ttdef"><b>Definition</b> <a href="#l00301">EVE_CoCmd_IO.c:301</a></div></div>
+<div class="ttc" id="aa00038_html_a7e591e3aa3bbf7792a77949b4c124cd7"><div class="ttname"><a href="a00038.html#a7e591e3aa3bbf7792a77949b4c124cd7">EVE_CoCmd_runAnim</a></div><div class="ttdeci">void EVE_CoCmd_runAnim(EVE_HalContext *phost, uint32_t waitmask, uint32_t play)</div><div class="ttdoc">Send CMD_RUNANIM.</div><div class="ttdef"><b>Definition</b> <a href="#l00306">EVE_CoCmd_IO.c:306</a></div></div>
+<div class="ttc" id="aa00038_html_a7eb3b891981437300cf9e42c3507d1a0"><div class="ttname"><a href="a00038.html#a7eb3b891981437300cf9e42c3507d1a0">EVE_CoCmd_memWrite32</a></div><div class="ttdeci">void EVE_CoCmd_memWrite32(EVE_HalContext *phost, uint32_t ptr, uint32_t value)</div><div class="ttdoc">Send CMD_MEMWRITE, followed by a single 32-bit value.</div><div class="ttdef"><b>Definition</b> <a href="#l00039">EVE_CoCmd_IO.c:39</a></div></div>
+<div class="ttc" id="aa00038_html_a811ad1cf31edf71343b9218d9e2f50f7"><div class="ttname"><a href="a00038.html#a811ad1cf31edf71343b9218d9e2f50f7">EVE_CoCmd_loadImage_flash</a></div><div class="ttdeci">bool EVE_CoCmd_loadImage_flash(EVE_HalContext *phost, uint32_t dst, uint32_t src, uint32_t *format)</div><div class="ttdoc">Load image from Flash to RAM_G.</div><div class="ttdef"><b>Definition</b> <a href="#l00230">EVE_CoCmd_IO.c:230</a></div></div>
+<div class="ttc" id="aa00038_html_a86041bb1f79a6a24058a7f5255a7e13f"><div class="ttname"><a href="a00038.html#a86041bb1f79a6a24058a7f5255a7e13f">EVE_CoCmd_memWrite</a></div><div class="ttdeci">void EVE_CoCmd_memWrite(EVE_HalContext *phost, uint32_t ptr, uint32_t num)</div><div class="ttdoc">Send CMD_MEMWRITE.</div><div class="ttdef"><b>Definition</b> <a href="#l00034">EVE_CoCmd_IO.c:34</a></div></div>
+<div class="ttc" id="aa00038_html_a874e97af6b5182e5193bb5e88efd58d3"><div class="ttname"><a href="a00038.html#a874e97af6b5182e5193bb5e88efd58d3">EVE_CoCmd_animStop</a></div><div class="ttdeci">void EVE_CoCmd_animStop(EVE_HalContext *phost, int32_t ch)</div><div class="ttdoc">Send CMD_ANIMSTOP.</div><div class="ttdef"><b>Definition</b> <a href="#l00281">EVE_CoCmd_IO.c:281</a></div></div>
+<div class="ttc" id="aa00038_html_a8f46eb2235d1fc5c6779755b09d13c23"><div class="ttname"><a href="a00038.html#a8f46eb2235d1fc5c6779755b09d13c23">EVE_CoCmd_fssize</a></div><div class="ttdeci">uint32_t EVE_CoCmd_fssize(EVE_HalContext *phost, const char *file, uint32_t size)</div><div class="ttdoc">Send CMD_FSSIZE.</div><div class="ttdef"><b>Definition</b> <a href="#l00501">EVE_CoCmd_IO.c:501</a></div></div>
+<div class="ttc" id="aa00038_html_a8fbd572142fd978b4f5d85fef86eb247"><div class="ttname"><a href="a00038.html#a8fbd572142fd978b4f5d85fef86eb247">EVE_CoCmd_sdattach</a></div><div class="ttdeci">uint32_t EVE_CoCmd_sdattach(EVE_HalContext *phost, uint32_t options, uint32_t result)</div><div class="ttdoc">Send CMD_SDATTACH.</div><div class="ttdef"><b>Definition</b> <a href="#l00545">EVE_CoCmd_IO.c:545</a></div></div>
+<div class="ttc" id="aa00038_html_a914ad1920cbf114699946e42ddd0c6f8"><div class="ttname"><a href="a00038.html#a914ad1920cbf114699946e42ddd0c6f8">EVE_CoCmd_flashSpiTx</a></div><div class="ttdeci">void EVE_CoCmd_flashSpiTx(EVE_HalContext *phost, uint32_t num)</div><div class="ttdoc">Send CMD_FLASHSPITX. Must follow data.</div><div class="ttdef"><b>Definition</b> <a href="#l00210">EVE_CoCmd_IO.c:210</a></div></div>
+<div class="ttc" id="aa00038_html_a91ca8835eca909acc640930bb0d7c5aa"><div class="ttname"><a href="a00038.html#a91ca8835eca909acc640930bb0d7c5aa">EVE_CoCmd_animXY</a></div><div class="ttdeci">void EVE_CoCmd_animXY(EVE_HalContext *phost, int32_t ch, int16_t x, int16_t y)</div><div class="ttdoc">Send CMD_ANIMXY.</div><div class="ttdef"><b>Definition</b> <a href="#l00286">EVE_CoCmd_IO.c:286</a></div></div>
+<div class="ttc" id="aa00038_html_a9282861f875e7013891ca6f189e79325"><div class="ttname"><a href="a00038.html#a9282861f875e7013891ca6f189e79325">EVE_CoCmd_videoStart</a></div><div class="ttdeci">void EVE_CoCmd_videoStart(EVE_HalContext *phost, uint32_t options)</div><div class="ttdoc">Send CMD_VIDEOSTART.</div><div class="ttdef"><b>Definition</b> <a href="#l00084">EVE_CoCmd_IO.c:84</a></div></div>
+<div class="ttc" id="aa00038_html_a94d7828340771143ea13efc7bc0873ad"><div class="ttname"><a href="a00038.html#a94d7828340771143ea13efc7bc0873ad">EVE_CoCmd_flashRead</a></div><div class="ttdeci">void EVE_CoCmd_flashRead(EVE_HalContext *phost, uint32_t dest, uint32_t src, uint32_t num)</div><div class="ttdoc">Read from Flash to RAM_G. Call EVE_Cmd_waitFlush to wait for completion.</div><div class="ttdef"><b>Definition</b> <a href="#l00127">EVE_CoCmd_IO.c:127</a></div></div>
+<div class="ttc" id="aa00038_html_ab7b53ba4d49e58d34fd7853dacc225b5"><div class="ttname"><a href="a00038.html#ab7b53ba4d49e58d34fd7853dacc225b5">EVE_CoCmd_flashDetach</a></div><div class="ttdeci">void EVE_CoCmd_flashDetach(EVE_HalContext *phost)</div><div class="ttdoc">Send CMD_FLASHDETACH.</div><div class="ttdef"><b>Definition</b> <a href="#l00147">EVE_CoCmd_IO.c:147</a></div></div>
+<div class="ttc" id="aa00038_html_ac614cf982a724a93bb214c7e1551f401"><div class="ttname"><a href="a00038.html#ac614cf982a724a93bb214c7e1551f401">EVE_CoCmd_fsread</a></div><div class="ttdeci">uint32_t EVE_CoCmd_fsread(EVE_HalContext *phost, uint32_t dst, const char *file, uint32_t result)</div><div class="ttdoc">Send CMD_FSREAD.</div><div class="ttdef"><b>Definition</b> <a href="#l00474">EVE_CoCmd_IO.c:474</a></div></div>
+<div class="ttc" id="aa00038_html_ad4732d787bba1631bd0d31a27f3e2f09"><div class="ttname"><a href="a00038.html#ad4732d787bba1631bd0d31a27f3e2f09">EVE_CoCmd_playVideo</a></div><div class="ttdeci">void EVE_CoCmd_playVideo(EVE_HalContext *phost, uint32_t options)</div><div class="ttdoc">Send CMD_PLAYVIDEO.</div><div class="ttdef"><b>Definition</b> <a href="#l00094">EVE_CoCmd_IO.c:94</a></div></div>
+<div class="ttc" id="aa00038_html_ad787c24bca50f35190a20f2b8c6bacb5"><div class="ttname"><a href="a00038.html#ad787c24bca50f35190a20f2b8c6bacb5">EVE_CoCmd_flashAttach</a></div><div class="ttdeci">uint32_t EVE_CoCmd_flashAttach(EVE_HalContext *phost)</div><div class="ttdoc">Attach flash.</div><div class="ttdef"><b>Definition</b> <a href="#l00152">EVE_CoCmd_IO.c:152</a></div></div>
+<div class="ttc" id="aa00038_html_ad934786dd80476f473e62aa8042e607a"><div class="ttname"><a href="a00038.html#ad934786dd80476f473e62aa8042e607a">EVE_CoCmd_mediaFifo</a></div><div class="ttdeci">void EVE_CoCmd_mediaFifo(EVE_HalContext *phost, uint32_t ptr, uint32_t size)</div><div class="ttdoc">Send CMD_MEDIAFIFO. See EVE_MediaFifo interface for easier FIFO access.</div><div class="ttdef"><b>Definition</b> <a href="#l00079">EVE_CoCmd_IO.c:79</a></div></div>
+<div class="ttc" id="aa00038_html_ad93631fa3ef09c13bf5ecbb387f1c2d2"><div class="ttname"><a href="a00038.html#ad93631fa3ef09c13bf5ecbb387f1c2d2">EVE_CoCmd_getPtr</a></div><div class="ttdeci">bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)</div><div class="ttdoc">Get the first unallocated memory location.</div><div class="ttdef"><b>Definition</b> <a href="#l00367">EVE_CoCmd_IO.c:367</a></div></div>
+<div class="ttc" id="aa00038_html_adb03b1d2a9faa1fa50fe6b6e0d03f2dc"><div class="ttname"><a href="a00038.html#adb03b1d2a9faa1fa50fe6b6e0d03f2dc">EVE_CoCmd_animFrame</a></div><div class="ttdeci">void EVE_CoCmd_animFrame(EVE_HalContext *phost, int16_t x, int16_t y, uint32_t aoptr, uint32_t frame)</div><div class="ttdoc">Send CMD_ANIMFRAMERAM.</div><div class="ttdef"><b>Definition</b> <a href="#l00260">EVE_CoCmd_IO.c:260</a></div></div>
+<div class="ttc" id="aa00038_html_adcf586d99e3145fdb82c6920bfb7e593"><div class="ttname"><a href="a00038.html#adcf586d99e3145fdb82c6920bfb7e593">EVE_CoCmd_inflate</a></div><div class="ttdeci">void EVE_CoCmd_inflate(EVE_HalContext *phost, uint32_t ptr, uint32_t options)</div><div class="ttdoc">Send CMD_INFLATE. Data must follow this command.</div><div class="ttdef"><b>Definition</b> <a href="#l00069">EVE_CoCmd_IO.c:69</a></div></div>
+<div class="ttc" id="aa00038_html_ade983b95c84128025ab3ed1f46efcfd5"><div class="ttname"><a href="a00038.html#ade983b95c84128025ab3ed1f46efcfd5">EVE_CoCmd_getImage</a></div><div class="ttdeci">bool EVE_CoCmd_getImage(EVE_HalContext *phost, uint32_t *source, uint32_t *fmt, uint32_t *w, uint32_t *h, uint32_t *palette)</div><div class="ttdoc">Send CMD_GETIMAGE.</div><div class="ttdef"><b>Definition</b> <a href="#l00420">EVE_CoCmd_IO.c:420</a></div></div>
+<div class="ttc" id="aa00038_html_af1404bc960047b74494dda27b26e76fc"><div class="ttname"><a href="a00038.html#af1404bc960047b74494dda27b26e76fc">EVE_CoCmd_loadAsset</a></div><div class="ttdeci">void EVE_CoCmd_loadAsset(EVE_HalContext *phost, uint32_t dst, uint32_t options)</div><div class="ttdoc">Send CMD_LOADASSET.</div><div class="ttdef"><b>Definition</b> <a href="#l00577">EVE_CoCmd_IO.c:577</a></div></div>
+<div class="ttc" id="aa00038_html_af2d143ba3207f89facb70e0fe26abc69"><div class="ttname"><a href="a00038.html#af2d143ba3207f89facb70e0fe26abc69">EVE_CoCmd_flashErase_flush</a></div><div class="ttdeci">bool EVE_CoCmd_flashErase_flush(EVE_HalContext *phost)</div><div class="ttdoc">Send CMD_FLASHERASE. Wait for completion.</div><div class="ttdef"><b>Definition</b> <a href="#l00112">EVE_CoCmd_IO.c:112</a></div></div>
+<div class="ttc" id="aa00038_html_afbe9d4aecc96c9cc211533e733a661d3"><div class="ttname"><a href="a00038.html#afbe9d4aecc96c9cc211533e733a661d3">EVE_CoCmd_loadImage</a></div><div class="ttdeci">void EVE_CoCmd_loadImage(EVE_HalContext *phost, uint32_t ptr, uint32_t options)</div><div class="ttdoc">Send CMD_LOADIMAGE. Data must follow this command.</div><div class="ttdef"><b>Definition</b> <a href="#l00074">EVE_CoCmd_IO.c:74</a></div></div>
+<div class="ttc" id="aa00053_html_a04ccbfec41ec6dbf63af845c654db666"><div class="ttname"><a href="a00053.html#a04ccbfec41ec6dbf63af845c654db666">CMD_FSOPTION</a></div><div class="ttdeci">#define CMD_FSOPTION</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00346">EVE_GpuDefs.h:346</a></div></div>
+<div class="ttc" id="aa00053_html_a065a7d86170d7b86ce17df5692dd3aee"><div class="ttname"><a href="a00053.html#a065a7d86170d7b86ce17df5692dd3aee">CMD_MEMZERO</a></div><div class="ttdeci">#define CMD_MEMZERO</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00375">EVE_GpuDefs.h:375</a></div></div>
+<div class="ttc" id="aa00053_html_a0f0b3eb886f744ec8aeef3a82588d843"><div class="ttname"><a href="a00053.html#a0f0b3eb886f744ec8aeef3a82588d843">CMD_ANIMDRAW</a></div><div class="ttdeci">#define CMD_ANIMDRAW</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00306">EVE_GpuDefs.h:306</a></div></div>
+<div class="ttc" id="aa00053_html_a16ed017be094b3b7d2d30ed52ab22041"><div class="ttname"><a href="a00053.html#a16ed017be094b3b7d2d30ed52ab22041">CMD_ANIMSTART</a></div><div class="ttdeci">#define CMD_ANIMSTART</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00308">EVE_GpuDefs.h:308</a></div></div>
+<div class="ttc" id="aa00053_html_a1735316cd9f0676395e1d4e6662de6c5"><div class="ttname"><a href="a00053.html#a1735316cd9f0676395e1d4e6662de6c5">OPT_FLASH</a></div><div class="ttdeci">#define OPT_FLASH</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00527">EVE_GpuDefs.h:527</a></div></div>
+<div class="ttc" id="aa00053_html_a1743d57c423b6f51a27c2d2070ff5ed4"><div class="ttname"><a href="a00053.html#a1743d57c423b6f51a27c2d2070ff5ed4">CMD_SDATTACH</a></div><div class="ttdeci">#define CMD_SDATTACH</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00397">EVE_GpuDefs.h:397</a></div></div>
+<div class="ttc" id="aa00053_html_a1b56aa4b0dcd5f2e8bfdfc0c2bd99da6"><div class="ttname"><a href="a00053.html#a1b56aa4b0dcd5f2e8bfdfc0c2bd99da6">CMD_VIDEOSTART</a></div><div class="ttdeci">#define CMD_VIDEOSTART</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00420">EVE_GpuDefs.h:420</a></div></div>
+<div class="ttc" id="aa00053_html_a2ca6df57dfb170284bbdcc9ffd47b067"><div class="ttname"><a href="a00053.html#a2ca6df57dfb170284bbdcc9ffd47b067">CMD_FLASHDETACH</a></div><div class="ttdeci">#define CMD_FLASHDETACH</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00334">EVE_GpuDefs.h:334</a></div></div>
+<div class="ttc" id="aa00053_html_a34298b6bf9f360e9002d0e55fd6a6214"><div class="ttname"><a href="a00053.html#a34298b6bf9f360e9002d0e55fd6a6214">CMD_VIDEOFRAME</a></div><div class="ttdeci">#define CMD_VIDEOFRAME</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00419">EVE_GpuDefs.h:419</a></div></div>
+<div class="ttc" id="aa00053_html_a37f793d8ac3af5f518d024727ce9f710"><div class="ttname"><a href="a00053.html#a37f793d8ac3af5f518d024727ce9f710">OPT_NODL</a></div><div class="ttdeci">#define OPT_NODL</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00515">EVE_GpuDefs.h:515</a></div></div>
+<div class="ttc" id="aa00053_html_a44407cb2390958461bf4a1563e6364a1"><div class="ttname"><a href="a00053.html#a44407cb2390958461bf4a1563e6364a1">CMD_FSSOURCE</a></div><div class="ttdeci">#define CMD_FSSOURCE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00349">EVE_GpuDefs.h:349</a></div></div>
+<div class="ttc" id="aa00053_html_a46d2e1693200e0f9dc2404014b258876"><div class="ttname"><a href="a00053.html#a46d2e1693200e0f9dc2404014b258876">RAM_CMD</a></div><div class="ttdeci">#define RAM_CMD</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00069">EVE_GpuDefs.h:69</a></div></div>
+<div class="ttc" id="aa00053_html_a4e8340225cdf1611bab27efb5a5ee33a"><div class="ttname"><a href="a00053.html#a4e8340225cdf1611bab27efb5a5ee33a">CMD_MEMWRITE</a></div><div class="ttdeci">#define CMD_MEMWRITE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00374">EVE_GpuDefs.h:374</a></div></div>
+<div class="ttc" id="aa00053_html_a4f0ca0363ceed8969906f3be1e3b535f"><div class="ttname"><a href="a00053.html#a4f0ca0363ceed8969906f3be1e3b535f">CMD_FLASHERASE</a></div><div class="ttdeci">#define CMD_FLASHERASE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00335">EVE_GpuDefs.h:335</a></div></div>
+<div class="ttc" id="aa00053_html_a554b2034f415a0e5a8c41941d3901272"><div class="ttname"><a href="a00053.html#a554b2034f415a0e5a8c41941d3901272">CMD_PLAYWAV</a></div><div class="ttdeci">#define CMD_PLAYWAV</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00380">EVE_GpuDefs.h:380</a></div></div>
+<div class="ttc" id="aa00053_html_a561dcf9b8cc86449f715fc1afd3773f2"><div class="ttname"><a href="a00053.html#a561dcf9b8cc86449f715fc1afd3773f2">CMD_FLASHSPITX</a></div><div class="ttdeci">#define CMD_FLASHSPITX</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00342">EVE_GpuDefs.h:342</a></div></div>
+<div class="ttc" id="aa00053_html_a5a5dcc3947355f08cfb62159a6128023"><div class="ttname"><a href="a00053.html#a5a5dcc3947355f08cfb62159a6128023">CMD_LOADWAV</a></div><div class="ttdeci">#define CMD_LOADWAV</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00368">EVE_GpuDefs.h:368</a></div></div>
+<div class="ttc" id="aa00053_html_a5d27545489d22eb819edd11f9cf29d9d"><div class="ttname"><a href="a00053.html#a5d27545489d22eb819edd11f9cf29d9d">CMD_INFLATE</a></div><div class="ttdeci">#define CMD_INFLATE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00361">EVE_GpuDefs.h:361</a></div></div>
+<div class="ttc" id="aa00053_html_a62f19baeef897f87adf955d8012655f6"><div class="ttname"><a href="a00053.html#a62f19baeef897f87adf955d8012655f6">FLASH_STATUS_BASIC</a></div><div class="ttdeci">#define FLASH_STATUS_BASIC</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00643">EVE_GpuDefs.h:643</a></div></div>
+<div class="ttc" id="aa00053_html_a653e76f748e322ce83e238f22d09be13"><div class="ttname"><a href="a00053.html#a653e76f748e322ce83e238f22d09be13">CMD_ANIMSTOP</a></div><div class="ttdeci">#define CMD_ANIMSTOP</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00309">EVE_GpuDefs.h:309</a></div></div>
+<div class="ttc" id="aa00053_html_a666dbeab017556aeb9523264b4d0c7fa"><div class="ttname"><a href="a00053.html#a666dbeab017556aeb9523264b4d0c7fa">CMD_FSDIR</a></div><div class="ttdeci">#define CMD_FSDIR</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00345">EVE_GpuDefs.h:345</a></div></div>
+<div class="ttc" id="aa00053_html_a6b87ab86bc66843064d084c47221f24c"><div class="ttname"><a href="a00053.html#a6b87ab86bc66843064d084c47221f24c">CMD_FLASHFAST</a></div><div class="ttdeci">#define CMD_FLASHFAST</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00336">EVE_GpuDefs.h:336</a></div></div>
+<div class="ttc" id="aa00053_html_a6da733b0c7068ece21b85396330aeca4"><div class="ttname"><a href="a00053.html#a6da733b0c7068ece21b85396330aeca4">CMD_FLASHATTACH</a></div><div class="ttdeci">#define CMD_FLASHATTACH</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00333">EVE_GpuDefs.h:333</a></div></div>
+<div class="ttc" id="aa00053_html_a7585c05043cf9004fe0d46b57c5110da"><div class="ttname"><a href="a00053.html#a7585c05043cf9004fe0d46b57c5110da">REG_CMD_WRITE</a></div><div class="ttdeci">#define REG_CMD_WRITE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00208">EVE_GpuDefs.h:208</a></div></div>
+<div class="ttc" id="aa00053_html_a7c6d81a98ade592b169c499e3a5b7268"><div class="ttname"><a href="a00053.html#a7c6d81a98ade592b169c499e3a5b7268">CMD_GETPROPS</a></div><div class="ttdeci">#define CMD_GETPROPS</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00353">EVE_GpuDefs.h:353</a></div></div>
+<div class="ttc" id="aa00053_html_a7c8a6c8911bd1d02baddc44842a74ac7"><div class="ttname"><a href="a00053.html#a7c8a6c8911bd1d02baddc44842a74ac7">CMD_FLASHREAD</a></div><div class="ttdeci">#define CMD_FLASHREAD</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00338">EVE_GpuDefs.h:338</a></div></div>
+<div class="ttc" id="aa00053_html_a8895e9b23050c847b5054b7fc77593bc"><div class="ttname"><a href="a00053.html#a8895e9b23050c847b5054b7fc77593bc">CMD_FLASHSOURCE</a></div><div class="ttdeci">#define CMD_FLASHSOURCE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00339">EVE_GpuDefs.h:339</a></div></div>
+<div class="ttc" id="aa00053_html_a894705cc099d425474cba2224c1dada7"><div class="ttname"><a href="a00053.html#a894705cc099d425474cba2224c1dada7">CMD_MEMCPY</a></div><div class="ttdeci">#define CMD_MEMCPY</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00371">EVE_GpuDefs.h:371</a></div></div>
+<div class="ttc" id="aa00053_html_a89c3962d987957522c4009771cec978f"><div class="ttname"><a href="a00053.html#a89c3962d987957522c4009771cec978f">CMD_ANIMXY</a></div><div class="ttdeci">#define CMD_ANIMXY</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00310">EVE_GpuDefs.h:310</a></div></div>
+<div class="ttc" id="aa00053_html_a8a5d236aa49da54c097423ef919000e6"><div class="ttname"><a href="a00053.html#a8a5d236aa49da54c097423ef919000e6">CMD_SNAPSHOT</a></div><div class="ttdeci">#define CMD_SNAPSHOT</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00408">EVE_GpuDefs.h:408</a></div></div>
+<div class="ttc" id="aa00053_html_aa6393a7f6c1bc38d6a511f075dd23ebb"><div class="ttname"><a href="a00053.html#aa6393a7f6c1bc38d6a511f075dd23ebb">CMD_GETPTR</a></div><div class="ttdeci">#define CMD_GETPTR</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00354">EVE_GpuDefs.h:354</a></div></div>
+<div class="ttc" id="aa00053_html_aa66eccbf747d288454ba843a6abd27a8"><div class="ttname"><a href="a00053.html#aa66eccbf747d288454ba843a6abd27a8">CMD_GETIMAGE</a></div><div class="ttdeci">#define CMD_GETIMAGE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00351">EVE_GpuDefs.h:351</a></div></div>
+<div class="ttc" id="aa00053_html_aa89c227dbb818209628b49bb4f2acfc1"><div class="ttname"><a href="a00053.html#aa89c227dbb818209628b49bb4f2acfc1">CMD_FLASHSPIDESEL</a></div><div class="ttdeci">#define CMD_FLASHSPIDESEL</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00340">EVE_GpuDefs.h:340</a></div></div>
+<div class="ttc" id="aa00053_html_aa9e67c0ce8704dd8aaf3962d390d0b42"><div class="ttname"><a href="a00053.html#aa9e67c0ce8704dd8aaf3962d390d0b42">CMD_LOADIMAGE</a></div><div class="ttdeci">#define CMD_LOADIMAGE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00366">EVE_GpuDefs.h:366</a></div></div>
+<div class="ttc" id="aa00053_html_aaa309768c79e2c3d7eae948be83e3399"><div class="ttname"><a href="a00053.html#aaa309768c79e2c3d7eae948be83e3399">CMD_REGREAD</a></div><div class="ttdeci">#define CMD_REGREAD</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00382">EVE_GpuDefs.h:382</a></div></div>
+<div class="ttc" id="aa00053_html_aaff099ec464bcadcdf21e2c7c06fcca6"><div class="ttname"><a href="a00053.html#aaff099ec464bcadcdf21e2c7c06fcca6">CMD_APPENDF</a></div><div class="ttdeci">#define CMD_APPENDF</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00312">EVE_GpuDefs.h:312</a></div></div>
+<div class="ttc" id="aa00053_html_ab1cd5a709866d022b038cd9dabd5eac5"><div class="ttname"><a href="a00053.html#ab1cd5a709866d022b038cd9dabd5eac5">CMD_APPEND</a></div><div class="ttdeci">#define CMD_APPEND</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00311">EVE_GpuDefs.h:311</a></div></div>
+<div class="ttc" id="aa00053_html_ab224c4903505cb35412c7c7e3df85d1b"><div class="ttname"><a href="a00053.html#ab224c4903505cb35412c7c7e3df85d1b">OPT_MEDIAFIFO</a></div><div class="ttdeci">#define OPT_MEDIAFIFO</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00523">EVE_GpuDefs.h:523</a></div></div>
+<div class="ttc" id="aa00053_html_ab6654d22dc903fb44a07461b66608c72"><div class="ttname"><a href="a00053.html#ab6654d22dc903fb44a07461b66608c72">CMD_FSREAD</a></div><div class="ttdeci">#define CMD_FSREAD</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00347">EVE_GpuDefs.h:347</a></div></div>
+<div class="ttc" id="aa00053_html_abe55fef203434750ad116c4c9b7b1c7c"><div class="ttname"><a href="a00053.html#abe55fef203434750ad116c4c9b7b1c7c">CMD_PLAYVIDEO</a></div><div class="ttdeci">#define CMD_PLAYVIDEO</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00379">EVE_GpuDefs.h:379</a></div></div>
+<div class="ttc" id="aa00053_html_ac22870b523d56fb582d08023b3486906"><div class="ttname"><a href="a00053.html#ac22870b523d56fb582d08023b3486906">CMD_FLASHUPDATE</a></div><div class="ttdeci">#define CMD_FLASHUPDATE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00343">EVE_GpuDefs.h:343</a></div></div>
+<div class="ttc" id="aa00053_html_ac5cd9d74dbee9219f9d82aa60f8b5d80"><div class="ttname"><a href="a00053.html#ac5cd9d74dbee9219f9d82aa60f8b5d80">CMD_FLASHPROGRAM</a></div><div class="ttdeci">#define CMD_FLASHPROGRAM</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00337">EVE_GpuDefs.h:337</a></div></div>
+<div class="ttc" id="aa00053_html_ac631112b2ce4392fccacbb7902c5e164"><div class="ttname"><a href="a00053.html#ac631112b2ce4392fccacbb7902c5e164">CMD_MEDIAFIFO</a></div><div class="ttdeci">#define CMD_MEDIAFIFO</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00370">EVE_GpuDefs.h:370</a></div></div>
+<div class="ttc" id="aa00053_html_acb7f01a7074f086799e283d6af12a21a"><div class="ttname"><a href="a00053.html#acb7f01a7074f086799e283d6af12a21a">CMD_FLASHWRITE</a></div><div class="ttdeci">#define CMD_FLASHWRITE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00344">EVE_GpuDefs.h:344</a></div></div>
+<div class="ttc" id="aa00053_html_acb9406afc1dea788863e8a5164686c45"><div class="ttname"><a href="a00053.html#acb9406afc1dea788863e8a5164686c45">CMD_MEMSET</a></div><div class="ttdeci">#define CMD_MEMSET</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00373">EVE_GpuDefs.h:373</a></div></div>
+<div class="ttc" id="aa00053_html_acbff10dfe6f88807e17902576a69f5c6"><div class="ttname"><a href="a00053.html#acbff10dfe6f88807e17902576a69f5c6">CMD_RUNANIM</a></div><div class="ttdeci">#define CMD_RUNANIM</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00392">EVE_GpuDefs.h:392</a></div></div>
+<div class="ttc" id="aa00053_html_acdcf3cadb86c4662c2ae0fdc1f87e7ca"><div class="ttname"><a href="a00053.html#acdcf3cadb86c4662c2ae0fdc1f87e7ca">CMD_FLASHSPIRX</a></div><div class="ttdeci">#define CMD_FLASHSPIRX</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00341">EVE_GpuDefs.h:341</a></div></div>
+<div class="ttc" id="aa00053_html_ad17e054f40aec4b37296a87d0644dd9e"><div class="ttname"><a href="a00053.html#ad17e054f40aec4b37296a87d0644dd9e">CMD_FSSIZE</a></div><div class="ttdeci">#define CMD_FSSIZE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00348">EVE_GpuDefs.h:348</a></div></div>
+<div class="ttc" id="aa00053_html_ade6217aed89b2f12440dd756bc20d147"><div class="ttname"><a href="a00053.html#ade6217aed89b2f12440dd756bc20d147">CMD_ANIMFRAME</a></div><div class="ttdeci">#define CMD_ANIMFRAME</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00307">EVE_GpuDefs.h:307</a></div></div>
+<div class="ttc" id="aa00053_html_ae59e8a6047d4df8708f499188869dfc1"><div class="ttname"><a href="a00053.html#ae59e8a6047d4df8708f499188869dfc1">FLASH_STATUS_DETACHED</a></div><div class="ttdeci">#define FLASH_STATUS_DETACHED</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00642">EVE_GpuDefs.h:642</a></div></div>
+<div class="ttc" id="aa00053_html_ae984c327fbc6b5bf4fa133aa434f8564"><div class="ttname"><a href="a00053.html#ae984c327fbc6b5bf4fa133aa434f8564">CMDBUF_SIZE</a></div><div class="ttdeci">#define CMDBUF_SIZE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00212">EVE_GpuDefs.h:212</a></div></div>
+<div class="ttc" id="aa00053_html_af594a57f18853767171d8ed8adb2f42b"><div class="ttname"><a href="a00053.html#af594a57f18853767171d8ed8adb2f42b">REG_FLASH_STATUS</a></div><div class="ttdeci">#define REG_FLASH_STATUS</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00102">EVE_GpuDefs.h:102</a></div></div>
+<div class="ttc" id="aa00053_html_af796b80715aa34103782de8013190e67"><div class="ttname"><a href="a00053.html#af796b80715aa34103782de8013190e67">CMD_MEMCRC</a></div><div class="ttdeci">#define CMD_MEMCRC</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00372">EVE_GpuDefs.h:372</a></div></div>
+<div class="ttc" id="aa00053_html_af9db4f734380527178351063a8b06488"><div class="ttname"><a href="a00053.html#af9db4f734380527178351063a8b06488">EVE_CMD_FIFO_MASK</a></div><div class="ttdeci">#define EVE_CMD_FIFO_MASK</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00047">EVE_GpuDefs.h:47</a></div></div>
+<div class="ttc" id="aa00053_html_afc33d9a8964211432417e1b9bf0c6e51"><div class="ttname"><a href="a00053.html#afc33d9a8964211432417e1b9bf0c6e51">CMD_REGWRITE</a></div><div class="ttdeci">#define CMD_REGWRITE</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00383">EVE_GpuDefs.h:383</a></div></div>
+<div class="ttc" id="aa00053_html_afcc9cf0e76dc383e9a09cb8e1f9c55f5"><div class="ttname"><a href="a00053.html#afcc9cf0e76dc383e9a09cb8e1f9c55f5">CMD_LOADASSET</a></div><div class="ttdeci">#define CMD_LOADASSET</div><div class="ttdef"><b>Definition</b> <a href="a00053_source.html#l00364">EVE_GpuDefs.h:364</a></div></div>
+<div class="ttc" id="aa00059_html_aa92bf7ac78be43b4a52dee758f901049"><div class="ttname"><a href="a00059.html#aa92bf7ac78be43b4a52dee758f901049">EVE_Hal_rd32</a></div><div class="ttdeci">uint32_t EVE_Hal_rd32(EVE_HalContext *phost, uint32_t addr)</div><div class="ttdoc">Read 4 bytes from Coprocessor&#39;s memory.</div><div class="ttdef"><b>Definition</b> <a href="a00059_source.html#l00156">EVE_Hal.c:156</a></div></div>
+<div class="ttc" id="aa00071_html_afb254ac926ccaa5d106dce051b16a43a"><div class="ttname"><a href="a00071.html#afb254ac926ccaa5d106dce051b16a43a">EVE_CMD_STRING_MAX</a></div><div class="ttdeci">#define EVE_CMD_STRING_MAX</div><div class="ttdef"><b>Definition</b> <a href="a00071_source.html#l00048">EVE_HalImpl.h:48</a></div></div>
+<div class="ttc" id="aa00086_html_a32f2e37ee053cf2ce8ca28d1f74630e5"><div class="ttname"><a href="a00086.html#a32f2e37ee053cf2ce8ca28d1f74630e5">int32_t</a></div><div class="ttdeci">int int32_t</div><div class="ttdef"><b>Definition</b> <a href="a00086_source.html#l00038">EVE_IntTypes_MSVC12.h:38</a></div></div>
+<div class="ttc" id="aa00086_html_a435d1572bf3f880d55459d9805097f62"><div class="ttname"><a href="a00086.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a></div><div class="ttdeci">unsigned int uint32_t</div><div class="ttdef"><b>Definition</b> <a href="a00086_source.html#l00042">EVE_IntTypes_MSVC12.h:42</a></div></div>
+<div class="ttc" id="aa00086_html_aa343fa3b3d06292b959ffdd4c4703b06"><div class="ttname"><a href="a00086.html#aa343fa3b3d06292b959ffdd4c4703b06">int16_t</a></div><div class="ttdeci">short int16_t</div><div class="ttdef"><b>Definition</b> <a href="a00086_source.html#l00037">EVE_IntTypes_MSVC12.h:37</a></div></div>
+<div class="ttc" id="aa00198_html"><div class="ttname"><a href="a00198.html">EVE_HalContext</a></div><div class="ttdef"><b>Definition</b> <a href="a00068_source.html#l00188">EVE_HalDefs.h:189</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.9.3-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_bdd9a5d540de89e9fe90efdfc6973a4f.html">common</a></li><li class="navelem"><a href="dir_7d7f499be83b400157504a134bf2709c.html">eve_hal</a></li><li class="navelem"><a href="a00038.html">EVE_CoCmd_IO.c</a></li>
+    <div align="right">
+    Copyright © Bridgetek Pte Ltd  
+    </div>  
+  </ul>
+</div>
+</body>
+</html>

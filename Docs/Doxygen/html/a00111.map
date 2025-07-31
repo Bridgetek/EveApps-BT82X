@@ -1,0 +1,21 @@
+<map id="common/eve_hal/EVE_Platform_WIN32.h" name="common/eve_hal/EVE_Platform_WIN32.h">
+<area shape="rect" id="Node000001" title="EVE platform for WIN32." alt="" coords="336,5,487,48"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,96,92,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="336,47,108,98,106,92,335,42"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="116,96,176,123"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="344,51,191,97,190,92,342,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="200,96,263,123"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="366,51,274,92,272,87,364,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="286,96,355,123"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="390,51,348,88,344,84,386,47"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="379,96,443,123"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="414,49,414,80,408,80,408,49"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="467,96,528,123"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="435,47,475,83,471,87,432,51"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="552,96,617,123"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="457,46,545,87,542,92,455,51"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="641,96,698,123"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="479,46,627,92,625,97,477,51"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="722,96,764,123"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="488,40,589,61,708,93,706,98,588,67,487,45"/>
+</map>

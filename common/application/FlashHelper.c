@@ -1,14 +1,14 @@
 /**
  * @file FlashHelper.c
- * @brief Eve's connected flash helper functions
+ * @brief EVE's connected flash helper functions
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,20 +30,22 @@
  */
 
 #include "FlashHelper.h"
+#include "Common.h"
 
 /**
  * @brief Writes the given data to flash.
  * If the data matches the existing contents of flash, nothing is done.
  * Otherwise the flash is erased in 4K units, and the data is written.
  *
- * dest_flash: destination address in flash memory. Must be 4096-byte aligned
- * src_ram: source data in main memory. Must be 4-byte aligned
- * num: number of bytes to write, should be multiple of 4096, otherwise, dummy data will be padded
+ * @note
+ * dest_flash: destination address in flash memory. Must be 4096-byte aligned \n
+ * src_ram: source data in main memory. Must be 4-byte aligned \n
+ * num: number of bytes to write, should be multiple of 4096, otherwise, dummy data will be padded \n
  *
  * @param phost Pointer to Hal context
  * @param dest_flash Destination on flash
  * @param src_ram Source in RAM_G
- * @param num Numbber of byte to write
+ * @param num Number of byte to write
  * @return Flash_Cmd_Status_t
  */
 Flash_Cmd_Status_t FlashHelper_Update(EVE_HalContext* phost, uint32_t dest_flash, uint32_t src_ram, uint32_t num)
@@ -81,8 +83,9 @@ Flash_Cmd_Status_t FlashHelper_Update(EVE_HalContext* phost, uint32_t dest_flash
  * @brief Writes the given data to flash.
  * It assumes that the flash is previously programmed to all-ones.
  *
- * dest_flash: destination address in flash memory. Must be 4096-byte aligned
- * src_ram: source data in main memory. Must be 4-byte aligned
+ * @note
+ * dest_flash: destination address in flash memory. Must be 4096-byte aligned \n
+ * src_ram: source data in main memory. Must be 4-byte aligned \n
  * num: number of bytes to write, should be multiple of 4096, otherwise, dummy data will be padded
  *
  * @param phost Pointer to Hal context
@@ -121,15 +124,11 @@ Flash_Cmd_Status_t FlashHelper_Program(EVE_HalContext *phost, uint32_t dest_flas
 
 /**
  * @brief Read data from flash to array
- * dest_ram: address in ram where the flash copy data to
- * src_flash: source address in flash memory. Must be 64-byte aligned. From 0 to 64*1024 for 64MB flash
- * num: number of bytes would be read
- * read_data: pointer to user read data
  *
  * @param phost Pointer to Hal context
  * @param dest_ram Destination on RAM_G
  * @param src_flash Source in flash
- * @param num Numbber of byte to read
+ * @param num Number of byte to read
  * @param read_data Buffer to get data
  * @return Flash_Cmd_Status_t
  */
@@ -153,7 +152,6 @@ Flash_Cmd_Status_t FlashHelper_Read(EVE_HalContext* phost, uint32_t dest_ram, ui
  * @brief Erase entire flash
  *
  * @param phost Pointer to Hal context
- * @return ft_void_t
  */
 void FlashHelper_Erase(EVE_HalContext* phost)
 {
@@ -165,15 +163,17 @@ void FlashHelper_Erase(EVE_HalContext* phost)
  * @brief Flash state/status
  *
  * @param phost Pointer to Hal context
- * @return uint8_t
+ * @return uint32_t
  */
-uint8_t FlashHelper_GetState(EVE_HalContext* phost)
+uint32_t FlashHelper_GetState(EVE_HalContext* phost)
 {
-	return EVE_Hal_rd8(phost, REG_FLASH_STATUS);
+	return EVE_Hal_rd32(phost, REG_FLASH_STATUS);
 }
 
 /**
- * @brief Write data to flash. Constraints:
+ * @brief Write data to flash. 
+ *
+ * Constraints:
  * - Destination flash address must be virgin (not used before)
  * - data array must be aligned 256-bit
  *
@@ -181,7 +181,6 @@ uint8_t FlashHelper_GetState(EVE_HalContext* phost)
  * @param dest Destination on flash
  * @param num Number of byte to write
  * @param data Data buffer to write
- * @return ft_void_t
  */
 void FlashHelper_flashWriteExt(EVE_HalContext *phost, uint32_t dest, uint32_t num, const uint8_t *data)
 {
@@ -205,10 +204,11 @@ void FlashHelper_flashWriteExt(EVE_HalContext *phost, uint32_t dest, uint32_t nu
 
 /**
  * @brief Write data to flash, and align byte if needed.
- * Note:
- * - Destination flash address must be virgin (not used before). Otherwise, users have to perform flash erase before using.
- * - Destination address must be 256-byte aligned.
- * - Automatically padding 0xFF to non-aligned num.
+ * 
+ * @note
+ * Destination flash address must be virgin (not used before). Otherwise, users have to perform flash erase before using. \n
+ * Destination address must be 256-byte aligned. \n
+ * Automatically padding 0xFF to non-aligned num. \n
  *
  * @param phost Pointer to Hal context
  * @param dest_flash Destination on flash. Must be 256-byte aligned
@@ -252,6 +252,7 @@ Flash_Cmd_Status_t FlashHelper_Write(EVE_HalContext* phost, uint32_t dest_flash,
 
 /**
  * @brief Switch to other flash state
+ * 
  * Error code:
  * - 0x0    command succeeds
  * - 0xffff command fails (invalid transition state)
@@ -269,8 +270,8 @@ uint32_t FlashHelper_SwitchState(EVE_HalContext* phost, uint8_t nextState)
 {
 	uint32_t ret = 0;
 	//uint8_t read_data[CMD_FIFO_SIZE]; Debug only
-	uint8_t curr_flash_state = EVE_Hal_rd8(phost, REG_FLASH_STATUS);
-	uint16_t ret_addr = 0;
+	uint32_t curr_flash_state = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
+	uint32_t ret_addr = 0;
 	if (curr_flash_state == nextState) {
 		return ret;
 	}
@@ -289,7 +290,7 @@ uint32_t FlashHelper_SwitchState(EVE_HalContext* phost, uint8_t nextState)
 			{
 				EVE_CoCmd_flashDetach(phost);
 				EVE_Cmd_waitFlush(phost);
-			} while (FLASH_STATUS_DETACHED != EVE_Hal_rd8(phost, REG_FLASH_STATUS));
+			} while (FLASH_STATUS_DETACHED != EVE_Hal_rd32(phost, REG_FLASH_STATUS));
 		}
 		EVE_CoCmd_flashAttach(phost);
 		EVE_Cmd_waitFlush(phost);
@@ -302,7 +303,7 @@ uint32_t FlashHelper_SwitchState(EVE_HalContext* phost, uint8_t nextState)
 			{
 				EVE_CoCmd_flashAttach(phost);
 				EVE_Cmd_waitFlush(phost);
-			} while (FLASH_STATUS_BASIC != EVE_Hal_rd8(phost, REG_FLASH_STATUS));
+			} while (FLASH_STATUS_BASIC != EVE_Hal_rd32(phost, REG_FLASH_STATUS));
 		}
 		EVE_CoCmd_flashFast(phost, 0);
 		EVE_Cmd_waitFlush(phost);
@@ -329,11 +330,11 @@ uint32_t FlashHelper_SwitchState(EVE_HalContext* phost, uint8_t nextState)
  */
 uint32_t FlashHelper_SwitchFullMode(EVE_HalContext* phost)
 {
-	uint8_t val;
+	uint32_t val;
 	/* Try detaching and attaching the flash followed by fast mdoe */
 	EVE_CoCmd_flashDetach(phost);
 	EVE_Cmd_waitFlush(phost);
-	val = EVE_Hal_rd8(phost, REG_FLASH_STATUS);
+	val = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
 
 	if (FLASH_STATUS_DETACHED != val)
 	{
@@ -343,7 +344,7 @@ uint32_t FlashHelper_SwitchFullMode(EVE_HalContext* phost)
 
 	EVE_CoCmd_flashAttach(phost);
 	EVE_Cmd_waitFlush(phost);
-	val = EVE_Hal_rd8(phost, REG_FLASH_STATUS);
+	val = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
 
 	if (FLASH_STATUS_BASIC != val)
 	{
@@ -353,7 +354,7 @@ uint32_t FlashHelper_SwitchFullMode(EVE_HalContext* phost)
 
 	EVE_CoCmd_flashFast(phost, 0);
 	EVE_Cmd_waitFlush(phost);
-	val = EVE_Hal_rd8(phost, REG_FLASH_STATUS);
+	val = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
 
 	if (FLASH_STATUS_FULL != val)
 	{

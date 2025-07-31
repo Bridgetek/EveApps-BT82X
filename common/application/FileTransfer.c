@@ -2,13 +2,13 @@
  * @file FileTransfer.c
  * @brief File transfer interface from host to flash
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,19 +29,14 @@
  * SOFTWARE.
  */
 
-#include "EVE_Platform.h"
 #include "Common.h"
+#include "FlashHelper.h"
 
 #define FREAD_BLOCK           (8 * 1024)
 
 #define BLOBSIZE              4096
 
-#if defined(MSVC_PLATFORM) || defined(BT8XXEMU_PLATFORM)
 #define EVE_FLASH_DIR         __FILE__ "\\..\\..\\..\\common\\eve_flash"
-#else
-#define EVE_FLASH_DIR         "/Test/common/eve_flash"
-#endif
-
 #define FILE_BLOB (EVE_FLASH_DIR "\\bt82x.blob")
 
 #define FTF_PROGESS_READ 1
@@ -50,15 +45,9 @@
 
 typedef struct Ftf_Progress
 {
-#if defined(BT8XXEMU_PLATFORM) || defined(MSVC_PLATFORM)
 	char file[200];
 	char fileName[200];
 	char message[MSG_SIZE];
-#else
-	char file[300];
-	char fileName[100];
-	char message[200];
-#endif
 	uint32_t fileSize;
 	uint32_t sent;
 	uint32_t bytesPerPercent;
@@ -79,7 +68,8 @@ typedef struct Ftf_Progress
  * @param pbuff data buffer
  * @return uint32_t 1 on successful, 0 on error
  */
-uint32_t Ftf_Update_Blob(EVE_HalContext* phost, const char* pbuff) {
+uint32_t Ftf_Update_Blob(EVE_HalContext* phost, const char* pbuff) 
+{
 	eve_printf("Updating blob\n");
 	char buf[BLOBSIZE] = { 0 };
 
@@ -128,7 +118,8 @@ uint32_t Ftf_Write_Blob_Default(EVE_HalContext *phost)
  * @param blobfile Blob file address
  * @return uint32_t 1 on successful, 0 on error
  */
-uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile) {
+uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile)
+{
 	char pBuff[BLOBSIZE];
 
 	eve_printf("Writing blob from file %s\n", blobfile);
@@ -155,7 +146,8 @@ uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile) {
  * @param direction FTF_PROGESS_READ or FTF_PROGESS_WRITE
  * @return Ftf_Progress_t*
  */
-Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, const char* fileName, uint32_t addr, uint8_t direction) {
+Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, const char* fileName, uint32_t addr, uint8_t direction)
+{
 	static Ftf_Progress_t progress;
 	uint32_t range = 0;
 	int32_t fileSize = 0;
@@ -217,7 +209,8 @@ Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, c
  * @param progress Ftf_Progress_t struct
  * @return uint32_t Percent of data transfered, 100 mean file transfer is done
  */
-uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress) {
+uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress)
+{
 	uint32_t bytes;
 	uint32_t sent = 0;
 	uint32_t ramGSent = 0;
@@ -251,7 +244,8 @@ uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress
  * @param progress Ftf_Progress_t struct
  * @return uint32_t 1 on successful, 0 on error
  */
-uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress_t* progress) {
+uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress_t* progress)
+{
 	char s[100];
 	uint16_t x;
 	uint16_t y;

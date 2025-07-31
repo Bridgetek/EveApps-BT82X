@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 
 #ifndef EVE_LOADFILE__H
 #define EVE_LOADFILE__H
-#include "EVE_HalDefs.h"
+#include "EVE_CoCmd.h"
 
 /*
 On Windows platform, filenames are assumed to be in the local character set.
@@ -39,28 +39,29 @@ The unicode variants of the functions can be used for unicode paths.
 On Linux platform, filenames are assumed to be in UTF-8.
 On embedded platforms, filename character set depends on the filesystem library.
 */
-
+/* Load a raw file into RAM_G */
 uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const char *filename);
+/* Load file into RAM_G by CMD_INFLATE */
 bool EVE_Util_loadInflateFile(EVE_HalContext *phost, uint32_t address, const char *filename);
 
-/** Load a file using CMD_LOADIMAGE.
+/* Load a file using CMD_LOADIMAGE.
 The image format is provided as output to the optional format argument */
 bool EVE_Util_loadImageFile(EVE_HalContext *phost, uint32_t address, const char *filename, uint32_t *format, uint32_t options);
 
-/** Load a file into the coprocessor FIFO */
+/* Load a file into the coprocessor FIFO */
 bool EVE_Util_loadCmdFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered);
 
-/** Read a file into a buffer, returns the number of bytes read */
+/* Read a file into a buffer, returns the number of bytes read */
 size_t EVE_Util_readFile(EVE_HalContext *phost, uint8_t *buffer, size_t size, const char *filename);
 
-/** Load a file into the media FIFO.
+/* Load a file into the media FIFO.
 If transfered is set, the file may be streamed partially,
 and will be kept open until EVE_Util_closeFile is called, 
 and stop once the coprocessor has processed it.
 Filename may be omitted in subsequent calls */
 bool EVE_Util_loadMediaFile(EVE_HalContext *phost, const char *filename, uint32_t *transfered);
 
-/** Load a file into RAM_G block by block, returns the number of bytes loaded at address
+/* Load a file into RAM_G block by block, returns the number of bytes loaded at address
 The file will be kept open until EVE_Util_closeFile is called 
 If transfered is set, can skip some data when first time to read */
 uint16_t EVE_Util_loadFile(EVE_HalContext *phost, uint32_t address, uint32_t size, const char *filename, uint32_t *transfered);
@@ -69,27 +70,29 @@ void EVE_Util_closeFile(EVE_HalContext *phost);
 
 #ifdef _WIN32
 
+/* Load a raw file into RAM_G */
 uint32_t EVE_Util_loadRawFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename);
+/* Load file into RAM_G by CMD_INFLATE */
 bool EVE_Util_loadInflateFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename);
 
-/** Load a file using CMD_LOADIMAGE.
+/* Load a file using CMD_LOADIMAGE.
 The image format is provided as output to the optional format argument */
 bool EVE_Util_loadImageFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename, uint32_t *format);
 
-/** Load a file into the coprocessor FIFO */
+/* Load a file into the coprocessor FIFO */
 bool EVE_Util_loadCmdFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered);
 
-/** Read a file into a buffer, returns the number of bytes read */
+/* Read a file into a buffer, returns the number of bytes read */
 size_t EVE_Util_readFileW(EVE_HalContext *phost, uint8_t *buffer, size_t size, const wchar_t *filename);
 
-/** Load a file into the media FIFO.
+/* Load a file into the media FIFO.
 If transfered is set, the file may be streamed partially,
 and will be kept open until EVE_Util_closeFile is called, 
 and stop once the coprocessor has processed it.
 Filename may be omitted in subsequent calls  */
 bool EVE_Util_loadMediaFileW(EVE_HalContext *phost, const wchar_t *filename, uint32_t *transfered);
 
-/** Load a file into RAM_G block by block, returns the number of bytes loaded at address
+/* Load a file into RAM_G block by block, returns the number of bytes loaded at address
 The file will be kept open until EVE_Util_closeFile is called 
 If transfered is set, can skip some data when first time to read */
 uint16_t EVE_Util_loadFileW(EVE_HalContext *phost, uint32_t address, uint32_t size, const wchar_t *filename, uint32_t *transfered);

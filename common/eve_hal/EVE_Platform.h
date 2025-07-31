@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,26 +40,16 @@ extern "C" {
  *      INCLUDES
  *********************/
 /* Include all public headers. */
-#if defined(_WIN32)
-#include "EVE_Platform_WIN32.h"
-#endif
-#if defined(BT8XXEMU_PLATFORM)
-#include "EVE_Platform_BT8XXEMU.h"
-#endif
+#include "EVE_Config.h"
+//#if defined(_WIN32)
+//#include "EVE_Platform_WIN32.h"
+//#endif
 #if defined(FT4222_PLATFORM)
 #include "EVE_Platform_FT4222.h"
 #endif
 #if defined(MPSSE_PLATFORM)
 #include "EVE_Platform_MPSSE.h"
 #endif
-#include "EVE_HalImpl.h"
-#include "EVE_Hal.h"
-#include "EVE_Cmd.h"
-#include "EVE_CoCmd.h"
-#include "EVE_CoDl.h"
-#include "EVE_Util.h"
-#include "EVE_LoadFile.h"
-#include "EVE_MediaFifo.h"
 
 /**********************
  *      MACROS

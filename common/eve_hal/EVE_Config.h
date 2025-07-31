@@ -8,7 +8,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,6 @@ Graphics target:
 - EVE_SUPPORT_CHIPID=EVE_BT820
 
 Platform target:
-- BT8XXEMU_PLATFORM (set EVE_PLATFORM_BT8XXEMU)
 - FT4222_PLATFORM (set EVE_PLATFORM_FT4222)
 - MPSSE_PLATFORM (set EVE_PLATFORM_MPSSE)
 
@@ -74,7 +73,7 @@ Additionally, the following support flags are set:
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-/** Validate the configured options. **/
+/* Validate the configured options. */
 #if defined(EVE_GRAPHICS_BT820)
 #define EVE_GRAPHICS_AVAILABLE
 #endif
@@ -83,9 +82,7 @@ Additionally, the following support flags are set:
 #define EVE_DISPLAY_AVAILABLE
 #endif
 
-#if defined(EVE_PLATFORM_BT8XXEMU)                                 \
-    || defined(EVE_PLATFORM_FT4222) || defined(EVE_PLATFORM_MPSSE) \
-    || defined(EVE_PLATFORM_RP2040)
+#if defined(EVE_PLATFORM_FT4222) || defined(EVE_PLATFORM_MPSSE)
 #define EVE_PLATFORM_AVAILABLE
 #endif
 
@@ -108,7 +105,6 @@ It may also set platform, display, and flash values if none are configured.
 #if defined(EVE_GRAPHICS_BT820)
 
 #define BT820_ENABLE
-#define RESISTANCE_THRESHOLD (1800)
 
 #ifndef EVE_DISPLAY_AVAILABLE
 #define EVE_DISPLAY_AVAILABLE
@@ -138,29 +134,23 @@ It may also set platform, display, and flash values if none are configured.
 #endif
 
 /** DDR config **/
-#define EVE_DDR_SIZE 0 //128M Bytes
-//#define EVE_DDR_SIZE 2 //512M Bytes
+#define EVE_DDR_SIZE 0 /**< 128M Bytes */
+//#define EVE_DDR_SIZE 2 /**< 512M Bytes */
 
 /** Flash config **/
 #define EVE_FLASH_NAND
 #define EVE_FLASH_SIZE 16
 
-/** Platform config **/
+/* Platform config */
 /*
 
 Ultimately, the platform selection must set one of the following internal platform flags.
-- BT8XXEMU_PLATFORM
 - FT4222_PLATFORM
 - MPSSE_PLATFORM
 These may only be set by one of the platform target definitions, and should not be set manually by the user.
 
 */
-
-#if defined(EVE_PLATFORM_BT8XXEMU)
-#define BT8XXEMU_PLATFORM
-#define EVE_HOST EVE_HOST_BT8XXEMU
-
-#elif defined(EVE_PLATFORM_FT4222)
+#if defined(EVE_PLATFORM_FT4222)
 #define FT4222_PLATFORM
 #define MSVC_PLATFORM
 #define EVE_HOST EVE_HOST_FT4222
@@ -177,8 +167,7 @@ These may only be set by one of the platform target definitions, and should not 
 
 
 #if defined(FT4222_PLATFORM)   \
-    || defined(MPSSE_PLATFORM)    \
-    || defined(BT8XXEMU_PLATFORM)
+    || defined(MPSSE_PLATFORM)
 #define EVE_PLATFORM_AVAILABLE
 #endif
 
@@ -212,14 +201,6 @@ These may only be set by one of the platform target definitions, and should not 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-
-// Platform special
-#define eve_progmem
-#define eve_progmem_const const
-
-typedef eve_progmem int8_t eve_prog_int8_t;
-typedef eve_progmem uint8_t eve_prog_uint8_t;
-typedef eve_progmem uint16_t eve_prog_uint16_t;
 
 #ifndef EVE_TCHAR_DEFINED
 #define EVE_TCHAR_DEFINED
@@ -279,8 +260,7 @@ typedef char eve_tchar_t;
                                                       "No display model has been selected")
 #endif
 #if ((defined(FT4222_PLATFORM) ? 1 : 0)   \
-    + (defined(MPSSE_PLATFORM) ? 1 : 0)    \
-    + (defined(BT8XXEMU_PLATFORM) ? 1 : 0)) \
+    + (defined(MPSSE_PLATFORM) ? 1 : 0)) \
     > 1
 #pragma message(__FILE__ "(" EVE_CONFIG_STR(__LINE__) "): warning PLATFORM: " \
                                                       "More than one platform has been selected")

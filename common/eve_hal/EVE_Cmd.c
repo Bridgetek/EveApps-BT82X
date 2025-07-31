@@ -4,7 +4,7 @@
  
  * This file defines the generic APIs of phost access layer for the BT820 or EVE compatible silicon.
  * Application shall access BT820 or EVE resources over these APIs,regardless of I2C or SPI protocol.
- * In addition, there are some helper functions defined for FT800 coprocessor engine as well as phost commands.
+ * In addition, there are some helper functions defined for BT820 coprocessor engine as well as phost commands.
  *
  * @author Bridgetek
  *
@@ -12,7 +12,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@
  * SOFTWARE.
 */
 
-#include "EVE_Platform.h"
+#include "EVE_Cmd.h"
 
 /**
  * @brief End read/write to Coprocessor
@@ -82,12 +82,12 @@ uint32_t EVE_Cmd_wp(EVE_HalContext *phost)
  * @param phost Pointer to Hal context
  * @return uint16_t Free space in Bytes
  */
-uint16_t EVE_Cmd_space(EVE_HalContext *phost)
+uint32_t EVE_Cmd_space(EVE_HalContext *phost)
 {
-	uint16_t space;
+	uint32_t space;
 	endFunc(phost);
 	
-	space = EVE_Hal_rd16(phost, REG_CMDB_SPACE) & EVE_CMD_FIFO_MASK;
+	space = EVE_Hal_rd32(phost, REG_CMDB_SPACE) & EVE_CMD_FIFO_MASK;
 	if (EVE_CMD_FAULT(space))
 		phost->CmdFault = true;
 	phost->CmdSpace = space;
@@ -141,11 +141,10 @@ static uint32_t wrString(EVE_HalContext *phost, const void *buffer, uint32_t *si
  * @param phost Pointer to Hal context
  * @param buffer Data pointer
  * @param size Size to write
- * @param progmem True if ProgMem 
  * @param string True is string
  * @return uint32_t Byte transfered
  */
-static uint32_t wrBuffer(EVE_HalContext *phost, const void *buffer, uint32_t size, bool progmem, bool string)
+static uint32_t wrBuffer(EVE_HalContext *phost, const void *buffer, uint32_t size, bool string)
 {
 	uint32_t transfered = 0;
 
@@ -170,10 +169,6 @@ static uint32_t wrBuffer(EVE_HalContext *phost, const void *buffer, uint32_t siz
 			if (string)
 			{
 				transfer = wrString(phost, buffer, &size, transfered, transfer);
-			}
-			else if (progmem)
-			{
-				EVE_Hal_transferProgMem(phost, NULL, (eve_progmem_const uint8_t *)(uintptr_t)(&((uint8_t *)buffer)[transfered]), transfer);
 			}
 			else
 			{
@@ -238,23 +233,7 @@ bool EVE_Cmd_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size)
 {
 	eve_assert(!phost->CmdWaiting);
 	eve_assert(phost->CmdBufferIndex == 0);
-	return wrBuffer(phost, buffer, size, false, false) == size;
-}
-
-/**
- * @brief Write buffer in ProgMem to Coprocessor's command fifo
- * 
- * @param phost Pointer to Hal context
- * @param buffer Data buffer
- * @param size Size to write
- * @return true True if ok
- * @return false False if error
- */
-bool EVE_Cmd_wrProgMem(EVE_HalContext *phost, eve_progmem_const uint8_t *buffer, uint32_t size)
-{
-	eve_assert(!phost->CmdWaiting);
-	eve_assert(phost->CmdBufferIndex == 0);
-	return wrBuffer(phost, (void *)(uintptr_t)buffer, size, true, false) == size;
+	return wrBuffer(phost, buffer, size, false) == size;
 }
 
 /**
@@ -270,35 +249,8 @@ uint32_t EVE_Cmd_wrString(EVE_HalContext *phost, const char *str, uint32_t maxLe
 	uint32_t transfered;
 	eve_assert(!phost->CmdWaiting);
 	eve_assert(phost->CmdBufferIndex == 0);
-	transfered = wrBuffer(phost, str, maxLength, false, true);
+	transfered = wrBuffer(phost, str, maxLength, true);
 	return transfered;
-}
-
-/**
- * @brief Write a byte to Coprocessor's command fifo
- * 
- * @param phost Pointer to Hal context
- * @param value Byte to write
- * @return true True if ok
- * @return false False if error
- */
-bool EVE_Cmd_wr8(EVE_HalContext *phost, uint8_t value)
-{
-	eve_assert(!phost->CmdWaiting);
-	eve_assert(phost->CmdBufferIndex < 4);
-
-	if (phost->CmdBufferIndex < 4)
-	{
-		phost->CmdBuffer[phost->CmdBufferIndex++] = value;
-	}
-
-	if (phost->CmdBufferIndex == 4)
-	{
-		phost->CmdBufferIndex = 0;
-		return EVE_Cmd_wrMem(phost, phost->CmdBuffer, 4);
-	}
-
-	return true;
 }
 
 /**
@@ -484,12 +436,16 @@ bool EVE_Cmd_waitFlush(EVE_HalContext *phost)
 	return true;
 }
 
-/** Wait for the command buffer to have at least the requested amount of free space.
+/** 
+ * @brief Wait for the command buffer to have at least the requested amount of free space.
+ * 
+ * @param phost Pointer to Hal context
+ * @param size Space size
  * @return 0 in case a coprocessor fault occurred 
  */
 uint32_t EVE_Cmd_waitSpace(EVE_HalContext *phost, uint32_t size)
 {
-	uint16_t space;
+	uint32_t space;
 
 	if (size > (EVE_CMD_FIFO_SIZE - 4))
 	{
@@ -551,7 +507,12 @@ bool EVE_Cmd_waitLogo(EVE_HalContext *phost)
 	return true;
 }
 
-/** Wait for a 32-bit value that was set by `EVE_CoCmd_memWrite32(phost, ptr, value)`.
+/** 
+ * @brief Wait for a 32-bit value that was set by `EVE_CoCmd_memWrite32(phost, ptr, value)`.
+ * 
+ * @param phost Pointer to Hal context
+ * @param ptr Pointer
+ * @param value Data to read
  * @return true when the value is found. 
  * @return false otherwise
  * when the coprocessor has flushed, or a coprocessor fault occured. 
@@ -584,8 +545,12 @@ bool EVE_Cmd_waitRead32(EVE_HalContext *phost, uint32_t ptr, uint32_t value)
 	return EVE_Hal_rd32(phost, ptr) == value;
 }
 
-/** Restore the internal state of EVE_Cmd.
- * Call this after manually writing to the coprocessor buffer 
+/** 
+ * @brief Restore the internal state of EVE_Cmd.
+ *
+ * Call this after manually writing to the coprocessor buffer
+ * 
+ * @param phost Pointer to Hal context
  */
 void EVE_Cmd_restore(EVE_HalContext *phost)
 {

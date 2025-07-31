@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 /*************
 ** INCLUDES **
 *************/
-#include "EVE_Platform.h"
+#include "EVE_HalImpl.h"
 
 /**********************
 ** GLOBAL PROTOTYPES **
@@ -49,9 +49,6 @@ EVE_HalPlatform *EVE_Hal_initialize();
 void EVE_Hal_release();
 /** Get the default configuration parameters */
 void EVE_Hal_defaults(EVE_HalParameters *parameters);
-/** Get the default configuration parameters.
-Use `deviceIdx` to choose the connected device, or set to -1 to get the first available device. */
-void EVE_Hal_defaultsEx(EVE_HalParameters *parameters, size_t deviceIdx);
 /** Opens a new HAL context using the specified parameters */
 bool EVE_Hal_open(EVE_HalContext *phost, const EVE_HalParameters *parameters);
 /** Close a HAL context */
@@ -63,17 +60,11 @@ void EVE_Hal_idle(EVE_HalContext *phost);
 
 /** @name TRANSFER HELPERS */
 ///@{
-
-uint8_t EVE_Hal_rd8(EVE_HalContext *phost, uint32_t addr);
-uint16_t EVE_Hal_rd16(EVE_HalContext *phost, uint32_t addr);
 uint32_t EVE_Hal_rd32(EVE_HalContext *phost, uint32_t addr);
 void EVE_Hal_rdMem(EVE_HalContext *phost, uint8_t *result, uint32_t addr, uint32_t size);
 
-void EVE_Hal_wr8(EVE_HalContext *phost, uint32_t addr, uint8_t v);
-void EVE_Hal_wr16(EVE_HalContext *phost, uint32_t addr, uint16_t v);
 void EVE_Hal_wr32(EVE_HalContext *phost, uint32_t addr, uint32_t v);
 void EVE_Hal_wrMem(EVE_HalContext *phost, uint32_t addr, const uint8_t *buffer, uint32_t size);
-void EVE_Hal_wrProgMem(EVE_HalContext *phost, uint32_t addr, eve_progmem_const uint8_t *buffer, uint32_t size);
 void EVE_Hal_wrString(EVE_HalContext *phost, uint32_t addr, const char *str, uint32_t index, uint32_t size, uint32_t padMask);
 ///@}
 

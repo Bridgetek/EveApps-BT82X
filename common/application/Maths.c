@@ -2,13 +2,13 @@
  * @file Maths.c
  * @brief Mathematic utilities
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
- * @date 2019
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@
 #define xyzswap(x, y) {Math_3d_Xyz_t z = x;x=y;y=z;}
 
  /* Optimized implementation of sin and cos table - precision is 16 bit */
-PROGMEM uint16_t sintab[] = {
+uint16_t sintab[] = {
 	0, 402, 804, 1206, 1607, 2009, 2410, 2811, 3211, 3611, 4011, 4409, 4807, 5205, 5601, 5997, 6392,
 	6786, 7179, 7571, 7961, 8351, 8739, 9126, 9511, 9895, 10278, 10659, 11038, 11416, 11792, 12166, 12539,
 	12909, 13278, 13645, 14009, 14372, 14732, 15090, 15446, 15799, 16150, 16499, 16845, 17189, 17530, 17868,
@@ -52,7 +52,7 @@ PROGMEM uint16_t sintab[] = {
  * @brief Sin function
  *
  * @param a Angle
- * @return int16_t
+ * @return int16_t Sin
  */
 int16_t Math_Qsin(uint16_t a)
 {
@@ -76,7 +76,7 @@ int16_t Math_Qsin(uint16_t a)
  * @brief Cos function
  *
  * @param a Angle
- * @return int16_t
+ * @return int16_t Qcos
  */
 int16_t Math_Qcos(uint16_t a)
 {
@@ -86,32 +86,41 @@ int16_t Math_Qcos(uint16_t a)
 /**
  * @brief Polar function
  *
- * @param r
- * @param th
- * @param x
- * @param y
- * @param ox
- * @param oy
+ * @param r Radius
+ * @param th Angle in degrees
+ * @param x X coordinate x
+ * @param y Y coordinate y
+ * @param ox Origin X coordinate
+ * @param oy Origin Y coordinate
  */
-void Math_Polarxy(int32_t r, float th, int32_t* x, int32_t* y, int32_t ox, int32_t oy) {
+void Math_Polarxy(int32_t r, float th, int32_t* x, int32_t* y, int32_t ox, int32_t oy)
+{
 	*x = (16 * ox) + (((long)r * Math_Qsin((uint16_t)th)) >> 11) + 16;
 	*y = (16 * oy) - (((long)r * Math_Qcos((uint16_t)th)) >> 11);
 }
 
 /**
   * @brief Da function
-  * 1 uint = 0.5 degree.
+  * 
+  * 1 uint = 0.5 degree. \n
   * 1 circle = 720 degree
   *
-  * @param i
-  * @param degree
-  * @return float
+  * @param i Current angle
+  * @param degree reference angle
+  * @return float Difference
   */
 float Math_Da(float i, int16_t degree)
 {
 	return (i - degree) * 32768 / 360;
 }
 
+/**
+  * @brief Power function
+  *
+  * @param x Base
+  * @param y Power
+  * @return float Power
+  */
 float Math_Power(float x, unsigned int y)
 {
 	if (y == 0)
@@ -122,17 +131,39 @@ float Math_Power(float x, unsigned int y)
 		return x * Math_Power(x, y / 2) * Math_Power(x, y / 2);
 }
 
-uint32_t Math_Points_Distance(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2) {
+/**
+  * @brief Distance function
+  *
+  * @param x1 X coordinate x1
+  * @param y1 Y coordinate y1
+  * @param x2 X coordinate x2
+  * @param y2 Y coordinate y2
+  * @return float Distance
+  */
+uint32_t Math_Points_Distance(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
+{
 	return (uint32_t)sqrt((double)(Math_Power((float)(x2 - x1), 2) + Math_Power((float)(y2 - y1), 2)));
 }
 
-uint32_t Math_Points_Nearby_NextX(uint32_t x1, uint32_t y1, uint32_t y2, uint32_t Distance) {
+/**
+  * @brief Distance along the X-axis
+  *
+  * @param x1 X coordinate x1
+  * @param y1 Y coordinate y1
+  * @param y2 Y coordinate y2
+  * @param Distance
+  * @return uint32_t Distance along the X-axis
+  */
+uint32_t Math_Points_Nearby_NextX(uint32_t x1, uint32_t y1, uint32_t y2, uint32_t Distance)
+{
 	return (uint32_t)sqrt((double)Math_Power((float)Distance, 2) - Math_Power((float)abs(y2 - y1), 2)) + x1;
 }
 
-/*
-   Normalise a vector
-*/
+/**
+  * @brief Normalise a vector
+  * 
+  * @param p Vector p
+  */
 void Normalise(Math_3d_Xyz_t* p)
 {
 	double length;
@@ -150,14 +181,20 @@ void Normalise(Math_3d_Xyz_t* p)
 	}
 }
 
-/*
-   Rotate a point p by angle theta around an arbitrary axis r
-   Return the rotated point.
-   Positive angles are anticlockwise looking down the axis
-   towards the origin.
-   Assume right hand coordinate system.
-*/
-Math_3d_Xyz_t Math_3D_ArbitraryRotate(Math_3d_Xyz_t p, double theta, Math_3d_Xyz_t r) {
+/**
+  * @brief Rotate a point p by angle theta around an arbitrary axis r
+  * 
+  * Positive angles are anticlockwise looking down the axis
+  * towards the origin.\n
+  * Assume right hand coordinate system.
+  * 
+  * @param p Vector p
+  * @param theta angle theta
+  * @param r Axis
+  * @return Math_3d_Xyz_t Vector
+  */
+Math_3d_Xyz_t Math_3D_ArbitraryRotate(Math_3d_Xyz_t p, double theta, Math_3d_Xyz_t r)
+{
 	Math_3d_Xyz_t q = { 0.0,0.0,0.0 };
 	double costheta;
 	double sintheta;
@@ -181,13 +218,19 @@ Math_3d_Xyz_t Math_3D_ArbitraryRotate(Math_3d_Xyz_t p, double theta, Math_3d_Xyz
 	return(q);
 }
 
-/*
-   Rotate a point p by angle theta around an arbitrary line segment p1-p2
-   Return the rotated point.
-   Positive angles are anticlockwise looking down the axis
-   towards the origin.
-   Assume right hand coordinate system.
-*/
+/**
+  * @brief Rotate a point p by angle theta around an arbitrary line segment p1-p2
+  * 
+  * Positive angles are anticlockwise looking down the axis
+  * towards the origin. \n
+  * Assume right hand coordinate system.
+  * 
+  * @param p Vector p
+  * @param theta Angle theta
+  * @param p1 Vector p1
+  * @param p2 Vector p2
+  * @return Math_3d_Xyz_t Vector
+  */
 Math_3d_Xyz_t Math_3D_ArbitraryRotate2(Math_3d_Xyz_t p, double theta, Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
 {
 	Math_3d_Xyz_t q = { 0.0,0.0,0.0 };
@@ -224,7 +267,15 @@ Math_3d_Xyz_t Math_3D_ArbitraryRotate2(Math_3d_Xyz_t p, double theta, Math_3d_Xy
 	return(q);
 }
 
-static Math_3d_Xyz_t subVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2) {
+/**
+  * @brief Calculate the vector subtraction of two 3D vectors
+  * 
+  * @param p1 Vector p1
+  * @param p2 Vector p2
+  * @return Math_3d_Xyz_t Vector
+  */
+static Math_3d_Xyz_t subVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
+{
 	Math_3d_Xyz_t ret;
 	ret.x = p1.x - p2.x;
 	ret.y = p1.y - p2.y;
@@ -233,7 +284,15 @@ static Math_3d_Xyz_t subVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2) {
 	return ret;
 }
 
-static Math_3d_Xyz_t normalVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2) {
+/**
+  * @brief Calculate the cross product of two 3D vectors
+  * 
+  * @param p1 Vector p1
+  * @param p2 Vector p2
+  * @return Math_3d_Xyz_t Vector
+  */
+static Math_3d_Xyz_t normalVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
+{
 	Math_3d_Xyz_t n;
 
 	n.x = p1.y * p2.z - p1.z * p2.y;
@@ -243,10 +302,24 @@ static Math_3d_Xyz_t normalVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2) {
 	return n;
 }
 
+/**
+  * @brief Calculate the dot product of two 3D vectors
+  * 
+  * @param a Vector a
+  * @param b Vector b
+  * @return double Dot product
+  */
 static double dotProduct(Math_3d_Xyz_t a, Math_3d_Xyz_t b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
+/**
+  * @brief Determine if a triangle (face) is visible from a given viewpoint
+  * 
+  * @param face A triangle (face)
+  * @param view Viewpoint
+  * @return int True on visible or otherwise
+  */
 int Math_3D_Backface_Find_Visible(Math_3d_Face_t face, Math_3d_Xyz_t view) {
 	Math_3d_Xyz_t v12 = subVector(face.p2, face.p1);
 	Math_3d_Xyz_t v13 = subVector(face.p3, face.p1);

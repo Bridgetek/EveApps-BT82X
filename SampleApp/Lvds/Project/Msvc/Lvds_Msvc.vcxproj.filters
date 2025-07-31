@@ -56,12 +56,6 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Hal.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMU.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_BT8XXEMUC.c">
-      <Filter>Common\eve_hal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_HalImpl_FT4222.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
@@ -134,9 +128,6 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_BT8XXEMU.h">
-      <Filter>Common\eve_hal</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Platform_FT4222.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
@@ -148,12 +139,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Util.h">
       <Filter>Common\eve_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\bt8xxemu.h">
-      <Filter>Common\eve_hal\Hdr</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\bt8xxemu_inttypes.h">
-      <Filter>Common\eve_hal\Hdr</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\ftd2xx.h">
       <Filter>Common\eve_hal\Hdr</Filter>

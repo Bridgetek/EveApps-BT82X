@@ -4,11 +4,11 @@
  *
  * @author Bridgetek
  *
- * @date 2018
+ * @date 2024
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
 */
 
 #include "EVE_MediaFifo.h"
-#include "EVE_Platform.h"
 
 #ifdef EVE_SUPPORT_MEDIAFIFO
 
@@ -38,8 +37,8 @@
  * @brief Set the media FIFO. 
  * 
  * @param phost Pointer to Hal context
- * @param address
- * @param size
+ * @param address Media FIFO address
+ * @param size Media FIFO size
  * @returns false in case a coprocessor fault occurred 
  */
 bool EVE_MediaFifo_set(EVE_HalContext *phost, uint32_t address, uint32_t size)
@@ -74,6 +73,11 @@ bool EVE_MediaFifo_set(EVE_HalContext *phost, uint32_t address, uint32_t size)
 	return res;
 }
 
+/**
+ * @brief Close the media FIFO.
+ * 
+ * @param phost Pointer to Hal context
+ */
 void EVE_MediaFifo_close(EVE_HalContext *phost)
 {
 	phost->MediaFifoAddress = 0;
@@ -130,12 +134,13 @@ uint32_t EVE_MediaFifo_space(EVE_HalContext *phost)
 
 /**
  * @brief Write a buffer to the media FIFO. 
+ * 
  * Waits if there is not enough space in the media FIFO.
  *
  * @param phost Pointer to Hal context
- * @param buffer
- * @param size
- * @param transfered
+ * @param buffer Data to write 
+ * @param size Data size
+ * @param transfered transfered length
  * @returns false in case a coprocessor fault occurred 
  */
 bool EVE_MediaFifo_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t size, uint32_t *transfered)
@@ -282,6 +287,14 @@ bool EVE_MediaFifo_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t 
 void debugBackupRamG(EVE_HalContext *phost);
 #endif
 
+/**
+ * @brief Check for coprocessor fault
+ * 
+ * @param phost Pointer to Hal context
+ * @param rpOrSpace Read pointer or space
+ * @return true True if ok
+ * @return false False if coprocessor fault
+ */
 static bool checkWait(EVE_HalContext *phost, uint32_t rpOrSpace)
 {
 	if (EVE_CMD_FAULT(rpOrSpace))
@@ -310,6 +323,14 @@ static bool checkWait(EVE_HalContext *phost, uint32_t rpOrSpace)
 	return true;
 }
 
+/**
+ * @brief Wait handler
+ * 
+ * @param phost Pointer to Hal context
+ * @param rpOrSpace Read pointer or space
+ * @return true True if ok
+ * @return false False if error
+ */
 static bool handleWait(EVE_HalContext *phost, uint16_t rpOrSpace)
 {
 	/* Check for coprocessor fault */
@@ -335,7 +356,7 @@ static bool handleWait(EVE_HalContext *phost, uint16_t rpOrSpace)
  * @brief Wait for the media FIFO to fully empty.
  * 
  * @param phost Pointer to Hal context
- * @param orCmdFlush
+ * @param orCmdFlush Need cmd_flush or not
  * @returns false in case a coprocessor fault occurred 
  */
 bool EVE_MediaFifo_waitFlush(EVE_HalContext *phost, bool orCmdFlush)
@@ -347,8 +368,8 @@ bool EVE_MediaFifo_waitFlush(EVE_HalContext *phost, bool orCmdFlush)
  * @brief Wait for the media FIFO to have at least the requested amount of free space.
  * 
  * @param phost Pointer to Hal context
- * @param size
- * @param orCmdFlush
+ * @param size Space size
+ * @param orCmdFlush Need cmd_flush or not
  * @returns 0 in case a coprocessor fault occurred 
  */
 uint32_t EVE_MediaFifo_waitSpace(EVE_HalContext *phost, uint32_t size, bool orCmdFlush)

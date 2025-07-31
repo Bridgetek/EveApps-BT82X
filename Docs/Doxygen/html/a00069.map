@@ -1,0 +1,20 @@
+<map id="common/eve_hal/EVE_HalDefs.h" name="common/eve_hal/EVE_HalDefs.h">
+<area shape="rect" id="Node000001" title="Eve_Hal framework APIs." alt="" coords="100,5,251,48"/>
+<area shape="rect" id="Node000002" href="$a00056.html" title="Defines EVE hardware values." alt="" coords="41,96,166,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,50,127,86,123,82,155,47"/>
+<area shape="rect" id="Node000009" href="$a00053.html" title="Defines EVE hardware values." alt="" coords="190,96,308,123"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="196,47,229,82,225,86,192,50"/>
+<area shape="rect" id="Node000003" href="$a00050.html" title="This file processes the input definitions." alt="" coords="123,171,228,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="118,121,154,158,151,161,114,125"/>
+<area shape="rect" id="Node000004" href="$a00083.html" title="Eve_Hal framework APIs." alt="" coords="117,245,234,272"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="178,198,178,230,173,230,173,198"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,320,74,347"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="153,275,78,315,75,310,151,270"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="98,320,165,347"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="170,274,149,308,145,305,166,271"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="189,320,253,347"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="186,271,207,305,203,308,181,274"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="277,320,351,347"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="201,270,278,310,275,315,198,275"/>
+<area shape="poly" id="edge9_Node000009_Node000003" title=" " alt="" coords="238,125,201,161,197,158,234,121"/>
+</map>

@@ -4,7 +4,7 @@
  *
  *  This file defines the generic APIs of phost access layer for the BT820 or EVE compatible silicon.
  *  Application shall access BT820 or EVE resources over these APIs,regardless of I2C or SPI protocol.
- *  In addition, there are some helper functions defined for FT800 coprocessor engine as well as phost commands.
+ *  In addition, there are some helper functions defined for BT820 coprocessor engine as well as phost commands.
  * 
  * @author Bridgetek
  *
@@ -12,7 +12,7 @@
  * 
  * MIT License
  *
- * Copyright (c) [2019] [Bridgetek Pte Ltd (BRTChip)]
+ * Copyright (c) [2024] [Bridgetek Pte Ltd (BRTChip)]
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@
 ** INCLUDES **
 *************/
 #include "EVE_GpuTypes.h"
+#include "EVE_GpuDefs.h"
 
 /***********
 ** MARCOS **
@@ -54,17 +55,17 @@
 typedef enum EVE_STATUS_T
 {
 	EVE_STATUS_CLOSED = 0, /**< 0 */
-	EVE_STATUS_OPENED,
-	EVE_STATUS_READING,
-	EVE_STATUS_WRITING,
-	EVE_STATUS_ERROR,
+	EVE_STATUS_OPENED, /**< 1 */
+	EVE_STATUS_READING, /**< 2 */
+	EVE_STATUS_WRITING, /**< 3 */
+	EVE_STATUS_ERROR, /**< 4 */
 } EVE_STATUS_T;
 
 typedef enum EVE_TRANSFER_T
 {
 	EVE_TRANSFER_NONE = 0, /**< 0 */
-	EVE_TRANSFER_READ,
-	EVE_TRANSFER_WRITE,
+	EVE_TRANSFER_READ, /**< 1 */
+	EVE_TRANSFER_WRITE, /**< 2 */
 } EVE_TRANSFER_T;
 
 typedef enum EVE_CHIPID_T
@@ -75,19 +76,18 @@ typedef enum EVE_CHIPID_T
 typedef enum EVE_HOST_T
 {
 	EVE_HOST_UNKNOWN = 0, /**< 0 */
-	EVE_HOST_BT8XXEMU,
-	EVE_HOST_FT4222,
-	EVE_HOST_MPSSE,
+	EVE_HOST_FT4222, /**< 1 */
+	EVE_HOST_MPSSE, /**< 2 */
 
-	EVE_HOST_NB
+	EVE_HOST_NB /**< 3 */
 } EVE_HOST_T;
 
 typedef enum EVE_PWR_STATE_T
 {
 	EVE_PWR_STATE_ACTIVE = 0, /**< 0 */
-	EVE_PWR_STATE_STANDBY,
-	EVE_PWR_STATE_SLEEP,
-	EVE_PWR_STATE_POWERDOWN
+	EVE_PWR_STATE_STANDBY, /**< 1 */
+	EVE_PWR_STATE_SLEEP, /**< 2 */
+	EVE_PWR_STATE_POWERDOWN /**< 3 */
 } EVE_PWR_STATE_T;
 
 /** SETPLLSP1 */
@@ -166,13 +166,6 @@ typedef struct EVE_HalParameters
 	/** Called anytime the code is waiting during CMD write. Return false to abort wait */
 	EVE_Callback CbCmdWait;
 
-#if defined(BT8XXEMU_PLATFORM)
-	void *EmulatorParameters; /**< BT8XXEMU_EmulatorParameters */
-	void *EmulatorFlashParameters; /**< BT8XXEMU_FlashParameters */
-
-	uint32_t EmulatorMode;
-#endif
-
 #if defined(MPSSE_PLATFORM)
 	uint32_t MpsseChannelNo; /**< MPSSE channel number */
 #endif
@@ -219,11 +212,6 @@ typedef struct EVE_HalContext
 
 	/** @name Handles to external context */
 	///@{
-#if defined(BT8XXEMU_PLATFORM)
-	void *Emulator; /**< FT8XXEMU_Emulator */
-	void *EmulatorFlash; /**< FT8XXEMU_Flash */
-	void *EmulatorParameters; /**< BT8XXEMU_EmulatorParameters */ /* Copy for powerCycle */
-#endif
 #if defined(FT4222_PLATFORM) | defined(MPSSE_PLATFORM)
 	void *SpiHandle;
 	void *GpioHandle; /**< LibFT4222 uses this member to store GPIO handle */
@@ -261,7 +249,7 @@ typedef struct EVE_HalContext
 	uint8_t CmdBuffer[4];
 	uint8_t CmdBufferIndex;
 
-	uint16_t CmdSpace; /**< Free space, cached value */
+	uint32_t CmdSpace; /**< Free space, cached value */
 	///@}
 
 	/** @name Media FIFO state */
