@@ -17,6 +17,12 @@ project(${ProjectId} C CXX)
 
 ADD_EXECUTABLE(${ProjectId} ${SRCS} ${HDRS})
 
+IF(IS_PLATFORM_RP2040)
+  pico_enable_stdio_uart(${ProjectId} 1)
+  pico_enable_stdio_usb(${ProjectId} 1) # Enable Virtual COM port
+  pico_add_extra_outputs(${ProjectId})
+ENDIF()
+
 # Deployment ###################################################################
 SET(path_deploy "${CMAKE_BINARY_DIR}/deploy/${ProjectId}")
 SET(path_exe "${path_deploy}/executable" )
@@ -25,6 +31,8 @@ SET(path_test "${CMAKE_CURRENT_SOURCE_DIR}/Test" )
 IF (WIN32)
     SET(exe_filename "${ProjectId}.exe")
     SET(path_exe "${path_deploy}/executable/1/2" ) # it need to access ../../../Test/image...
+ELSEIF(IS_PLATFORM_RP2040)
+    SET(exe_filename "${ProjectId}.uf2")
 ENDIF()
 
 add_custom_command(TARGET "${ProjectId}"  PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${path_deploy}" )

@@ -58,9 +58,11 @@ Graphics target:
 Platform target:
 - FT4222_PLATFORM (set EVE_PLATFORM_FT4222)
 - MPSSE_PLATFORM (set EVE_PLATFORM_MPSSE)
+- RP2040_PLATFORM (set EVE_PLATFORM_RP2040)
 
 Display resolution:
 - DISPLAY_RESOLUTION_WUXGA
+- DISPLAY_RESOLUTION_FHD
 
 Additionally, the following support flags are set:
 - EVE_SUPPORT_UNICODE
@@ -74,15 +76,16 @@ Additionally, the following support flags are set:
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 /* Validate the configured options. */
-#if defined(EVE_GRAPHICS_BT820)
+#if defined(EVE_GRAPHICS_BT820) || defined(VM820B156)
 #define EVE_GRAPHICS_AVAILABLE
 #endif
 
-#if defined(EVE_DISPLAY_WUXGA)
+#if defined(EVE_DISPLAY_WUXGA) || defined(EVE_DISPLAY_FHD)
 #define EVE_DISPLAY_AVAILABLE
 #endif
 
-#if defined(EVE_PLATFORM_FT4222) || defined(EVE_PLATFORM_MPSSE)
+#if defined(EVE_PLATFORM_FT4222) || defined(EVE_PLATFORM_MPSSE) || defined(EVE_PLATFORM_RP2040) \
+    || defined(MM2040EV)
 #define EVE_PLATFORM_AVAILABLE
 #endif
 
@@ -111,6 +114,14 @@ It may also set platform, display, and flash values if none are configured.
 #define DISPLAY_RESOLUTION_WUXGA
 #endif
 
+#elif defined(VM820B156)
+#define BT820_ENABLE
+
+#ifndef EVE_DISPLAY_AVAILABLE
+#define EVE_DISPLAY_AVAILABLE
+#define DISPLAY_RESOLUTION_FHD
+#endif
+#define TOUCH_PATCH_REQUIRED
 #endif
 
 // Re-Mapping BT820 Series to BT82X
@@ -122,6 +133,14 @@ It may also set platform, display, and flash values if none are configured.
 /** Display config **/
 #if defined(EVE_DISPLAY_WUXGA)
 #define DISPLAY_RESOLUTION_WUXGA
+#elif defined(EVE_DISPLAY_FHD)
+#define DISPLAY_RESOLUTION_FHD
+#define TOUCH_PATCH_REQUIRED
+#endif
+
+/** Platform config **/
+#if defined(MM2040EV) && !defined(EVE_PLATFORM_RP2040)
+#define EVE_PLATFORM_RP2040
 #endif
 
 /** SPI config **/
@@ -131,6 +150,14 @@ It may also set platform, display, and flash values if none are configured.
 #define ENABLE_SPI_DUAL
 #else
 #define ENABLE_SPI_SINGLE
+#endif
+#if defined(EVE_PLATFORM_RP2040) // RP2040 only support single mode
+#ifdef ENABLE_SPI_QUAD
+#undef ENABLE_SPI_QUAD
+#endif
+#ifdef ENABLE_SPI_DUAL
+#undef ENABLE_SPI_DUAL
+#endif
 #endif
 
 /** DDR config **/
@@ -147,6 +174,7 @@ It may also set platform, display, and flash values if none are configured.
 Ultimately, the platform selection must set one of the following internal platform flags.
 - FT4222_PLATFORM
 - MPSSE_PLATFORM
+- RP2040_PLATFORM
 These may only be set by one of the platform target definitions, and should not be set manually by the user.
 
 */
@@ -160,16 +188,13 @@ These may only be set by one of the platform target definitions, and should not 
 #define MSVC_PLATFORM
 #define EVE_HOST EVE_HOST_MPSSE
 
+#elif defined(EVE_PLATFORM_RP2040)
+#define RP2040_PLATFORM
+#define EVE_HOST EVE_HOST_RP2040
 #endif
 
 #define EVE_CONFIG__STR(x) #x
 #define EVE_CONFIG_STR(x) EVE_CONFIG__STR(x)
-
-
-#if defined(FT4222_PLATFORM)   \
-    || defined(MPSSE_PLATFORM)
-#define EVE_PLATFORM_AVAILABLE
-#endif
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -212,8 +237,9 @@ typedef char eve_tchar_t;
 #endif
 
 #ifndef _MSC_VER
-/* strcpy_s is not available in GCC */
+/* strcpy_s, sprintf_s is not available in GCC */
 #define strcpy_s(dst, sz, src) strcpy(dst, src)
+#define sprintf_s(str, size, fmt, ...) snprintf(str, size, fmt, ##__VA_ARGS__)
 #endif
 
 #ifdef _MSC_VER
@@ -246,6 +272,15 @@ typedef char eve_tchar_t;
 #define EVE_BUFFER_WRITES
 #endif
 
+/* Enable FatFS by default on supported platforms */
+#if defined(RP2040_PLATFORM)
+#ifndef EVE_ENABLE_FATFS
+#define EVE_ENABLE_FATFS 1
+#endif
+#else
+#define EVE_ENABLE_FATFS 0
+#endif
+
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -260,7 +295,8 @@ typedef char eve_tchar_t;
                                                       "No display model has been selected")
 #endif
 #if ((defined(FT4222_PLATFORM) ? 1 : 0)   \
-    + (defined(MPSSE_PLATFORM) ? 1 : 0)) \
+    + (defined(MPSSE_PLATFORM) ? 1 : 0)   \
+    + (defined(RP2040_PLATFORM) ? 1 : 0)) \
     > 1
 #pragma message(__FILE__ "(" EVE_CONFIG_STR(__LINE__) "): warning PLATFORM: " \
                                                       "More than one platform has been selected")

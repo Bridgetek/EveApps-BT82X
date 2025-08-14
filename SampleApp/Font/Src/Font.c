@@ -30,7 +30,6 @@
  */
 
 #include "Font.h"
-#include "Common.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
@@ -63,7 +62,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
         SAMAPP_Font();
@@ -435,6 +434,7 @@ void helperLoadXfont(uint8_t isReindex)
 */
 void SAMAPP_Font_indexer()
 {
+#if defined(MSVC_PLATFORM)
     Draw_Text(s_pHalContext, "Example for: Code point ordinal/UTF-8");
 
     Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
@@ -449,6 +449,7 @@ void SAMAPP_Font_indexer()
     helperLoadXfont(1);
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
+#endif
 }
 
 EVE_FontsExt2_chblk *get_FontsExt2_glyph_addr(uint32_t xf, uint32_t cp)

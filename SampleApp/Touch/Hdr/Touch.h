@@ -4,7 +4,12 @@
 #include "Common.h"
 
 // Path to UI assets Folder
+#if defined(MSVC_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
+#else
+#define TEST_DIR                            "/EveApps/SampleApp/Touch/Test"
+#endif
+
 #define GET_CALIBRATION                     1
 
 #define NAMEARRAYSZ 500

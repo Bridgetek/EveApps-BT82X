@@ -32,6 +32,7 @@
 #include "Widget.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
+#include "base.h"
 
 #define SAMAPP_DELAY           EVE_sleep(2000);
 
@@ -51,6 +52,10 @@ int main(int argc, char* argv[])
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
     LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+	if (eve_loadpatch(s_pHalContext) != 0)
+		eve_printf_debug("eve_loadpatch failed\n");
+	else
+		eve_printf_debug("eve_loadpatch OK\n");
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -67,7 +72,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
         SAMAPP_Widget();
 
@@ -78,6 +83,10 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
         LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+		if (eve_loadpatch(s_pHalContext) != 0)
+			eve_printf_debug("eve_loadpatch failed\n");
+		else
+			eve_printf_debug("eve_loadpatch OK\n");
 #if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif

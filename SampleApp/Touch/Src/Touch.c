@@ -32,6 +32,9 @@
 #include "Touch.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
+#if defined(TOUCH_PATCH_REQUIRED)
+#include "base.h"
+#endif
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -43,6 +46,12 @@ int main(int argc, char* argv[])
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
     LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+#if defined(TOUCH_PATCH_REQUIRED)
+	if (eve_loadpatch(s_pHalContext) != 0)
+		eve_printf_debug("eve_loadpatch failed\n");
+	else
+		eve_printf_debug("load patch ok\n");
+#endif
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -59,7 +68,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
         SAMAPP_Touch();
@@ -71,6 +80,12 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
         LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+#if defined(TOUCH_PATCH_REQUIRED)
+		if (eve_loadpatch(s_pHalContext) != 0)
+			eve_printf_debug("eve_loadpatch failed\n");
+		else
+			eve_printf_debug("load patch ok\n");
+#endif
 #if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif

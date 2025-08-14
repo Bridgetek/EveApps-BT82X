@@ -25,33 +25,50 @@
 
 2. SUPPORTED PLATFORM
     * Microsoft Visual C++ platform with FT4222 or MPSSE
-
+    * RP2040
+    
     EVE platform: EVE5
-    LCD size: WUXGA(1920x1200)
+    LCD size: WUXGA(1920x1200), FHD(1920x1080)
 
 3. SETUP AND RUN
     3.1 CONNECT HARDWARE
         3.1.1 Microsoft Visual C++ platform with FT4222 and MPSSE
             - Connect PC with EVE platform via FT4222 or MPSSE
             - Connect power to EVE platform
+        
+        3.1.2 RP2040 platform
+            - Connect RP2040 with EVE platform via SPI port
+            - Connect PC with RP2040 via micro USB port
 
     3.2 DOWNLOAD ASSETS
         3.2.1 Use EAB to program the board with the flash.bin file located in the Flash folder.
 
         3.2.2 Copy all files from the SDCard folder to the SD card.
+        
+        3.2.3 RP2040 platform
+            - Copy Test folder to SDcard, the path is: /EveApps/SampleApp/Widget/Test
 
     3.3 BUILD AND RUN
         3.3.1 Microsoft Visual C++ platform with FT4222 and MPSSE
             - Open project in Project\MSVC with Microsoft Visual C++
             - Build (Ctrl + B)
             - Run (F5)
+            
+        3.3.2 RP2040 platform
+            - Build project with Cmake, see EveApps/README.md #Raspberry Pi Pico
+            - Run: 
+              1. Connect RP2040 and PC via mirco USB
+              1. Hold down the BOOTSEL button
+              2. Power on the RP2040, and RP2040 drive will appear on the PC
+              3. Copy .uf2 binary into RP2040 drive
 
 4. CONFIGURATION INSTRUCTIONS
     Sample application uses the macros to configure the platforms: 
 
     Host platform:
         - Window host: EVE_PLATFORM_FT4222, EVE_PLATFORM_MPSSE
-
+        - RP2040 host: EVE_PLATFORM_RP2040, MM2040EV
+    
     EVE platform: EVE_GRAPHICS_BT820
 
     Please see common\eve_hal\EVE_Config.h. for more macros.

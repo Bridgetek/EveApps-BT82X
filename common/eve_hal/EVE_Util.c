@@ -273,7 +273,11 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 	if (!display)
 	{
 		/* Default displays if none was explicitly chosen */
+#if defined(DISPLAY_RESOLUTION_FHD)
+		display = EVE_DISPLAY_FHD_1920x1080_60Hz;
+#elif defined(DISPLAY_RESOLUTION_WUXGA)
 		display = EVE_DISPLAY_WUXGA_1920x1200_60Hz;
+#endif
 	}
 
 	width = s_DisplayResolutions[display][0];
@@ -309,7 +313,32 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 #endif
 		config->PCLKPol = 0;
     }
-
+	else if (display == EVE_DISPLAY_FHD_1920x1080_60Hz)
+	{
+		/*
+		BT820 known values:
+		REG_FREQUENCY: 72MHz
+		Resolution: 1920x1080
+		Refresh rate: 60Hz
+		*/
+#if EVE_HARDCODED_DISPLAY_TIMINGS
+		if (supportedResolution)
+		{
+			config->Width = 1920;
+			config->Height = 1080;
+			config->HCycle = 2240;
+			config->HOffset = 50;
+			config->HSync0 = 0;
+			config->HSync1 = 30;
+			config->VCycle = 1115;
+			config->VOffset = 10;
+			config->VSync0 = 0;
+			config->VSync1 = 3;
+			config->PCLK = 1;
+		}
+#endif
+		config->PCLKPol = 0;
+	}
 
 #ifdef _DEBUG
 	eve_printf_debug("Display refresh rate set to %f Hz\n", (float)((double)freq / ((double)config->HCycle * (double)config->VCycle * (double)config->PCLK)));

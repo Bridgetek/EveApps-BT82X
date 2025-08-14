@@ -62,7 +62,14 @@ press F5 to build and run
 
 #### Way 2: Use Cmake: (Need Cmake 3.19 installed)
 ```sh
-#Launch the Developer Command Prompt for VS
+# Launch the appropriate Developer Command Prompt for VS
+# For 64-bit build, open:
+# x64 Native Tools Command Prompt for VS
+call "[path to VS]\VC\Auxiliary\Build\vcvars64.bat"   # for 64-bit
+# For 32-bit build, open:
+# x86 Native Tools Command Prompt for VS
+call "[path to VS]\VC\Auxiliary\Build\vcvars32.bat"   # for 32-bit
+
 cd [path to EveApps]
 mkdir build
 cd build
@@ -71,7 +78,7 @@ nmake SampleApp_[Project Name]
 
 # EVE_APPS_PLATFORM can be one of : EVE_PLATFORM_FT4222 or EVE_PLATFORM_MPSSE
 # [EVE graphics] must be : EVE_GRAPHICS_BT820
-# [EVE display] must be:  EVE_DISPLAY_WUXGA   (1920x1200 LCD)
+# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD)
 # [EVE SPI] can be one of : EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE  (FT4222 can support Quad/Dual/Single, MPSSE supports single only)
 # [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
 # The output binary [Project Name].exe can be found in build\[Project Name]
@@ -84,6 +91,54 @@ example:
 ![image](https://github.com/user-attachments/assets/d1d4b27c-8634-44d4-a0db-1efed9333bd4)
 
 ![image](https://github.com/user-attachments/assets/2f0bfb2d-30c0-4b5f-a19f-4eb864e2a721)
+
+### Raspberry Pi Pico
+
+Requires the Pico toolchain https://github.com/ndabas/pico-setup-windows to be installed.
+
+Pico-SDK version 1.3.0 is required
+
+
+The following steps will build for Raspberry Pi Pico.
+
+ 1. Install cmake 3.19.x, python, Visual Studio 2019 community (must select C++), GNU Arm Embedded Toolchain for window.
+ 2. Launch the *Developer Command Prompt for VS*
+```sh
+set PICO_SDK_PATH=[path to pico-sdk]
+set PICO_TOOLCHAIN_PATH=[path to GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin]
+cd EveApps
+mkdir build
+cd build
+cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_RP2040 -DEVE_APPS_GRAPHICS=[EVE graphics] -DEVE_APPS_DISPLAY=[EVE display] -DEVE_APPS_SPI=[EVE SPI] -DCMAKE_BUILD_TYPE=Debug ..
+nmake [Project name]
+
+# [EVE graphics] must be : EVE_GRAPHICS_BT820
+# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD)
+# [EVE SPI] must : EVE_SPI_SINGLE (PR2040 supports single only)
+# [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
+# The output binary [Project Name].uf2 can be found in build\SampleApp\[Project]
+```
+
+Example: 
+```
+$ cmake.exe -G "NMake Makefiles"  -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_PLATFORM=MM2040EV -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_SINGLE -DCMAKE_BUILD_TYPE=Debug ..
+$ nmake 
+```
+
+#### Connections
+
+| RP2040 | EVE | UART | SD |
+| --- | --- | --- | --- |
+| GP0 (TX) | | RX (debug) | |
+| GP1 (RX) | | TX (optional) | |
+| GP2 (SPI0 SCK) | SCK | | |
+| GP3 (SPI0 MOSI) | MOSI | | |
+| GP4 (SPI0 MISO) | MISO | | |
+| GP5 (GPIO) | CS | | |
+| GP6 (GPIO) | INT | | |
+| GP7 (GPIO) | PWD | | |
+| 5V | 5V | | |
+| GND | GND | | |
 
 ## Version
 This version is v1.0.0_RC1

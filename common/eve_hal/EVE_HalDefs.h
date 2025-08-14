@@ -40,6 +40,9 @@
 *************/
 #include "EVE_GpuTypes.h"
 #include "EVE_GpuDefs.h"
+#if EVE_ENABLE_FATFS
+#include "ff.h"
+#endif
 
 /***********
 ** MARCOS **
@@ -183,6 +186,15 @@ typedef struct EVE_HalParameters
 	uint16_t SpiClockrateKHz; /**< In kHz */
 #endif
 
+#if defined(RP2040_PLATFORM)
+	uint32_t DeviceIdx;
+	uint8_t SpiCsPin; /**< SPI chip select number of BT8XX chip */
+	uint8_t SpiSckPin;
+	uint8_t SpiMosiPin;
+	uint8_t SpiMisoPin;
+	uint8_t PowerDownPin; /**< BT8XX power down pin number */
+#endif
+
 } EVE_HalParameters;
 
 typedef struct EVE_HalContext
@@ -228,10 +240,18 @@ typedef struct EVE_HalContext
 	uint32_t MpsseChannelNo; /**< MPSSE channel number */
 #endif
 #if defined(FT4222_PLATFORM)
-	uint8_t SpiCsPin; /**< SPI chip select number of FT8XX chip */
+	uint8_t SpiCsPin; /**< SPI chip select number of BT8XX chip */
 #endif
 #if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
-	uint8_t PowerDownPin; /**< FT8XX power down pin number */
+	uint8_t PowerDownPin; /**< BT8XX power down pin number */
+#endif
+#if defined(RP2040_PLATFORM)
+	void *SpiPort; /**< SPI port */
+	uint8_t SpiCsPin; /**< SPI chip select number of BT8XX chip */
+	uint8_t SpiSckPin;
+	uint8_t SpiMosiPin;
+	uint8_t SpiMisoPin;
+	uint8_t PowerDownPin; /**< BT8XX power down pin number */
 #endif
 	///@}
 
@@ -257,7 +277,11 @@ typedef struct EVE_HalContext
 #if defined(EVE_SUPPORT_MEDIAFIFO)
 	uint32_t MediaFifoAddress;
 	uint32_t MediaFifoSize;
+#if EVE_ENABLE_FATFS
+	FIL LoadFileObj;
+#else
 	void *LoadFileHandle;
+#endif
 	ptrdiff_t LoadFileRemaining;
 #endif
 	///@}

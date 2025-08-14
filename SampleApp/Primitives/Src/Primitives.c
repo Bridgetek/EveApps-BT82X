@@ -30,7 +30,6 @@
  */
 
 #include "Primitives.h"
-#include "Common.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 #include "Maths.h"
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
         SAMAPP_Primitives();

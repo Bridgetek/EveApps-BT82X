@@ -68,6 +68,9 @@ void Gpu_Init(EVE_HalContext* phost)
     EVE_Hal_open(phost, &params);
 
     EVE_Util_bootupConfig(phost);
+#if defined(RP2040_PLATFORM)
+    EVE_Util_loadSdCard(phost);
+#endif
 }
 
 /**
@@ -327,6 +330,8 @@ void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath, const uint8_t *f
 {
 #if defined(_WIN32)
 #define _WHERE "PC"
+#elif defined(RP2040_PLATFORM)
+#define _WHERE "SDcard"
 #endif
 
     /// show a dialog on the screen with two options: Yes or No?
@@ -677,14 +682,12 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     uint8_t lvdspll_cks = 0;
     uint8_t lvdspll_ns = 7;
     uint16_t w, h;
-#if defined(DISPLAY_RESOLUTION_WUXGA)
-    w = 1920;
-    h = 1200;
+	w = phost->Width;
+	h = phost->Height;
     TXPLLDiv = 0x03;
     eve_printf_debug("TXPLLDiv %d\n", TXPLLDiv);
     lvdspll_cks = TXPLLDiv > 4 ? 1 : 2;
     EVE_Hal_wr32(phost, REG_LVDSTX_PLLCFG, LVDSTX_PLLCFG(lvdspll_cps, lock_delay, lvdspll_cks, lvdspll_ns, TXPLLDiv));
-#endif
     EVE_Hal_wr32(phost, REG_LVDSTX_EN, 0);
     EVE_Hal_wr32(phost, REG_LVDSTX_EN, LVDS_CH1_EN | LVDS_CH0_EN);
     EVE_sleep(10);
@@ -726,16 +729,33 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     }
 	else if (mode == MODE_LVDSRX)
 	{
-		EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
-        EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) |
-		                                      (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
+		// This LVDSRX mode is not using Swapchain 2 to display, so only simple address is required
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, DDR_FRAMEBUFFER_STARTADDR);
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
+		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
 
+		EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+		EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
+			                                  (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
+
+		scanout_swapping(phost, format, w, h);
+	}
+	else if (mode == MODE_LVDSRX_SC)
+	{
+		// This LVDSRX mode is using Swapchain 2 to display
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, SWAPCHAIN_2);
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
 		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
+
+		EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+		EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
+			                                  (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
 
 		scanout_swapping(phost, format, w, h);
 	}
@@ -748,3 +768,20 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     eve_printf_debug("LVDSTX_STAT is %lx \n", EVE_Hal_rd32(phost, REG_LVDSTX_STAT));
     eve_printf_debug("LVDSTX_ERR_STAT is %lx \n", EVE_Hal_rd32(phost, REG_LVDSTX_ERR_STAT));
 }
+
+#if defined(RP2040_PLATFORM)
+void strcat_s(char *dest, size_t dest_size, const char *src)
+{
+	size_t space_left = dest_size - strlen(dest) - 1; // leave space for null terminator
+
+	if (space_left > 0)
+	{
+		strncat(dest, src, space_left);
+	}
+	else
+	{
+		// Optional: handle error or truncation
+		eve_printf_debug("Buffer full. Cannot append string.\n");
+	}
+}
+#endif

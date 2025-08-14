@@ -26,7 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--# filter source list-->
-    <ClCompile Include="..\..\Src\Lvds.c">
+    <ClCompile Include="..\..\Src\Lvdsrx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\common\application\Common.c">
@@ -152,7 +152,7 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\Hdr\WinTypes.h">
       <Filter>Common\eve_hal\Hdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Hdr\Lvds.h">
+    <ClInclude Include="..\..\Hdr\Lvdsrx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\FlashHelper.h">

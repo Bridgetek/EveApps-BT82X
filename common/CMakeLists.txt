@@ -1,1 +1,5 @@
+IF(IS_PLATFORM_RP2040)
+  ADD_SUBDIRECTORY(application/fatfs)
+ENDIF()
+
 ADD_SUBDIRECTORY(eve_hal)

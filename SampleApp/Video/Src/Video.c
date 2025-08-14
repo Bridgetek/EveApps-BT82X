@@ -30,7 +30,6 @@
  */
 
 #include "Video.h"
-#include "Common.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
@@ -60,7 +59,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
         SAMAPP_Video();

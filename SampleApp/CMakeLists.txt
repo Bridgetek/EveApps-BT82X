@@ -2,6 +2,11 @@ LINK_LIBRARIES(eve_hal)
 
 set_directory_properties(PROPERTIES FOLDER SampleApp)
 
+IF(IS_PLATFORM_RP2040)
+  LINK_LIBRARIES(fatfs)
+  INCLUDE_DIRECTORIES("../common/application/fatfs/source")
+ENDIF()
+
 INCLUDE_DIRECTORIES("../common/application")
 
 # Iterate through all sub folder and add into ADD_SUBDIRECTORY

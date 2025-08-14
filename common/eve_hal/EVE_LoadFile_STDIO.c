@@ -31,7 +31,7 @@
 
 #include "EVE_LoadFile.h"
 #include "EVE_MediaFifo.h"
-
+#if !defined(RP2040_PLATFORM)
 #include <stdio.h>
 
 /**
@@ -41,8 +41,7 @@
  * @param address Address in RAM_G
  * @param filename File to load
  * @param filenameW File to load
- * @return true True if ok
- * @return false False if error
+ * @return uint32_t File size
  */
 #ifdef _WIN32
 static uint32_t loadRawFile(EVE_HalContext *phost, uint32_t address, const char *filename, const wchar_t *filenameW)
@@ -97,8 +96,7 @@ uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const cha
  * @param phost Pointer to Hal context
  * @param address Address in RAM_G
  * @param filename File to load
- * @return true True if ok
- * @return false False if error
+ * @return uint32_t File size
  */
 uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const char *filename)
 {
@@ -110,8 +108,7 @@ uint32_t EVE_Util_loadRawFile(EVE_HalContext *phost, uint32_t address, const cha
  * @param phost  Pointer to Hal context
  * @param address Address in RAM_G
  * @param filename File to load
- * @return true True if ok
- * @return false False if error
+ * @return uint32_t File size
  */
 uint32_t EVE_Util_loadRawFileW(EVE_HalContext *phost, uint32_t address, const wchar_t *filename)
 {
@@ -787,6 +784,6 @@ void EVE_Util_closeFile(EVE_HalContext *phost)
         phost->LoadFileRemaining = 0;
     }
 }
-
+#endif
 
 /* end of file */

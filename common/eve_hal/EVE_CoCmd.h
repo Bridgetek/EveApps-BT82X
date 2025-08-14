@@ -783,6 +783,14 @@ void EVE_CoCmd_loadWav(EVE_HalContext *phost, uint32_t dst, uint32_t options);
  */
 void EVE_CoCmd_loadAsset(EVE_HalContext *phost, uint32_t dst, uint32_t options);
 
+/**
+ * @brief Send CMD_I2SSTARTUP.
+ *
+ * @param phost Pointer to Hal context
+ * @param freq I2S sample frequency, in Hz
+ */
+void EVE_CoCmd_i2sStartup(EVE_HalContext *phost, uint32_t freq);
+
 /**********************************************************************
 ************************* EVE_CoCmd_State.c ***************************
 **********************************************************************/

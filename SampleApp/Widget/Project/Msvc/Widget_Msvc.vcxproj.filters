@@ -77,6 +77,9 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_Widgets.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!--# filter header list-->
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalDefs.h">
       <Filter>Common\eve_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Hdr\base.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

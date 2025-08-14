@@ -1,5 +1,5 @@
 /**
- * @file Lvds.c
+ * @file Extension.c
  * @brief Sample usage of LVDS
  *
  * @author Bridgetek
@@ -29,14 +29,14 @@
  * SOFTWARE.
  */
 
-#include "Lvds.h"
-#include "Common.h"
+#include "Extension.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
+#include "base.h"
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
-void SAMAPP_LvdsRx();
+void SAMAPP_Extension();
 
 /**
  * @brief Main function to initialize EVE, do calibrate and start application
@@ -50,6 +50,10 @@ int main(int argc, char* argv[])
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
 	LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+	if (eve_loadpatch(s_pHalContext) != 0)
+		eve_printf_debug("eve_loadpatch failed\n");
+	else
+		eve_printf_debug("eve_loadpatch OK\n");
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -61,15 +65,15 @@ int main(int argc, char* argv[])
 
     char *info[] =
     {  "EVE Sample Application",
-        "This sample demonstrate the using of LVDS", 
+        "This sample demonstrate the using of Extension", 
         "",
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
-        SAMAPP_LvdsRx();
+        SAMAPP_Extension();
 
         EVE_Util_clearScreen(s_pHalContext);
 
@@ -78,6 +82,10 @@ int main(int argc, char* argv[])
         /* Init HW Hal for next loop*/
         Gpu_Init(s_pHalContext);
 		LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+		if (eve_loadpatch(s_pHalContext) != 0)
+			eve_printf_debug("eve_loadpatch failed\n");
+		else
+			eve_printf_debug("eve_loadpatch OK\n");
 #if GET_CALIBRATION == 1
         Calibration_Restore(s_pHalContext);
 #endif
@@ -86,30 +94,34 @@ int main(int argc, char* argv[])
 }
 
 
-void SAMAPP_LvdsRx() {
-	Draw_Text(s_pHalContext, "Example for: LVDSRX");
-	LVDS_Config(s_pHalContext, YCBCR, MODE_LVDSRX);
+void SAMAPP_Extension() {
+	Draw_Text(s_pHalContext, "Example for: EVE_CMD_REGION and EVE_CMD_ENDREGION from base package");
+	
+	Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 0 });
+	EVE_CoDl_scissorSize(s_pHalContext, 240, 320);
+	EVE_CoDl_scissorXY(s_pHalContext, 150, 0);
 
-	uint32_t lvdsrx_data_addr;
-	EVE_CoCmd_regRead(s_pHalContext, REG_SC2_ADDR, &lvdsrx_data_addr);
-	uint32_t valid = 0;
-	while (!valid)
-	{
-		EVE_CoCmd_regRead(s_pHalContext, REG_SC2_STATUS, &valid);
-	}
-	eve_printf_debug("lvdsrx_data_addr 0x%lx, valid 0x%lx\n", lvdsrx_data_addr, valid);
+	EVE_CMD_REGION(s_pHalContext);
+	EVE_CoDl_colorRgb(s_pHalContext, 255, 0, 0); // red
+	EVE_CoDl_clearColorRgb(s_pHalContext, 255, 165, 0); // orange
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	EVE_CMD_REGION(s_pHalContext);
+	EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 255); // blue
+	EVE_CoDl_clearColorRgb(s_pHalContext, 80, 80, 200); // medium blue
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	EVE_CMD_REGION(s_pHalContext);
+	EVE_CoDl_clearColorRgb(s_pHalContext, 250, 80, 200); // bright pink
+	EVE_CoDl_clear(s_pHalContext, 1, 1, 1);
+	EVE_CMD_ENDREGION(s_pHalContext, 0, 90, 0, 80);
+	EVE_CMD_ENDREGION(s_pHalContext, 0, 50, 0, 170);
+	EVE_CMD_ENDREGION(s_pHalContext, 0, 10, 0, 300);
 
-	while (1)
-	{
-		Display_Start(s_pHalContext);
-		EVE_CoCmd_setBitmap(s_pHalContext, lvdsrx_data_addr, RGB8, 1920, 1080);
-		EVE_CoDl_begin(s_pHalContext, BITMAPS);
-		EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
-		EVE_CoDl_end(s_pHalContext);
-
-		EVE_CoCmd_text(s_pHalContext, 1920/2, 100, 31, OPT_CENTERX, "LVDSRX");
-		Display_End(s_pHalContext);
-	}
+	EVE_CoDl_begin(s_pHalContext, LINES);
+	EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
+	EVE_CoDl_vertex2f_4(s_pHalContext, 16 * 512, 16 * 320);
+	EVE_CoDl_end(s_pHalContext);
+	Display_End(s_pHalContext);
+	EVE_sleep(2000);
 }
 
 

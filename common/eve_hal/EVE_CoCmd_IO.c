@@ -579,4 +579,9 @@ void EVE_CoCmd_loadAsset(EVE_HalContext *phost, uint32_t dst, uint32_t options)
 	EVE_CoCmd_ddd(phost, CMD_LOADASSET, dst, options);
 }
 
+void EVE_CoCmd_i2sStartup(EVE_HalContext *phost, uint32_t freq)
+{
+	EVE_CoCmd_dd(phost, CMD_I2SSTARTUP, freq);
+}
+
 /* end of file */

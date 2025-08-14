@@ -33,6 +33,35 @@
 #define EVE_LOADFILE__H
 #include "EVE_CoCmd.h"
 
+#if defined(RP2040_PLATFORM)
+typedef enum
+{
+	SDHOST_OK = 0, /**< 0, OK */
+	SDHOST_ERROR, /**< general error */
+	SDHOST_CARD_INSERTED, /**< card inserted */
+	SDHOST_CARD_REMOVED, /**< card removed */
+	SDHOST_INVALID_RESPONSE_TYPE, /**< invalid response */
+	SDHOST_CMD_TIMEOUT, /**< command timeout */
+	SDHOST_UNUSABLE_CARD, /**< card is unusable */
+	SDHOST_CMD2_FAILED, /**< command 2 (get CID) failed */
+	SDHOST_CMD3_FAILED, /**< command 3 (get RCA) failed */
+	SDHOST_CMD8_FAILED, /**< command 8 (voltage check) failed */
+	SDHOST_CMD9_FAILED, /**< command 9 (send CSD) failed */
+	SDHOST_CMD55_FAILED, /**< command 55 (app cmd) failed */
+	SDHOST_ACMD41_FAILED, /**< command 41 failed */
+	SDHOST_CANNOT_ENTER_TRANSFER_STATE, /**< cannot enter transfer state */
+	SDHOST_CANNOT_SET_CARD_BUS_WIDTH, /**< cannot set bus width */
+	SDHOST_RESPONSE_ERROR, /**< response error */
+	SDHOST_WRITE_ERROR, /**< read error */
+	SDHOST_READ_ERROR, /**< write error */
+	SDHOST_NOT_INITIALISED, /**< host is not initialised by driver */
+	SDHOST_CARD_NOT_INITIALISED, /**< card is not initialised by driver */
+} SDHOST_STATUS;
+
+bool EVE_Util_loadSdCard(EVE_HalContext *phost);
+bool EVE_Util_sdCardReady(EVE_HalContext *phost);
+#endif
+
 /*
 On Windows platform, filenames are assumed to be in the local character set.
 The unicode variants of the functions can be used for unicode paths.

@@ -50,6 +50,9 @@ extern "C" {
 #if defined(MPSSE_PLATFORM)
 #include "EVE_Platform_MPSSE.h"
 #endif
+#if defined(RP2040_PLATFORM)
+#include "EVE_Platform_RP2040.h"
+#endif
 
 /**********************
  *      MACROS

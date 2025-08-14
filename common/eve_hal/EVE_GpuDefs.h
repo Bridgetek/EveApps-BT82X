@@ -759,6 +759,12 @@
 #define CHn_PWDN_B_ON              1UL
 ///@}
 
+/** @name for REG_LVDSRX_STAT */
+///@{
+#define SIG_VALUE                  15UL /**< 0xF */
+#define CHn_DLL_LOCKED             1UL
+///@}
+
 /** @name for REG_INT_FLAGS and REG_INT_MASK */
 ///@{
 #define INT_SWAP                   0UL

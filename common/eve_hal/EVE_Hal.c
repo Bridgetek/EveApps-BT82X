@@ -116,13 +116,20 @@ void EVE_Hal_close(EVE_HalContext *phost)
 	}
 
 #ifdef EVE_SUPPORT_MEDIAFIFO
-	//EVE_Util_closeFile(phost);
+#if EVE_ENABLE_FATFS
+	if (phost->LoadFileRemaining)
+	{
+		f_close(&phost->LoadFileObj);
+		phost->LoadFileRemaining = 0;
+	}
+#else
 	if (phost->LoadFileHandle)
 	{
 		fclose(phost->LoadFileHandle);
 		phost->LoadFileHandle = NULL;
 		phost->LoadFileRemaining = 0;
 	}
+#endif
 #endif
 	EVE_HalImpl_close(phost);
 	memset(phost, 0, sizeof(EVE_HalContext));

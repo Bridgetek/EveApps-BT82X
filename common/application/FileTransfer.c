@@ -36,7 +36,12 @@
 
 #define BLOBSIZE              4096
 
+#if defined(MSVC_PLATFORM)
 #define EVE_FLASH_DIR         __FILE__ "\\..\\..\\..\\common\\eve_flash"
+#else
+#define EVE_FLASH_DIR         "/Test/common/eve_flash"
+#endif
+
 #define FILE_BLOB (EVE_FLASH_DIR "\\bt82x.blob")
 
 #define FTF_PROGESS_READ 1

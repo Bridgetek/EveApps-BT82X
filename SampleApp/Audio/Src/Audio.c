@@ -30,7 +30,6 @@
  */
 
 #include "Audio.h"
-#include "Common.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
         ""
     }; 
 
-    while (TRUE) {
+    while (true) {
         WelcomeScreen(s_pHalContext, info);
 
         SAMAPP_Audio();
@@ -135,9 +134,7 @@ void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char
             EVE_CoDl_vertex2f_4(s_pHalContext, ((j * wbutton) + wbutton - 2) * 16, ((hbutton * i) + hbutton - 2) * 16);
             EVE_CoDl_end(s_pHalContext);
 
-#if defined(MSVC_PLATFORM)
             strcpy_s(StringArray, 8, pString);
-#endif
             EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
             EVE_CoCmd_text(s_pHalContext, (int16_t)((wbutton / 2) + j * wbutton),
             (int16_t)((hbutton / 2) + hbutton * i), 29, OPT_CENTER, StringArray);

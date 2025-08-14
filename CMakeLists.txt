@@ -8,6 +8,12 @@
 #  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_MPSSE -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820 -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA -DEVE_APPS_SPI=EVE_SPI_QUAD -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
+# 3. Build for RP2040 example:
+#  set PICO_SDK_PATH=[path-to-pico-sdk]
+#  set PICO_TOOLCHAIN_PATH=[path-to-gnu-arm-toolchain]
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=MM2040EV -DEVE_APPS_GRAPHICS=VM820B156 -DEVE_APPS_DISPLAY=EVE_DISPLAY_FHD -DEVE_APPS_SPI=EVE_SPI_SINGLE -DCMAKE_BUILD_TYPE=Debug ..
+#  nmake SampleApp
+#
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13 FATAL_ERROR)
 
@@ -47,11 +53,15 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/")
 
 # Valid option input ###########################################################
 set(LIST_GRAPHICS EVE_GRAPHICS_BT820
+                  VM820B156
   )
 set(LIST_PLATFORM EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
+                  EVE_PLATFORM_RP2040
+                  MM2040EV
   )
 set(LIST_DISPLAY  EVE_DISPLAY_WUXGA
+                  EVE_DISPLAY_FHD
   )
 
 # Validate input ###############################################################
@@ -87,6 +97,15 @@ function(validate_input option_name array)
   MESSAGE(STATUS "Other ${option_name}'s are: ${list_str} \n")
 endfunction()
 
+function(validate_env_rp2040 env env_name)
+    MESSAGE(STATUS "${env_name} is ${env}")
+    
+    if ("${env}" STREQUAL "")
+        MESSAGE(FATAL_ERROR "${env_name} is not set, stop compile!")
+    endif()
+    MESSAGE(STATUS "${env_name} is ${env}")
+endfunction()
+
 validate_input("EVE_APPS_GRAPHICS" LIST_GRAPHICS)
 validate_input("EVE_APPS_PLATFORM" LIST_PLATFORM)
 validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
@@ -95,13 +114,16 @@ validate_input("EVE_APPS_DISPLAY"  LIST_DISPLAY)
 STRING(REGEX MATCH "(EVE_PLATFORM_FT4222|EVE_PLATFORM_MPSSE)" IS_PLATFORM_WINDOW   ${EVE_APPS_PLATFORM})
 STRING(REGEX MATCH "EVE_PLATFORM_FT4222"       IS_PLATFORM_FT4222   ${EVE_APPS_PLATFORM})
 STRING(REGEX MATCH "EVE_PLATFORM_MPSSE"        IS_PLATFORM_MPSSE    ${EVE_APPS_PLATFORM}) 
+STRING(REGEX MATCH "(EVE_PLATFORM_RP2040|MM2040EV)"       IS_PLATFORM_RP2040   ${EVE_APPS_PLATFORM})
 SET(IS_PLATFORM_WINDOW   "${IS_PLATFORM_WINDOW}"   CACHE STRING "Platform Target WINDOW  ")
 SET(IS_PLATFORM_FT4222   "${IS_PLATFORM_FT4222}"   CACHE STRING "Platform Target FT4222  ")
 SET(IS_PLATFORM_MPSSE    "${IS_PLATFORM_MPSSE}"    CACHE STRING "Platform Target MPSSE   ")
+SET(IS_PLATFORM_RP2040   "${IS_PLATFORM_RP2040}"   CACHE STRING "Platform Target RP2040  ")
 
 mark_as_advanced(IS_PLATFORM_WINDOW  )
 mark_as_advanced(IS_PLATFORM_FT4222  )
 mark_as_advanced(IS_PLATFORM_MPSSE   )
+mark_as_advanced(IS_PLATFORM_RP2040  )
 
 # Set up the basic build environment ###########################################
 IF (CMAKE_BUILD_TYPE STREQUAL "")
@@ -131,6 +153,18 @@ IF(IS_PLATFORM_WINDOW)
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/common/eve_hal/Bin/MSVC/x86)
   ENDIF()
 
+ELSEIF(IS_PLATFORM_RP2040)
+  #validate_env_rp2040("$ENV{PICO_SDK_PATH}" "PICO_SDK_PATH")
+  #validate_env_rp2040("$ENV{PICO_TOOLCHAIN_PATH}" "PICO_TOOLCHAIN_PATH")
+
+  # Pull in Pico SDK (must be before project)
+  INCLUDE(pico_sdk_import.cmake)
+  PROJECT("EVE_Apps" C CXX ASM)
+
+  # Initialise the Pico SDK
+  pico_sdk_init()
+
+  INCLUDE_DIRECTORIES(common/application/fatfs/source)
 ENDIF()
 
 # C language version ###########################################################
