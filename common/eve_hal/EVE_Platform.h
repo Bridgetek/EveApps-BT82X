@@ -41,9 +41,6 @@ extern "C" {
  *********************/
 /* Include all public headers. */
 #include "EVE_Config.h"
-//#if defined(_WIN32)
-//#include "EVE_Platform_WIN32.h"
-//#endif
 #if defined(FT4222_PLATFORM)
 #include "EVE_Platform_FT4222.h"
 #endif

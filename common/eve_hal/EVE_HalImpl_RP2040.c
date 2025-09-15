@@ -32,7 +32,8 @@
 #if defined(RP2040_PLATFORM)
 
 bool EVE_Hal_NoInit = false;
-#define READ_TIMEOUT 500
+#define POLLING_BYTES 8
+#define READ_TIMEOUT 5
 
 void setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls);
 
@@ -226,22 +227,41 @@ void EVE_Hal_flush(EVE_HalContext *phost)
  */
 static inline void rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t size)
 {
-	uint8_t buffer_readybyte[1];
-	uint8_t countTimout = 0;
-	do
+	uint8_t buffer_readybyte[8];
+	uint8_t retry = 0;
+	bool readyRecved = false;
+	uint8_t sizeTransferred;
+	if (size & 3)
 	{
-		spi_read_blocking(phost->SpiPort, 0, buffer_readybyte, 1);
-		countTimout++;
+		size = (size + 3) & ~3UL;
+		eve_printf_debug("Data size should be align to 4 bytes\n");
+	}
+	while (1)
+	{
+		spi_read_blocking(phost->SpiPort, 0, buffer_readybyte, 8);
 
-		if ( countTimout >= READ_TIMEOUT)
+		for (uint8_t i = 0; i < POLLING_BYTES; i++)
 		{
-			buffer = 0;
-			return; // Timeout error
+			if (buffer_readybyte[i] == 0x01)
+			{
+				readyRecved = true;
+				sizeTransferred = POLLING_BYTES - (i + 1);
+				sizeTransferred = size > sizeTransferred ? sizeTransferred : size;
+				memcpy(buffer, &buffer_readybyte[i + 1], sizeTransferred);
+				break;
+			}
 		}
-	} while (buffer_readybyte[0] != 0x01);
+		if (readyRecved)
+			break;
 
-	spi_read_blocking(phost->SpiPort, 0, buffer, size);
-}
+		retry++;
+		if (retry >= READ_TIMEOUT)
+			return;
+	}
+
+    if (sizeTransferred < size)
+	    spi_read_blocking(phost->SpiPort, 0, buffer + sizeTransferred, size - sizeTransferred);
+    }
 
 /**
  * @brief Write a block data

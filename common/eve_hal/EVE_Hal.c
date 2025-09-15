@@ -98,7 +98,6 @@ bool EVE_Hal_open(EVE_HalContext *phost, const EVE_HalParameters *parameters)
 {
 	memset(phost, 0, sizeof(EVE_HalContext));
 	phost->UserContext = parameters->UserContext;
-	phost->CbCmdWait = parameters->CbCmdWait;
 	return EVE_HalImpl_open(phost, parameters);
 }
 

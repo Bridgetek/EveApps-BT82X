@@ -187,11 +187,6 @@ uint32_t EVE_CoCmd_flashFast(EVE_HalContext *phost, uint32_t *result)
 		return flashStatus;
 	} // Only enter fast mode when attached
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FLASHFAST, 0))
-		return flashStatus;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FLASHFAST);
 	resAddr = EVE_Cmd_moveWp(phost, 4); // Get the address where the coprocessor will write the result
@@ -227,31 +222,6 @@ void EVE_CoCmd_appendF(EVE_HalContext *phost, uint32_t ptr, uint32_t num)
 	EVE_CoCmd_ddd(phost, CMD_APPENDF, ptr, num);
 }
 
-bool EVE_CoCmd_loadImage_flash(EVE_HalContext *phost, uint32_t dst, uint32_t src, uint32_t *format)
-{
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FLASHSOURCE, src))
-		return false;
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_LOADIMAGE, dst))
-		return false;
-#endif
-
-	if (!EVE_Cmd_waitFlush(phost))
-		return false; // Coprocessor must be ready
-	EVE_Cmd_startFunc(phost);
-	EVE_Cmd_wr32(phost, CMD_FLASHSOURCE);
-	EVE_Cmd_wr32(phost, src);
-	EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
-	EVE_Cmd_wr32(phost, dst);
-	EVE_Cmd_wr32(phost, OPT_FLASH | OPT_NODL);
-	EVE_Cmd_endFunc(phost);
-	if (!EVE_Cmd_waitFlush(phost))
-		return false; // Image failed to load
-	if (format)
-		*format = EVE_Hal_rd32(phost, 0x3097e8);
-	return true;
-}
-
 void EVE_CoCmd_flashProgram(EVE_HalContext *phost, uint32_t dst, uint32_t src, uint32_t num)
 {
 	EVE_CoCmd_dddd(phost, CMD_FLASHPROGRAM, dst, src, num);
@@ -259,11 +229,6 @@ void EVE_CoCmd_flashProgram(EVE_HalContext *phost, uint32_t dst, uint32_t src, u
 
 void EVE_CoCmd_animFrame(EVE_HalContext *phost, int16_t x, int16_t y, uint32_t aoptr, uint32_t frame)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_ANIMFRAMERAM, 0))
-		return;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_ANIMFRAME);
 	EVE_Cmd_wr16(phost, x);
@@ -285,11 +250,6 @@ void EVE_CoCmd_animStop(EVE_HalContext *phost, int32_t ch)
 
 void EVE_CoCmd_animXY(EVE_HalContext *phost, int32_t ch, int16_t x, int16_t y)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_ANIMXY, d0))
-		return;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_ANIMXY);
 	EVE_Cmd_wr32(phost, ch);
@@ -312,11 +272,6 @@ bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_
 {
 	uint32_t resAddr;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_MEMCRC, 0))
-		return false;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_MEMCRC);
 	EVE_Cmd_wr32(phost, ptr);
@@ -337,11 +292,6 @@ bool EVE_CoCmd_memCrc(EVE_HalContext *phost, uint32_t ptr, uint32_t num, uint32_
 bool EVE_CoCmd_regRead(EVE_HalContext *phost, uint32_t ptr, uint32_t *result)
 {
 	uint32_t resAddr;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_REGREAD, 0))
-		return false;
-#endif
 
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_REGREAD);
@@ -368,11 +318,6 @@ bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 {
 	uint32_t resAddr;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPTR, 0))
-		return false;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_GETPTR);
 	resAddr = EVE_Cmd_moveWp(phost, 4); // move write pointer to result location
@@ -391,11 +336,6 @@ bool EVE_CoCmd_getPtr(EVE_HalContext *phost, uint32_t *result)
 bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint32_t *h)
 {
 	uint32_t resAddr;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETPROPS, 0))
-		return false;
-#endif
 
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_GETPROPS);
@@ -420,11 +360,6 @@ bool EVE_CoCmd_getProps(EVE_HalContext *phost, uint32_t *ptr, uint32_t *w, uint3
 bool EVE_CoCmd_getImage(EVE_HalContext *phost, uint32_t *source, uint32_t *fmt, uint32_t *w, uint32_t *h, uint32_t *palette)
 {
 	uint32_t resAddr;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_GETIMAGE, 0))
-		return false;
-#endif
 
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_GETIMAGE);
@@ -454,10 +389,6 @@ uint32_t EVE_CoCmd_fssource(EVE_HalContext *phost, const char *file, uint32_t re
 {
 	uint32_t wp;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSSOURCE, 0))
-		return 0;
-#endif
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FSSOURCE);
 	EVE_Cmd_wrString(phost, file, EVE_CMD_STRING_MAX);
@@ -475,10 +406,6 @@ uint32_t EVE_CoCmd_fsread(EVE_HalContext *phost, uint32_t dst, const char *file,
 {
 	uint32_t wp;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSREAD, 0))
-		return 0;
-#endif
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FSREAD);
 	EVE_Cmd_wr32(phost, dst);
@@ -502,10 +429,6 @@ uint32_t EVE_CoCmd_fssize(EVE_HalContext *phost, const char *file, uint32_t size
 {
 	uint32_t wp;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSSIZE, 0))
-		return 0;
-#endif
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FSSIZE);
 	EVE_Cmd_wrString(phost, file, EVE_CMD_STRING_MAX);
@@ -523,10 +446,6 @@ uint32_t EVE_CoCmd_fsdir(EVE_HalContext *phost, uint32_t dst, uint32_t num, cons
 {
 	uint32_t wp;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_FSDIR, 0))
-		return 0;
-#endif
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_FSDIR);
 	EVE_Cmd_wr32(phost, dst);
@@ -545,11 +464,6 @@ uint32_t EVE_CoCmd_fsdir(EVE_HalContext *phost, uint32_t dst, uint32_t num, cons
 uint32_t EVE_CoCmd_sdattach(EVE_HalContext *phost, uint32_t options, uint32_t result)
 {
 	uint32_t wp;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_SDATTACH, 0))
-		return 0;
-#endif
 
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_SDATTACH);

@@ -171,8 +171,6 @@ Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, c
 	}
 	else {
 #ifdef EVE_FLASH_NAND
-		snprintf(progress.message, MSG_SIZE, "Writing %s to flash", progress.fileName);
-		FlashHelper_Erase(phost);
 		progress.fileSize = EVE_Util_loadRawFile(phost, RAM_G, filePath);
 		progress.sent = progress.fileSize / 2; // assume half is done
 #else
@@ -303,7 +301,13 @@ uint32_t Ftf_Write_File_To_Flash_With_Progressbar(EVE_HalContext* phost, const c
 	Ftf_Progress_t progress_init;
 	progress_init.sent = 0;
 	progress_init.fileSize = 1;
-	snprintf(progress_init.message, MSG_SIZE, "Writing %s to flash", fileName);
+	snprintf(progress_init.message, MSG_SIZE, "Reading %s", fileName);
+	Ftf_Progress_Ui(phost, &progress_init);
+	EVE_sleep(1000);
+	snprintf(progress_init.message, MSG_SIZE, "Erasing flash before writing %s", fileName);
+	Ftf_Progress_Ui(phost, &progress_init);
+	FlashHelper_Erase(phost);
+	snprintf(progress_init.message, MSG_SIZE, "Loading %s", fileName);
 	Ftf_Progress_Ui(phost, &progress_init);
 #endif
 	Ftf_Progress_t* progress = Ftf_Progress_Init(phost, filePath, fileName, address, FTF_PROGESS_WRITE);
@@ -313,8 +317,8 @@ uint32_t Ftf_Write_File_To_Flash_With_Progressbar(EVE_HalContext* phost, const c
 	}
 
 #ifdef EVE_FLASH_NAND
+	snprintf(progress->message, MSG_SIZE, "Writing %s to flash", progress->fileName);
 	Ftf_Progress_Ui(phost, progress);
-	EVE_sleep(1000);
 	FlashHelper_Program(phost, 0, RAM_G, progress->fileSize);
 	progress->sent = progress->fileSize;
 	Ftf_Progress_Ui(phost, progress);

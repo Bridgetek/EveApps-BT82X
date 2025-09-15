@@ -166,9 +166,6 @@ typedef struct EVE_HalParameters
 {
 	void *UserContext;
 
-	/** Called anytime the code is waiting during CMD write. Return false to abort wait */
-	EVE_Callback CbCmdWait;
-
 #if defined(MPSSE_PLATFORM)
 	uint32_t MpsseChannelNo; /**< MPSSE channel number */
 #endif
@@ -202,16 +199,6 @@ typedef struct EVE_HalContext
 	/** Pointer to user context */
 	void *UserContext;
 
-	/** Called anytime the code is waiting during CMD write. Return false to abort wait */
-	EVE_Callback CbCmdWait;
-	/** Callback hook called anytime the coprocessor is reset through the EVE_Util interface */
-	EVE_ResetCallback CbCoprocessorReset;
-
-#if EVE_CMD_HOOKS
-	/* Hook into coprocessor commands. Called when EVE_CoCmd interface is used. Return 1 to abort the command. Useful for an optimization routine */
-	EVE_CoCmdHook CoCmdHook;
-#endif
-
 	EVE_STATUS_T Status;
 
 	uint8_t PCLK;
@@ -222,17 +209,13 @@ typedef struct EVE_HalContext
 	uint32_t Height;
 	///@}
 
-	/** @name Handles to external context */
-	///@{
-#if defined(FT4222_PLATFORM) | defined(MPSSE_PLATFORM)
+#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
 	void *SpiHandle;
 	void *GpioHandle; /**< LibFT4222 uses this member to store GPIO handle */
-#endif
-
-#if defined(FT4222_PLATFORM) | defined(MPSSE_PLATFORM)
 	/** Currently configured SPI clock rate. In kHz.
 	May be different from requested the clock rate in parameters */
 	uint16_t SpiClockrateKHz;
+	uint8_t PowerDownPin; /**< BT8XX power down pin number */
 #endif
 	EVE_SPI_CHANNELS_T SpiChannels; /**< Variable to contain single/dual/quad channels */
 
@@ -242,9 +225,6 @@ typedef struct EVE_HalContext
 #if defined(FT4222_PLATFORM)
 	uint8_t SpiCsPin; /**< SPI chip select number of BT8XX chip */
 #endif
-#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
-	uint8_t PowerDownPin; /**< BT8XX power down pin number */
-#endif
 #if defined(RP2040_PLATFORM)
 	void *SpiPort; /**< SPI port */
 	uint8_t SpiCsPin; /**< SPI chip select number of BT8XX chip */
@@ -253,7 +233,6 @@ typedef struct EVE_HalContext
 	uint8_t SpiMisoPin;
 	uint8_t PowerDownPin; /**< BT8XX power down pin number */
 #endif
-	///@}
 
 	/** @name Write buffer to optimize writes into larger batches */
 	///@{
@@ -268,7 +247,6 @@ typedef struct EVE_HalContext
 	///@{
 	uint8_t CmdBuffer[4];
 	uint8_t CmdBufferIndex;
-
 	uint32_t CmdSpace; /**< Free space, cached value */
 	///@}
 

@@ -875,7 +875,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 		if (phost->PowerDownPin & 0x80)
 			ftRes = EVE_HalImpl_passthroughGpio(phost, phost->PowerDownPin & 0x7F, 0);
 		else if (phost->GpioHandle == phost->SpiHandle)
-#if 1 // test Power down pin
 		{
 			byOutputBuffer[dwNumBytesToSend++] = 0x80; // #define MPSSE_CMD_SET_DATA_BITS_LOWBYTE		0x80
 			byOutputBuffer[dwNumBytesToSend++] = 0x00; // value: set PD_N to L
@@ -886,9 +885,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 				res = false;
 			}
 		}
-#else
-			ftRes = FT_OK;
-#endif
 		else
 			ftRes = FT_Write(phost->GpioHandle, &pwd0, 1, &written);
 		if (ftRes != FT_OK)
@@ -900,7 +896,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 		if (phost->PowerDownPin & 0x80)
 			ftRes = EVE_HalImpl_passthroughGpio(phost, phost->PowerDownPin & 0x7F, 1);
 		else if (phost->GpioHandle == phost->SpiHandle)
-#if 1 // test Power down pin
 		{
 			dwNumBytesToSend = 0;
 			byOutputBuffer[dwNumBytesToSend++] = 0x80; // #define MPSSE_CMD_SET_DATA_BITS_LOWBYTE		0x80
@@ -912,9 +907,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 				res = false;
 			}
 		}
-#else
-			ftRes = FT_OK;
-#endif
 		else
 			ftRes = FT_Write(phost->GpioHandle, &pwd1, 1, &written);
 		if (ftRes != FT_OK)
@@ -928,7 +920,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 		if (phost->PowerDownPin & 0x80)
 			ftRes = EVE_HalImpl_passthroughGpio(phost, phost->PowerDownPin & 0x7F, 1);
 		else if (phost->GpioHandle == phost->SpiHandle)
-#if 1 // test Power down pin
 		{
 			byOutputBuffer[dwNumBytesToSend++] = 0x80; // #define MPSSE_CMD_SET_DATA_BITS_LOWBYTE		0x80
 			byOutputBuffer[dwNumBytesToSend++] = 0x80; // value: set PD_N to H
@@ -939,9 +930,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 				res = false;
 			}
 		}
-#else
-			ftRes = FT_OK;
-#endif
 		else
 			ftRes = FT_Write(phost->GpioHandle, &pwd1, 1, &written);
 		if (ftRes != FT_OK)
@@ -953,7 +941,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 		if (phost->PowerDownPin & 0x80)
 			ftRes = EVE_HalImpl_passthroughGpio(phost, phost->PowerDownPin & 0x7F, 0);
 		else if (phost->GpioHandle == phost->SpiHandle)
-#if 1 // test Power down pin
 		{
 			dwNumBytesToSend = 0;
 			byOutputBuffer[dwNumBytesToSend++] = 0x80; // #define MPSSE_CMD_SET_DATA_BITS_LOWBYTE		0x80
@@ -965,9 +952,6 @@ bool EVE_Hal_powerCycle(EVE_HalContext *phost, bool up)
 				res = false;
 			}
 		}
-#else
-			ftRes = FT_OK;
-#endif
 		else
 			ftRes = FT_Write(phost->GpioHandle, &pwd0, 1, &written);
 		if (ftRes != FT_OK)
@@ -1011,24 +995,9 @@ void EVE_Hal_restoreSPI(EVE_HalContext *phost)
  */
 bool EVE_Hal_getInterrupt(EVE_HalContext *phost)
 {
-#if 0
-	uint8_t byOutputBuffer[3];
-#endif
 	DWORD dwNumBytesToSend = 0;
 	DWORD dwNumBytesSent;
 	FT_STATUS status;
-
-#if 0 // ADBUS5 by default is set as an input pin
-	dwNumBytesToSend = 0;
-	byOutputBuffer[dwNumBytesToSend++] = 0x80; // Configure data bits low-byte of MPSSE port
-	byOutputBuffer[dwNumBytesToSend++] = 0x80; // value
-	byOutputBuffer[dwNumBytesToSend++] = 0x80; // direction: set ADBUS5 to input, keep ADBUS7 output since it is PD_N pin
-	status = FT_Write(phost->GpioHandle, byOutputBuffer, dwNumBytesToSend, &dwNumBytesSent);
-	if (dwNumBytesToSend != dwNumBytesSent)
-	{
-		return false;
-	}
-#endif
 
 	// read GPIO status
 	BYTE command = 0x81; // 0x81 = Read Low byte GPIO (ADBUS)

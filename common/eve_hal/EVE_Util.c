@@ -433,9 +433,6 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 			eve_printf_debug("EVE REG_CHIP_ID after wake up %lx\n", (unsigned long)chipId);
 
 			EVE_sleep(20);
-			if (phost->CbCmdWait && !phost->CbCmdWait(phost))
-				return false;
-
 			chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
 		}
 	} while (!chipId);
@@ -452,8 +449,6 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
 
 		EVE_sleep(20);
-		if (phost->CbCmdWait && !phost->CbCmdWait(phost))
-			return false;
 	}
 	eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
 	eve_assert(chipId == EVE_Hal_rd32(phost, REG_CHIP_ID));
@@ -480,8 +475,6 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		}
 
 		EVE_sleep(20);
-		if (phost->CbCmdWait && !phost->CbCmdWait(phost))
-			return false;
 	}
 	eve_printf_debug("All engines are ready\n");
 
@@ -730,8 +723,6 @@ bool EVE_Util_resetCoprocessor(EVE_HalContext *phost)
 
 	/* Wait for coprocessor to be ready */
 	ready = EVE_Cmd_waitFlush(phost);
-	if (phost->CbCoprocessorReset) /* Notify */
-		phost->CbCoprocessorReset(phost, !ready);
 
 #if defined(_DEBUG)
 	debugRestoreRamG(phost);

@@ -40,18 +40,6 @@ static uint32_t e;
 static uint32_t f;
 
 /**
- * @brief Callback function
- * 
- * @param phost Pointer to Hal context
- * @return true 
- */
-bool cbCmdWait(struct EVE_HalContext* phost)
-{
-    (void) (phost); // suspress warning on unused
-    return true;
-}
-
-/**
  * @brief EVE initialization
  * 
  * @param phost Pointer to Hal context
@@ -63,7 +51,6 @@ void Gpu_Init(EVE_HalContext* phost)
     EVE_Hal_initialize();
 
     EVE_Hal_defaults(&params);
-    params.CbCmdWait = cbCmdWait;
 
     EVE_Hal_open(phost, &params);
 
@@ -459,7 +446,7 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
     uint16_t y = (base_h - h) / 2;
     uint8_t htop = 50;
     uint8_t hbottom = 50;
-    uint8_t font = 31;
+    uint8_t font = 30;
 
     uint16_t btn_h = 30;
     uint16_t btn_w = 80;
@@ -478,14 +465,9 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
    }
 
     do {
-        Display_Start(phost);
+		Display_StartColor(phost, (uint8_t[]) { 0x3F, 0x3F, 0x3F }, (uint8_t[]) { 0, 0, 0 });
 
-        // fade the whole LCD
-        EVE_CoDl_colorRgb(phost, 0x3F, 0x3F, 0x3F);
-        EVE_CoDl_begin(phost, RECTS);
-        EVE_CoDl_vertex2f_4(phost, 0, 0);
-        EVE_CoDl_vertex2f_4(phost, phost->Width * 16, phost->Height * 16);
-
+		EVE_CoDl_begin(phost, RECTS);
         // diag border
         EVE_CoDl_colorRgb(phost, 0xE1, 0xE1, 0xE1);
         EVE_CoDl_vertex2f_4(phost, x * 16, y * 16);
@@ -512,8 +494,12 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
         EVE_CoCmd_text(phost, x + border + 10, y + border + 10, font, 0, title);
 
         EVE_CoDl_colorRgb(phost, 0x78, 0x78, 0x78);
+#if 0 // This can be enabled when basic patch is loaded
         EVE_CoCmd_fillWidth(phost, w);
         EVE_CoCmd_text(phost, x + border + 30, y + h / 2 - 20, font, OPT_FILL, msg);
+#else
+		EVE_CoCmd_text(phost, x + border + 30, y + h / 2 - 20, font, 0, msg);
+#endif
 
         // diag button yes/no
         EVE_CoDl_colorRgb(phost, 0xFF, 0xFF, 0xFF);
@@ -527,14 +513,17 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
         EVE_CoCmd_button(phost, x + w / 2 + btn_margin,
                 y + h - hbottom + border + (hbottom - btn_h) / 2, btn_w, btn_h,
                 font, 0, "No");
+		EVE_CoDl_tag(phost, 0);
 
         Display_End(phost);
+		EVE_sleep(10);
 
-        if ((EVE_Hal_rd32(phost, REG_TOUCH_TAG) & 0xFF) == tag_y)
+		uint32_t tag = EVE_Hal_rd32(phost, REG_TOUCH_TAG) & 0xFFFFFF;
+        if (tag == tag_y)
         {
             return true;
         }
-        else if ((EVE_Hal_rd32(phost, REG_TOUCH_TAG) & 0xFF) == tag_n)
+        else if (tag == tag_n)
         {
             return false;
         }
@@ -566,8 +555,7 @@ void WelcomeScreen(EVE_HalContext *phost, char *info[])
 
     do
     {
-        Display_StartColor(phost, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 219, 180, 150 });
-        EVE_CoDl_colorRgb(phost, 0, 0, 0);
+        Display_StartColor(phost, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 });
         EVE_CoCmd_text(phost, phost->Width / 2, 40, 31, OPT_CENTER, info[0]);
         EVE_CoCmd_text(phost, phost->Width / 2, 80, 31, OPT_CENTER, info[1]);
         EVE_CoCmd_text(phost, phost->Width / 2, 120, 31, OPT_CENTER, info[2]);

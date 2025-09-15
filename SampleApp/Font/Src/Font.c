@@ -383,6 +383,7 @@ void SAMAPP_Font_extendedFormat()
     SAMAPP_DELAY;
 }
 
+#if defined(MSVC_PLATFORM)
 /**
 * @brief Load xfont to RAM_G
 *
@@ -428,6 +429,7 @@ void helperLoadXfont(uint8_t isReindex)
     EVE_CoCmd_text(s_pHalContext, 10, 100, 6, 0, str);
     EVE_CoCmd_resetFonts(s_pHalContext);
 }
+#endif
 
 /**
 * @brief An example for code point ordinal/UTF-8

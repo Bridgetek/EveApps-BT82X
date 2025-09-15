@@ -55,39 +55,7 @@ DWORD s_NumDevsD2XX;
  */
 void EVE_HalImpl_initialize()
 {
-#if 0
-	FT_DEVICE_LIST_INFO_NODE devList;
-	FT_STATUS status;
-	uint32_t numdevs;
-
-	status = FT_CreateDeviceInfoList(&numdevs);
-	if (FT_OK == status)
-	{
-		eve_printf_debug("Number of D2xx devices connected = %d\n", numdevs);
-		// TODO: g_HalPlatform.TotalDevices = numdevs;
-
-		FT_GetDeviceInfoDetail(0, &devList.Flags, &devList.Type, &devList.ID,
-		    &devList.LocId,
-		    devList.SerialNumber,
-		    devList.Description,
-		    &devList.ftHandle);
-	}
-	else
-	{
-		eve_printf_debug("FT_CreateDeviceInfoList failed");
-		return;
-	}
-
-	eve_printf_debug("Information on channel number %d:\n", 0);
-	/* print the dev info */
-	eve_printf_debug(" Flags=0x%x\n", devList.Flags);
-	eve_printf_debug(" Type=0x%x\n", devList.Host);
-	eve_printf_debug(" ID=0x%x\n", devList.ID);
-	eve_printf_debug(" LocId=0x%x\n", devList.LocId);
-	eve_printf_debug(" SerialNumber=%s\n", devList.SerialNumber);
-	eve_printf_debug(" Description=%s\n", devList.Description);
-	eve_printf_debug(" ftHandle=0x%p\n", devList.ftHandle); /*is 0 unless open*/
-#endif
+	/* no-op */
 }
 
 /**

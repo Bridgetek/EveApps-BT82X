@@ -166,7 +166,7 @@ It may also set platform, display, and flash values if none are configured.
 
 /** Flash config **/
 #define EVE_FLASH_NAND
-#define EVE_FLASH_SIZE 16
+#define EVE_FLASH_SIZE 128 /**< 128M Bytes */
 
 /* Platform config */
 /*
@@ -226,14 +226,10 @@ These may only be set by one of the platform target definitions, and should not 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-
-#ifndef EVE_TCHAR_DEFINED
-#define EVE_TCHAR_DEFINED
 #ifdef _WIN32
 typedef wchar_t eve_tchar_t;
 #else
 typedef char eve_tchar_t;
-#endif
 #endif
 
 #ifndef _MSC_VER
@@ -268,7 +264,7 @@ typedef char eve_tchar_t;
 #endif
 
 /* Set implementation options */
-#if defined(FT4222_PLATFORM) || defined(MPSSE_PLATFORM)
+#if defined(MPSSE_PLATFORM)
 #define EVE_BUFFER_WRITES
 #endif
 

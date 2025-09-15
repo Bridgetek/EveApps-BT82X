@@ -169,7 +169,7 @@ void SAMAPP_Video_frameByFrameFlashPauseResume()
     do
     {
         //only change the button when a release happened
-        if ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && ((tag & 0xFF) == btnPauseTag))
+        if ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && ((tag & 0xFFFFFF) == btnPauseTag))
         {
             pressed = 1;
         }
@@ -314,7 +314,7 @@ void SAMAPP_Video_fromSDPauseResume()
 	while (EVE_Cmd_wp(s_pHalContext) != EVE_Cmd_rp(s_pHalContext))
 	{
 		//only change the button when a release happened
-		if ((EVE_Hal_rd32(s_pHalContext, REG_TOUCH_TAG) & 0xFF) == btnPauseTag)
+		if ((EVE_Hal_rd32(s_pHalContext, REG_TOUCH_TAG) & 0xFFFFFF) == btnPauseTag)
 		{
 			pressed = 1;
 		}
@@ -426,7 +426,7 @@ void SAMAPP_Video_frameByFrameSDPauseResume()
     do
     {
         //only change the button when a release happened
-        if ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && ((tag & 0xFF) == btnPauseTag))
+        if ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && ((tag & 0xFFFFFF) == btnPauseTag))
         {
             pressed = 1;
         }

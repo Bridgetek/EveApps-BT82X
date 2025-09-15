@@ -150,13 +150,18 @@ Flash_Cmd_Status_t FlashHelper_Read(EVE_HalContext* phost, uint32_t dest_ram, ui
 
 /**
  * @brief Erase entire flash
+ * @warning This function erases the entire Flash, which means the bad block information will be lost. Please use with caution.
  *
  * @param phost Pointer to Hal context
  */
 void FlashHelper_Erase(EVE_HalContext* phost)
 {
-	EVE_CoCmd_flashErase(phost);
-	EVE_Cmd_waitFlush(phost);
+	if (Show_Diaglog_YesNo(phost, "Flash programming",
+	        "Continue to erase the whole Flash?"))
+	{
+		EVE_CoCmd_flashErase(phost);
+		EVE_Cmd_waitFlush(phost);
+	}
 }
 
 /**

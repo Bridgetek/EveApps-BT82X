@@ -116,10 +116,6 @@ Returns true when the value is found. Returns false otherwise
 when the coprocessor has flushed, or a coprocessor fault occured. */
 bool EVE_Cmd_waitRead32(EVE_HalContext *phost, uint32_t ptr, uint32_t value);
 
-/* Restore the internal state of EVE_Cmd.
-Call this after manually writing the the coprocessor buffer */
-void EVE_Cmd_restore(EVE_HalContext *phost);
-
 #endif /* #ifndef EVE_CMD__H */
 
 /* end of file */

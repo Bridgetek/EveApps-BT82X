@@ -190,6 +190,20 @@ void EVE_CoCmd_setRotate(EVE_HalContext *phost, uint32_t r);
 void EVE_CoCmd_watchdog(EVE_HalContext *phost, uint32_t init_val);
 
 /**
+ * @brief CMD_GRAPHICSFINISH
+ *
+ * @param phost Pointer to Hal context
+ */
+void EVE_CoCmd_graphicsFinish(EVE_HalContext *phost);
+
+/**
+ * @brief CMD_FENCE
+ *
+ * @param phost Pointer to Hal context
+ */
+void EVE_CoCmd_fence(EVE_HalContext *phost);
+
+/**
  * @brief Send CMD_CALIBRATE
  *
  * @param phost Pointer to Hal context
@@ -561,17 +575,6 @@ void EVE_CoCmd_flashSource(EVE_HalContext *phost, uint32_t ptr);
  * @param num Number of bytes to copy. This must be a multiple of 4
  */
 void EVE_CoCmd_appendF(EVE_HalContext *phost, uint32_t ptr, uint32_t num);
-
-/**
- * @brief Load image from Flash to RAM_G
- *
- * @param phost Pointer to Hal context
- * @param dst Image location on flash
- * @param src Destination on RAM_G
- * @param format Output parameter format returns loaded bitmap format on success
- * @return bool Returns false on coprocessor fault
- */
-bool EVE_CoCmd_loadImage_flash(EVE_HalContext *phost, uint32_t dst, uint32_t src, uint32_t *format);
 
 /**
  * @brief Send CMD_FLASHPROGRAM
@@ -979,22 +982,6 @@ void EVE_CoCmd_text(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, u
  * @param length length of text
  */
 void EVE_CoCmd_text_s(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, uint16_t options, const char *s, uint32_t length);
-
-/**
- * @brief Send CMD_TEXT
- *
- * @param phost Pointer to Hal context
- * @param x x-coordinate of text base, in pixels
- * @param y y-coordinate of text base, in pixels
- * @param font Font to use for text, 0-31
- * @param options Text option
- * @param bottom
- * @param baseLine
- * @param capsHeight
- * @param xOffset
- * @param s Text string, UTF-8 encoding
- */
-void EVE_CoCmd_text_ex(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, uint16_t options, bool bottom, int16_t baseLine, int16_t capsHeight, int16_t xOffset, const char *s);
 
 /**
  * @brief Send CMD_BUTTON

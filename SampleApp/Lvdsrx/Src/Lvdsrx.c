@@ -84,11 +84,11 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-static uint8_t LVDS_connected = 0; // 0: disconnected, 1: connected, 2:lost connection
+static uint8_t LVDS_connected = 0; // 0: disconnected, 1: re-connect, 2:connection
 uint8_t check_LVDS_connection()
 {
 	uint32_t reg_val;
-	reg_val = EVE_Hal_rd32(s_pHalContext, REG_LVDSRX_STAT);
+	reg_val = (EVE_Hal_rd32(s_pHalContext, REG_LVDSRX_STAT) & ((CHn_DLL_LOCKED << 25) | (CHn_DLL_LOCKED << 24)));
 
 	if (reg_val != ((CHn_DLL_LOCKED << 25) | (CHn_DLL_LOCKED << 24)))
 	{
@@ -143,7 +143,7 @@ void SAMAPP_LvdsRx_withoutSC() {
 	uint32_t counter = 2000;
 	while (counter > 0)
 	{
-		if (check_LVDS_connection() != 1)
+		if (check_LVDS_connection() != 2)
 			continue;
 
 		Display_Start(s_pHalContext);
@@ -179,7 +179,7 @@ void SAMAPP_LvdsRx_withSC()
 
 	while (counter > 0)
 	{
-		if (check_LVDS_connection() != 1)
+		if (check_LVDS_connection() != 2)
 			continue;
 
 		EVE_CoCmd_waitCond(s_pHalContext, REG_SC2_STATUS, EQUAL, 0x1, 0x1);

@@ -395,15 +395,6 @@ static bool handleWait(EVE_HalContext *phost, uint16_t rpOrSpace)
 
 	/* Process any idling */
 	EVE_Hal_idle(phost);
-
-	/* Process user idling */
-	if (phost->CbCmdWait && !phost->CbCmdWait(phost))
-	{
-		/* Wait aborted */
-		phost->CmdWaiting = false;
-		eve_printf_debug("Wait for coprocessor aborted\n");
-		return false;
-	}
 	return true;
 }
 
@@ -543,20 +534,6 @@ bool EVE_Cmd_waitRead32(EVE_HalContext *phost, uint32_t ptr, uint32_t value)
 	phost->CmdSpace = EVE_CMD_FIFO_SIZE - 4;
 	phost->CmdWaiting = false;
 	return EVE_Hal_rd32(phost, ptr) == value;
-}
-
-/** 
- * @brief Restore the internal state of EVE_Cmd.
- *
- * Call this after manually writing to the coprocessor buffer
- * 
- * @param phost Pointer to Hal context
- */
-void EVE_Cmd_restore(EVE_HalContext *phost)
-{
-	EVE_Cmd_rp(phost);
-	EVE_Cmd_wp(phost);
-	EVE_Cmd_space(phost);
 }
 
 /* end of file */

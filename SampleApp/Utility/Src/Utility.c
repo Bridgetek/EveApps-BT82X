@@ -782,13 +782,8 @@ void SAMAPP_Utility_crcCheck()
     EVE_CoCmd_memSet(s_pHalContext, RAM_G, memWrite, memSizeTest);
     EVE_Cmd_waitFlush(s_pHalContext);/*reset cmd index*/
 
-    uint32_t cmdbuff_write_ptr = EVE_Cmd_wp(s_pHalContext);
-    uint32_t crc_result_addr = RAM_CMD + ((cmdbuff_write_ptr + 12) & EVE_CMD_FIFO_MASK);
-
-    EVE_CoCmd_memCrc(s_pHalContext, 0, memSizeTest, 0);
+    EVE_CoCmd_memCrc(s_pHalContext, 0, memSizeTest, &memcrcRet);
     EVE_Cmd_waitFlush(s_pHalContext);
-
-    EVE_CoCmd_regRead(s_pHalContext, crc_result_addr, &memcrcRet);
     eve_printf_debug("current CRC number [0,1023) is 0x%x \r\n", memcrcRet);
     if (memcrcRet == crcExpected)
     {

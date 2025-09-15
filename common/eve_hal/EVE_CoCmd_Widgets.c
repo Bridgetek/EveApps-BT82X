@@ -63,11 +63,6 @@ void EVE_CoCmd_text(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, u
 	va_list args;
 	uint8_t num;
 
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_TEXT, 0))
-		return;
-#endif
-
 	if (font >= 64)
 	{
 		eve_printf_debug("Invalid font handle specified: %i\n", (int)font);
@@ -91,11 +86,6 @@ void EVE_CoCmd_text(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, u
 
 void EVE_CoCmd_text_s(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, uint16_t options, const char *s, uint32_t length)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_TEXT, 0))
-		return;
-#endif
-
 	if (font >= 64)
 	{
 		eve_printf_debug("Invalid font handle specified: %i\n", (int)font);
@@ -112,33 +102,10 @@ void EVE_CoCmd_text_s(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font,
 	EVE_Cmd_endFunc(phost);
 }
 
-void EVE_CoCmd_text_ex(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, uint16_t options, bool bottom, int16_t baseLine, int16_t capsHeight, int16_t xOffset, const char *s)
-{
-	int16_t yOffset;
-	if (options & OPT_CENTERY)
-		yOffset = baseLine - (capsHeight >> 1);
-	else if (bottom)
-		yOffset = baseLine;
-	else
-		yOffset = baseLine - capsHeight;
-	/*
-	if (options & OPT_RIGHTX)
-		xOffset = 0;
-	else if (options & OPT_CENTERX)
-		xOffset >>= 1;
-	*/
-	EVE_CoCmd_text(phost, x - xOffset, y - yOffset, font, options & ~OPT_CENTERY, s);
-}
-
 void EVE_CoCmd_button(EVE_HalContext *phost, int16_t x, int16_t y, int16_t w, int16_t h, int16_t font, uint16_t options, const char *s, ...)
 {
 	va_list args;
 	uint8_t num;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_BUTTON, 0))
-		return;
-#endif
 
 	if (font >= 64)
 	{
@@ -162,11 +129,6 @@ void EVE_CoCmd_button(EVE_HalContext *phost, int16_t x, int16_t y, int16_t w, in
 
 void EVE_CoCmd_keys(EVE_HalContext *phost, int16_t x, int16_t y, int16_t w, int16_t h, int16_t font, uint16_t options, const char *s)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_KEYS, 0))
-		return;
-#endif
-
 	if (font >= 64)
 	{
 		eve_printf_debug("Invalid font handle specified: %i\n", (int)font);
@@ -189,11 +151,6 @@ void EVE_CoCmd_toggle(EVE_HalContext *phost, int16_t x, int16_t y, int16_t w, in
 {
 	va_list args;
 	uint8_t num;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_TOGGLE, 0))
-		return;
-#endif
 
 	if (font >= 64)
 	{
@@ -221,11 +178,6 @@ void EVE_CoCmd_toggle(EVE_HalContext *phost, int16_t x, int16_t y, int16_t w, in
 
 void EVE_CoCmd_number(EVE_HalContext *phost, int16_t x, int16_t y, int16_t font, uint16_t options, int32_t n)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_NUMBER, 0))
-		return;
-#endif
-
 	if (font >= 64)
 	{
 		eve_printf_debug("Invalid font handle specified: %i\n", (int)font);
@@ -289,11 +241,6 @@ void EVE_CoCmd_gradientA(EVE_HalContext *phost, int16_t x0, int16_t y0, uint32_t
 
 void EVE_CoCmd_cgradient(EVE_HalContext *phost, uint32_t shape, int16_t x, int16_t y, int16_t w, uint16_t h, uint32_t argb0, uint32_t argb1)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_CGRADIENT, 0))
-		return;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_CGRADIENT);
 	EVE_Cmd_wr32(phost, shape);

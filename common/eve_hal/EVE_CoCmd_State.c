@@ -98,11 +98,6 @@ void EVE_CoCmd_setBitmap(EVE_HalContext *phost, uint32_t source, uint16_t fmt, u
 
 void EVE_CoCmd_rotateAround(EVE_HalContext *phost, int32_t x, int32_t y, int32_t a, int32_t s)
 {
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_ROTATEAROUND, d0))
-		return;
-#endif
-
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_ROTATEAROUND);
 	EVE_Cmd_wr32(phost, x);
@@ -126,11 +121,6 @@ void EVE_CoCmd_fillWidth(EVE_HalContext *phost, uint32_t s)
 bool EVE_CoCmd_bitmapTransform(EVE_HalContext *phost, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t tx0, int32_t ty0, int32_t tx1, int32_t ty1, int32_t tx2, int32_t ty2, uint16_t *result)
 {
 	uint32_t resAddr;
-
-#if EVE_CMD_HOOKS
-	if (phost->CoCmdHook && phost->CoCmdHook(phost, CMD_BITMAP_TRANSFORM, 0))
-		return false;
-#endif
 
 	EVE_Cmd_startFunc(phost);
 	EVE_Cmd_wr32(phost, CMD_BITMAP_TRANSFORM);

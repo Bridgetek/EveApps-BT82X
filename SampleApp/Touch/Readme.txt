@@ -41,12 +41,12 @@
             - Connect PC with RP2040 via micro USB port
 
     3.2 DOWNLOAD ASSETS
-        3.2.1 Use EAB to program the board with the flash.bin file located in the Flash folder.
+        3.2.1 Use EAB to program the board with the Test/Flash/flash.bin file.
 
-        3.2.2 Copy all files from the SDCard folder to the SD card.
+        3.2.2 Copy all files from the Test/SDCard folder to the EVE connected SD card.
         
         3.2.3 RP2040 platform
-            - Copy Test folder to SDcard, the path is: /EveApps/SampleApp/Touch/Test
+            - Copy Test folder to MCU connected SD card, the path is: /EveApps/SampleApp/Touch/Test
 
     3.3 BUILD AND RUN
         3.3.1 Microsoft Visual C++ platform with FT4222 and MPSSE
