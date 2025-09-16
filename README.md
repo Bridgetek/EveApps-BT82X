@@ -142,10 +142,20 @@ $ nmake
 | GND | GND | | |
 
 ## Version
-This version is v1.0.0_RC1
+This version is v1.1.0_RC1
 
 ## Release log
 ```
+v1.1.0_RC1
+    - Added support for Raspberry Pi Pico RP2040
+    - Added support for the VM820B15A module
+    - Updated README to clarify 64-bit and 32-bit build support
+    - Enhanced LVDSRX sample applications and added a showcase demonstrating the use of swapchain with LVDSRX 
+    - Added a new sample application demonstrating extension usage, including patch loading and the use of newly introduced commands from the patch
+      Commands: CMD_REGION, CMD_ENDREGION, CMD_TOUCHOFFSET, CMD_ENDTOUCHOFFSET
+    - Added a Flash sample application demonstrating how to program flash from an EVE-connected SD card
+    - Performed code cleanup
+
 v1.0.0_RC1
     - Refactored and organized codebase for Doxygen integration
     - Added Doxygen documentation support for EveApps APIs
