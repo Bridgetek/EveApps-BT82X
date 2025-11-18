@@ -226,12 +226,6 @@ These may only be set by one of the platform target definitions, and should not 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-#ifdef _WIN32
-typedef wchar_t eve_tchar_t;
-#else
-typedef char eve_tchar_t;
-#endif
-
 #ifndef _MSC_VER
 /* strcpy_s, sprintf_s is not available in GCC */
 #define strcpy_s(dst, sz, src) strcpy(dst, src)

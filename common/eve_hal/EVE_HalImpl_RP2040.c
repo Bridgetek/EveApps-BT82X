@@ -522,7 +522,6 @@ void EVE_Mcu_initialize()
 		stdio_init_all();
 	}
 	sleep_ms(1000);
-	set_sys_clock_khz(32000, true);
 
 	eve_printf_debug("--------------------------------\n");
 	eve_printf_debug("- Bridgetek EVE HAL for RP2040 -\n");

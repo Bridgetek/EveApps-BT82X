@@ -232,6 +232,11 @@ void EVE_CoCmd_endList(EVE_HalContext *phost)
 	EVE_CoCmd_d(phost, CMD_ENDLIST);
 }
 
+void EVE_CoCmd_copyList(EVE_HalContext *phost, uint32_t dst)
+{
+	EVE_CoCmd_dd(phost, CMD_COPYLIST, dst);
+}
+
 bool EVE_CoCmd_getMatrix(EVE_HalContext *phost, int32_t *m)
 {
 	uint32_t resAddr;

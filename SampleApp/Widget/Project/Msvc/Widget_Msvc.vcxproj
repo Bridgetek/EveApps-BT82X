@@ -13,6 +13,7 @@
   <ItemGroup>
     <!--# source file list-->
     <ClCompile Include="..\..\..\..\common\application\FlashHelper.c" />
+    <ClCompile Include="..\..\..\..\common\application\PatchDefault.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_Cmd.c" />
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_IO.c" />
@@ -28,12 +29,12 @@
     <ClCompile Include="..\..\..\..\common\application\FileTransfer.c" />
     <ClCompile Include="..\..\..\..\common\application\Common.c" />
     <ClCompile Include="..\..\..\..\common\application\Maths.c" />
-    <ClCompile Include="..\..\Src\base.c" />
     <ClCompile Include="..\..\Src\Widget.c" />
   </ItemGroup>
   <ItemGroup>
     <!--# header file list-->
     <ClInclude Include="..\..\..\..\common\application\FlashHelper.h" />
+    <ClInclude Include="..\..\..\..\common\application\PatchDefault.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoCmd.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_Cmd.h" />
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_CoDl.h" />
@@ -59,7 +60,6 @@
     <ClInclude Include="..\..\..\..\common\application\Common.h" />
     <ClInclude Include="..\..\..\..\common\application\FileTransfer.h" />
     <ClInclude Include="..\..\..\..\common\application\Maths.h" />
-    <ClInclude Include="..\..\Hdr\base.h" />
     <ClInclude Include="..\..\Hdr\Widget.h" />
   </ItemGroup>
   <!--# end header file list-->
@@ -112,7 +112,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_BT820;EVE_PLATFORM_FT4222;EVE_DISPLAY_FHD;EVE_SPI_QUAD</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_BT820;EVE_PLATFORM_FT4222;EVE_DISPLAY_WUXGA;EVE_SPI_QUAD</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\common\application;..\..\..\..\common\eve_hal;..\..\..\..\common\eve_hal\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>
@@ -130,7 +130,7 @@
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>;WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_ME817EV;EVE_PLATFORM_FT4222;EVE_DISPLAY_WVGA</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions);EVE_GRAPHICS_BT820;EVE_PLATFORM_FT4222;EVE_DISPLAY_WUXGA;EVE_SPI_QUAD</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\common\application;..\..\..\..\common\eve_hal;..\..\..\..\common\eve_hal\Hdr;..\..\Hdr\;</AdditionalIncludeDirectories>
       <AdditionalOptions>/VERBOSE /utf-8 </AdditionalOptions>
     </ClCompile>

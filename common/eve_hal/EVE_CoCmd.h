@@ -165,6 +165,15 @@ void EVE_CoCmd_newList(EVE_HalContext *phost, uint32_t a);
  * @param phost Pointer to Hal context
  */
 void EVE_CoCmd_endList(EVE_HalContext *phost);
+
+/**
+ * @brief Send CMD_COPYLIST
+ *
+ * @param phost Pointer to Hal context
+ * @param dst Destination address for the display list, 4 byte aligned
+ */
+void EVE_CoCmd_copyList(EVE_HalContext *phost, uint32_t dst);
+
 /**
  * @brief Send CMD_GETMATRIX
  *

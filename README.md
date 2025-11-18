@@ -95,18 +95,22 @@ example:
 
 ### Raspberry Pi Pico
 
-Requires the Pico toolchain https://github.com/ndabas/pico-setup-windows to be installed.
+Requires the Pico toolchain https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads to be installed.
 
-Pico-SDK version 1.3.0 is required
+Pico-SDK version 2.2.0 is required
+```sh
+$ git clone https://github.com/raspberrypi/pico-sdk.git --branch master
+$ git submodule update --init
+```
 
 
 The following steps will build for Raspberry Pi Pico.
 
- 1. Install cmake 3.19.x, python, Visual Studio 2019 community (must select C++), GNU Arm Embedded Toolchain for window.
+ 1. Install cmake 3.19.x, Visual Studio 2019 community (must select C++), GNU Arm Embedded Toolchain for window.
  2. Launch the *Developer Command Prompt for VS*
 ```sh
 set PICO_SDK_PATH=[path to pico-sdk]
-set PICO_TOOLCHAIN_PATH=[path to GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin]
+set PICO_TOOLCHAIN_PATH=[path to GNU Arm Embedded Toolchain\\bin]
 cd EveApps
 mkdir build
 cd build
@@ -146,6 +150,20 @@ This version is v1.1.0_RC1
 
 ## Release log
 ```
+v1.2.0_pre_release
+    - Refactored sample application code
+    - Added default patch loading support
+    - Introduced new functions for NAND flash
+    - Updated RP2040 SDK support to version 2.2.0
+    - Removed Display_StartColor
+    - Added new sample applications:
+      Video playback from SD card with pause/resume functionality
+      CCMD_COPYLIST example
+    - Fixed font indexer issue on RP2040
+    - Corrected configuration errors in Release mode
+    - Removed unused code
+    - Updated asset naming to align with EAB 4.0
+
 v1.1.0_RC1
     - Added support for Raspberry Pi Pico RP2040
     - Added support for the VM820B15A module

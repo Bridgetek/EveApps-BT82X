@@ -33,17 +33,40 @@
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
-#define pgm_read_byte(x) (*(x))
+#define pgm_read_byte(x)      (*(x))
+#define STR_NOW_HEAR_MUSIC    "Now you will hear the music"
+#define AUDIO_MAX_VOLUME      0xFF
+#define AUDIO_SLIDER_WIDTH    15
+#define AUDIO_SLIDER_MARGIN   40
+#define AUDIO_SLIDER_TAG      100
+#define AUDIO_SLIDER_MAX      88
+#define AUDIO_BUTTON_ROWS     7 //number of rows to be created - note that mute and unmute are not played in this application
+#define AUDIO_BUTTON_COLS     8 //number of colomns to be created
+#define AUDIO_BUTTON_MARGIN   2
+#define AUDIO_STR_LENGTH      8
+#define AUDIO_STR_FONT        29
+#define AUDIO_BUILTIN_LOOP    1000
+#define AUDIO_LOAD_ADDR       RAM_G
+#define AUDIO_WAV_VOL         155
+#define AUDIO_MEDIAFIFO_ADDR  RAM_G
+#define AUDIO_MEDIAFIFO_LEN   (16 * 1024)
+#define AUDIO_BTN_W           300
+#define AUDIO_BTN_H           120
+#define AUDIO_BTN_Y_OFFSET    50
+#define AUDIO_BTN_FONT        31
+#define AUDIO_BTN_PAUSE_TAG   1
+#define AUDIO_DELAY_MS        10
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
-void SAMAPP_Audio();
+static void SAMAPP_Audio();
+static uint32_t addr_flash = 0;
 
 int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+    Display_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -51,54 +74,61 @@ int main(int argc, char* argv[])
     Calibration_Save(s_pHalContext);
 #endif
 
-    Flash_Init(s_pHalContext, TEST_DIR "/Flash/flash.bin", "flash.bin");
+    addr_flash = Flash_Init(s_pHalContext, FLASH_FILE);
     EVE_Util_clearScreen(s_pHalContext);
 
-    char *info[] =
-    {  "EVE Sample Application",
-        "This sample demonstrate the using of Audio", 
+    char *info[] = { 
+        "EVE Sample Application",
+        "This sample demonstrates the use of Audio",
         "",
         ""
-    }; 
+    };
+    WelcomeScreen(s_pHalContext, info);
 
-    while (true) {
-        WelcomeScreen(s_pHalContext, info);
+    SAMAPP_Audio();
 
-        SAMAPP_Audio();
-
-        EVE_Util_clearScreen(s_pHalContext);
-
-        EVE_Hal_close(s_pHalContext);
-        EVE_Hal_release();
-
-        /* Init HW Hal for next loop*/
-        Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if GET_CALIBRATION == 1
-        Calibration_Restore(s_pHalContext);
-#endif
-    }
-
+    EVE_Util_clearScreen(s_pHalContext);
+    Gpu_Release(s_pHalContext);
     return 0;
 }
 
-char SAMAPP_Snd_Array[5 * 58] =
+// Helper to set playback volume
+static void helperAudioSetVolume(EVE_HalContext *phost, uint8_t left, uint8_t right)
+{
+    EVE_CoCmd_regWrite(phost, REG_VOL_L_PB, left);
+    EVE_CoCmd_regWrite(phost, REG_VOL_R_PB, right);
+}
+
+// Helper to mute playback
+static void helperAudioMute(EVE_HalContext *phost)
+{
+    helperAudioSetVolume(phost, 0, 0);
+    EVE_CoCmd_regWrite(phost, REG_PLAYBACK_LOOP, 0);
+    EVE_CoCmd_regWrite(phost, REG_PLAYBACK_LENGTH, 0);
+    EVE_CoCmd_regWrite(phost, REG_PLAYBACK_PLAY, 1);
+}
+
+// Helper to start playback
+static void helperAudioStartPlayback(EVE_HalContext *phost, uint8_t left, uint8_t right)
+{
+    helperAudioSetVolume(phost, left, right);
+    EVE_CoCmd_regWrite(phost, REG_PLAYBACK_PLAY, 1);
+}
+
+static char SAMAPP_Snd_Array[5 * 58] =
 "Slce\0Sqrq\0Sinw\0Saww\0Triw\0Beep\0Alrm\0Warb\0Crsl\0Pp01\0Pp02\0Pp03\0Pp04\0Pp05\0Pp06\0Pp07\0Pp08\0Pp09\0Pp10\0Pp11\0Pp12\0Pp13\0Pp14\0Pp15\0Pp16\0DMF#\0DMF*\0DMF0\0DMF1\0DMF2\0DMF3\0DMF4\0DMF5\0DMF6\0DMF7\0DMF8\0DMF9\0Harp\0Xyph\0Tuba\0Glok\0Orgn\0Trmp\0Pian\0Chim\0MBox\0Bell\0Clck\0Swth\0Cowb\0Noth\0Hiht\0Kick\0Pop\0Clak\0Chak\0Mute\0uMut\0";
 
-char SAMAPP_Snd_TagArray[58] = { 0x63, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,
+static char SAMAPP_Snd_TagArray[58] = { 0x63, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,
 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 0x23, 0x2a, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41, 0x42, 0x43,
 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x60,
 0x61 };
 
-void helperHighLightBtn(int32_t tagvalsnd, const char* pTagArray, int32_t wbutton, int32_t hbutton)
+static void helperHighLightBtn(int32_t tagvalsnd, const char *pTagArray, int32_t wbutton, int32_t hbutton)
 {
-    int32_t numbtnrow = 7;
-    int32_t numbtncol = 8;
-
-    for (int i = 0; i < numbtnrow; i++)
+    for (int i = 0; i < AUDIO_BUTTON_ROWS; i++)
     {
-        for (int j = 0; j < numbtncol; j++)
+        for (int j = 0; j < AUDIO_BUTTON_COLS; j++)
         {
             EVE_CoDl_tag(s_pHalContext, pgm_read_byte(pTagArray));
             if (tagvalsnd == pgm_read_byte(pTagArray))
@@ -107,9 +137,8 @@ void helperHighLightBtn(int32_t tagvalsnd, const char* pTagArray, int32_t wbutto
                 EVE_CoDl_colorRgb(s_pHalContext, 0x80, 0x00, 0x00);
                 EVE_CoDl_colorA(s_pHalContext, 0x55);
                 EVE_CoDl_begin(s_pHalContext, RECTS);
-                EVE_CoDl_vertex2f_4(s_pHalContext, (j * wbutton + 2) * 16, (hbutton * i + 2) * 16);
-                EVE_CoDl_vertex2f_4(s_pHalContext, ((j * wbutton) + wbutton - 2) * 16,
-                        ((hbutton * i) + hbutton - 2) * 16);
+                EVE_CoDl_vertex2f_4(s_pHalContext, (j * wbutton + AUDIO_BUTTON_MARGIN) * 16, (i * hbutton + AUDIO_BUTTON_MARGIN) * 16);
+                EVE_CoDl_vertex2f_4(s_pHalContext, ((j + 1) * wbutton - AUDIO_BUTTON_MARGIN) * 16, ((i + 1) * hbutton - AUDIO_BUTTON_MARGIN) * 16);
                 EVE_CoDl_end(s_pHalContext);
             }
             pTagArray++;
@@ -118,26 +147,23 @@ void helperHighLightBtn(int32_t tagvalsnd, const char* pTagArray, int32_t wbutto
     EVE_CoDl_colorA(s_pHalContext, 255);
 }
 
-void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char *StringArray, char *pString)
+static void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char *StringArray, char *pString)
 {
-    int32_t numbtnrow = 7;
-    int32_t numbtncol = 8;
-
-    for (int i = 0; i < numbtnrow; i++)
+    for (int i = 0; i < AUDIO_BUTTON_ROWS; i++)
     {
-        for (int j = 0; j < numbtncol; j++)
+        for (int j = 0; j < AUDIO_BUTTON_COLS; j++)
         {
             EVE_CoDl_tag(s_pHalContext, pgm_read_byte(pTagArray));
             EVE_CoDl_colorRgb(s_pHalContext, 0x80, 0x80, 0x00);
             EVE_CoDl_begin(s_pHalContext, RECTS);
-            EVE_CoDl_vertex2f_4(s_pHalContext, (j * wbutton + 2) * 16, (hbutton * i + 2) * 16);
-            EVE_CoDl_vertex2f_4(s_pHalContext, ((j * wbutton) + wbutton - 2) * 16, ((hbutton * i) + hbutton - 2) * 16);
+            EVE_CoDl_vertex2f_4(s_pHalContext, (j * wbutton + AUDIO_BUTTON_MARGIN) * 16, (i * hbutton + AUDIO_BUTTON_MARGIN) * 16);
+            EVE_CoDl_vertex2f_4(s_pHalContext, ((j + 1) * wbutton - AUDIO_BUTTON_MARGIN) * 16, ((i + 1) * hbutton - AUDIO_BUTTON_MARGIN) * 16);
             EVE_CoDl_end(s_pHalContext);
 
-            strcpy_s(StringArray, 8, pString);
+            strcpy_s(StringArray, AUDIO_STR_LENGTH, pString);
             EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-            EVE_CoCmd_text(s_pHalContext, (int16_t)((wbutton / 2) + j * wbutton),
-            (int16_t)((hbutton / 2) + hbutton * i), 29, OPT_CENTER, StringArray);
+            EVE_CoCmd_text(s_pHalContext, (int16_t)(j * wbutton + (wbutton / 2)),
+                (int16_t)(i * hbutton + (hbutton / 2)), AUDIO_STR_FONT, OPT_CENTER, StringArray);
 
             pString += (strlen(StringArray) + 1);
             pTagArray++;
@@ -146,27 +172,27 @@ void helperDrawBtn(const char *pTagArray, int32_t wbutton, int32_t hbutton, char
 }
 
 /**
-* @brief Sample app api to demonstrate audio
-* @brief ple app api to demonstrate audio
-* @brief  mple app api to demonstrate audio
-*
-*/
-void SAMAPP_Audio_builtin()
+ * @brief Sample app API to demonstrate built-in audio
+ *
+ * Demonstrates playing built-in sounds and pitches using touch input.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_builtin()
 {
-    int32_t LoopFlag = 1000;
+    int32_t LoopFlag = AUDIO_BUILTIN_LOOP;
     int32_t wbutton;
     int32_t hbutton;
     int32_t tagval;
     int32_t tagvalsnd = -1;
-    int32_t numbtnrow;
-    int32_t numbtncol;
     int32_t prevtag = -1;
     uint32_t freqtrack = 0;
     uint32_t currfreq = 0;
     uint32_t prevcurrfreq;
     char* pString;
     char* pTagArray;
-    char StringArray[8] = { 0 };
+    char StringArray[AUDIO_STR_LENGTH] = { 0 };
 
     Draw_Text(s_pHalContext, "Example for: Play built-in sound\n\n\nPlease touch on screen");
 
@@ -175,16 +201,11 @@ void SAMAPP_Audio_builtin()
     /* sounds and respective pitches are put as part of keys/buttons, by     */
     /* choosing particular key/button the sound is played                    */
     /*************************************************************************/
-    numbtnrow = 7; //number of rows to be created - note that mute and unmute are not played in this application
-    numbtncol = 8; //number of colomns to be created
-    wbutton = (s_pHalContext->Width - 60) / numbtncol;
-    hbutton = s_pHalContext->Height / numbtnrow;
-
-    /* set the volume to maximum */
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_SOUND, 0xFF);
+    wbutton = (s_pHalContext->Width - 2 * AUDIO_SLIDER_MARGIN) / AUDIO_BUTTON_COLS;
+    hbutton = s_pHalContext->Height / AUDIO_BUTTON_ROWS;
     /* set the tracker to track the slider for frequency */
-    EVE_CoCmd_track(s_pHalContext, (int16_t) (s_pHalContext->Width - 40), 40, 15,
-        (int16_t) (s_pHalContext->Height - 80), 100);
+    EVE_CoCmd_track(s_pHalContext, (int16_t)(s_pHalContext->Width - AUDIO_SLIDER_MARGIN), AUDIO_SLIDER_MARGIN, AUDIO_SLIDER_WIDTH,
+        (int16_t)(s_pHalContext->Height - 2 * AUDIO_SLIDER_MARGIN), AUDIO_SLIDER_TAG);
     EVE_Cmd_waitFlush(s_pHalContext);
 
     while (LoopFlag--)
@@ -212,15 +233,13 @@ void SAMAPP_Audio_builtin()
             if ((prevtag != tagval) || (prevcurrfreq != currfreq))
             {
                 /* Play sound wrt pitch */
-                EVE_CoCmd_regWrite(s_pHalContext, REG_SOUND,
-                    (int32_t) (((currfreq + 21) << 8) | tagvalsnd));
-                EVE_CoCmd_regWrite(s_pHalContext, REG_PLAY, 1);
+                Play_Sound(s_pHalContext, tagvalsnd, AUDIO_MAX_VOLUME, currfreq + 21);
             }
             if (0 == tagvalsnd)
                 tagvalsnd = 99;
         }
         /* start a new display list for construction of screen */
-        Display_Start(s_pHalContext);
+        Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
         /* custom keys for sound input */
         pTagArray = SAMAPP_Snd_TagArray;
         pString = SAMAPP_Snd_Array;
@@ -236,50 +255,44 @@ void SAMAPP_Audio_builtin()
         strcat_s(StringArray, sizeof(StringArray), "Pt ");
         Gpu_Hal_Dec2Ascii(StringArray, (int32_t) (currfreq + 21));
         EVE_CoDl_tagMask(s_pHalContext, 0);
-        EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width - 25), 10, 29, OPT_CENTER,
-            StringArray);
+        EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width - AUDIO_SLIDER_MARGIN), AUDIO_SLIDER_MARGIN / 4, AUDIO_STR_FONT, OPT_CENTER, StringArray);
         EVE_CoDl_tagMask(s_pHalContext, 1);
-        EVE_CoDl_tag(s_pHalContext, 100);
-        EVE_CoCmd_slider(s_pHalContext, (int16_t) (s_pHalContext->Width - 40), 40, 15,
-            (int16_t) (s_pHalContext->Height - 80), 0, (int16_t) currfreq, 88);
+        EVE_CoDl_tag(s_pHalContext, AUDIO_SLIDER_TAG);
+        EVE_CoCmd_slider(s_pHalContext, (int16_t)(s_pHalContext->Width - AUDIO_SLIDER_MARGIN), AUDIO_SLIDER_MARGIN, AUDIO_SLIDER_WIDTH,
+            (int16_t)(s_pHalContext->Height - 2 * AUDIO_SLIDER_MARGIN), 0, (int16_t)currfreq, AUDIO_SLIDER_MAX);
 
         prevtag = tagval;
-
         prevcurrfreq = currfreq;
         /* Wait till coprocessor completes the operation */
         Display_End(s_pHalContext);
-        EVE_sleep(10);
+        EVE_sleep(AUDIO_DELAY_MS);
     }
 
-    EVE_CoCmd_regWrite(s_pHalContext, REG_SOUND, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAY, 1);
+    Play_Sound(s_pHalContext, 0, 0, 0);
 }
 
 /**
-* @brief API to demonstrate music playback
-*
-*/
-void SAMAPP_Audio_fromEABConvertedRaw()
+ * @brief API to demonstrate music playback from raw file
+ *
+ * Loads and plays a raw audio file from storage.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_fromEABConvertedRaw()
 {
-    uint32_t currreadlen = 0;
-    const uint8_t* pBuff = NULL;
-    const uint8_t* music_playing = 0;
-    uint32_t wrptr = 0;
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: Play music");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
-
-    EVE_Util_loadRawFile(s_pHalContext, RAM_G, TEST_DIR "\\Devil_Ride_30_11025hz.raw");
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_START, RAM_G); //Audio playback start address
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 334707); //Length of raw data buffer in bytes
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_FREQ, 11025); //Frequency
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_FORMAT, LINEAR_SAMPLES); //Current sampling frequency
+    EVE_Util_loadRawFile(s_pHalContext, AUDIO_LOAD_ADDR, TEST_DIR AUDIO_RAW_FILE);
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_START, AUDIO_LOAD_ADDR); //Audio playback start address
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, AUDIO_WAV_LEN); //Length of raw data buffer in bytes
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_FREQ, AUDIO_WAV_FREQ); //Frequency
+    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_FORMAT, S16S_SAMPLES); //Current sampling frequency
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioStartPlayback(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
 
     // wait until the end of audio
     do
@@ -288,107 +301,101 @@ void SAMAPP_Audio_fromEABConvertedRaw()
     } while (result != 0);
 
     //The file is done, mute the audio first.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0); //Length of raw data buffer in bytes
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioMute(s_pHalContext);
 }
 
 /**
-* @brief play WAV from command buffer
-*
-*/
-void SAMAPP_Audio_playWavFromCMDB()
+ * @brief Play WAV from command buffer
+ *
+ * Loads and plays a WAV file from the command buffer.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_playWavFromCMDB()
 {
     Draw_Text(s_pHalContext, "Example for: play wav file from command buffer");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
-
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
+    helperAudioSetVolume(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
     EVE_CoCmd_playWav(s_pHalContext, 0);
-    uint32_t transfered = 0;
-    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
-
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR AUDIO_WAV_FILE, NULL);
     EVE_Cmd_waitFlush(s_pHalContext);
-    //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
+    helperAudioSetVolume(s_pHalContext, 0, 0);
 }
 
 /**
-* @brief play WAV from MediaFifo
-*
-*/
-void SAMAPP_Audio_playWavFromMediaFifo()
+ * @brief Play WAV from MediaFifo
+ *
+ * Loads and plays a WAV file using the MediaFifo buffer.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_playWavFromMediaFifo()
 {
     Draw_Text(s_pHalContext, "Example for: Play wav file from Media FiFo");
-    uint32_t mediafifo;
-    uint32_t mediafifolen;
-    /* start video playback, load the data into media fifo */
-    mediafifo = RAM_G; //the starting address of the media fifo
-    mediafifolen = 16 * 1024;
-    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen); //address of the media fifo buffer
+    uint32_t mediafifo = AUDIO_MEDIAFIFO_ADDR;
+    uint32_t mediafifolen = AUDIO_MEDIAFIFO_LEN;
+    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
+    helperAudioSetVolume(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
     EVE_CoCmd_playWav(s_pHalContext, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
-
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR AUDIO_WAV_FILE, NULL);
     EVE_Cmd_waitFlush(s_pHalContext);
-    //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
+    helperAudioSetVolume(s_pHalContext, 0, 0);
     EVE_MediaFifo_close(s_pHalContext);
 }
 
 /**
-* @brief play WAV from SD card
-*
-*/
-void SAMAPP_Audio_playWavFromSD()
+ * @brief Play WAV from SD card
+ *
+ * Loads and plays a WAV file from an SD card.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_playWavFromSD()
 {
-    const char *file = "perfect_beauty.wav";
+    const char *file = AUDIO_WAV_FILE;
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: play wav file from SD card");
-
-    Draw_Text(s_pHalContext, "Now you will hear the music");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-	eve_printf_debug("SD attach status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD attach failed\n");
-		return;
-	}
+    eve_printf_debug("SD attach status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD attach failed\n");
+        return;
+    }
 
-	result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
-	eve_printf_debug("file read status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD read failed\n");
-		return;
-	}
+    result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
+    eve_printf_debug("file read status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD read failed\n");
+        return;
+    }
 
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
+    helperAudioSetVolume(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
     EVE_CoCmd_playWav(s_pHalContext, OPT_FS);
-
     EVE_Cmd_waitFlush(s_pHalContext);
-    //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
+    helperAudioSetVolume(s_pHalContext, 0, 0);
 }
 
 /**
-* @brief play WAV from Flash
-*
-*/
-void SAMAPP_Audio_playWavFromFlash()
+ * @brief Play WAV from Flash
+ *
+ * Loads and plays a WAV file from Flash memory.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_playWavFromFlash()
 {
     if (!FlashHelper_SwitchFullMode(s_pHalContext))
     {
@@ -396,46 +403,42 @@ void SAMAPP_Audio_playWavFromFlash()
         return;
     }
     Draw_Text(s_pHalContext, "Example for: play wav file from Flash");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
-
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
+    helperAudioSetVolume(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + AUDIO_FLASH_ADDR);
     EVE_CoCmd_playWav(s_pHalContext, OPT_FLASH);
-
     EVE_Cmd_waitFlush(s_pHalContext);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
+    helperAudioSetVolume(s_pHalContext, 0, 0);
 }
 
 /**
-* @brief load WAV from command buffer
-*
-*/
-void SAMAPP_Audio_loadWavFromCMDBwithPauseResume()
+ * @brief Load WAV from command buffer with pause/resume
+ *
+ * Loads a WAV file from the command buffer and allows pause/resume control.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_loadWavFromCMDBwithPauseResume()
 {
-    uint32_t btnW = 300;
-    uint32_t btnH = 120;
+    uint32_t btnW = AUDIO_BTN_W;
+    uint32_t btnH = AUDIO_BTN_H;
     uint32_t btnX = s_pHalContext->Width / 2 - btnW / 2;
-    uint32_t btnY = s_pHalContext->Height - btnH - 50;
+    uint32_t btnY = s_pHalContext->Height - btnH - AUDIO_BTN_Y_OFFSET;
     static bool isPause = 0;
-    const uint8_t btnPauseTag = 1;
+    const uint8_t btnPauseTag = AUDIO_BTN_PAUSE_TAG;
     static bool pressed = 0;
     uint8_t txtPause[2][20] = { "PAUSE", "RESUME" };
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: Load wav file from command buffer");
 
-    EVE_CoCmd_loadWav(s_pHalContext, RAM_G, 0);
-    uint32_t transfered = 0;
-    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", &transfered);
+    EVE_CoCmd_loadWav(s_pHalContext, AUDIO_LOAD_ADDR, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR AUDIO_WAV_FILE, NULL);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
-
+    helperAudioStartPlayback(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
     // wait until the end of audio
     do
     {
@@ -455,12 +458,12 @@ void SAMAPP_Audio_loadWavFromCMDBwithPauseResume()
             }
         }
 
-        Display_StartColor(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 });
-        EVE_CoCmd_text(s_pHalContext, (uint16_t)(s_pHalContext->Width / 2), (uint16_t)(s_pHalContext->Height / 2), 31, OPT_CENTERX | OPT_FILL, "Now you will hear the music");
+        Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 }, 0, 4);
+        EVE_CoCmd_text(s_pHalContext, (uint16_t)(s_pHalContext->Width / 2), (uint16_t)(s_pHalContext->Height / 2), AUDIO_BTN_FONT, OPT_CENTERX | OPT_FILL, "Now you will hear the music");
 
         /*** Show a button ***/
         EVE_CoDl_tag(s_pHalContext, btnPauseTag);
-        EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, 31, 0, txtPause[isPause]);
+        EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, AUDIO_BTN_FONT, 0, txtPause[isPause]);
         /*** Done button ***/
         Display_End(s_pHalContext);
 
@@ -468,36 +471,32 @@ void SAMAPP_Audio_loadWavFromCMDBwithPauseResume()
     } while (result != 0);
 
     //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioMute(s_pHalContext);
 }
 
 /**
-* @brief load WAV from MediaFifo
-*
-*/
-void SAMAPP_Audio_loadWavFromMediaFifo()
+ * @brief Load WAV from MediaFifo
+ *
+ * Loads a WAV file using the MediaFifo buffer.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_loadWavFromMediaFifo()
 {
     Draw_Text(s_pHalContext, "Example for: Load wav file from Media FiFo");
     uint32_t result = 0;
-    uint32_t mediafifo;
-    uint32_t mediafifolen;
-    /* start video playback, load the data into media fifo */
-    mediafifo = RAM_G; //the starting address of the media fifo
-    mediafifolen = 16 * 1024;
-    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen); //address of the media fifo buffer
+    uint32_t mediafifo = AUDIO_MEDIAFIFO_ADDR;
+    uint32_t mediafifolen = AUDIO_MEDIAFIFO_LEN;
+    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    EVE_CoCmd_loadWav(s_pHalContext, RAM_G + mediafifolen, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
+    EVE_CoCmd_loadWav(s_pHalContext, mediafifo + mediafifolen, OPT_MEDIAFIFO);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR AUDIO_WAV_FILE, NULL);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioStartPlayback(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
 
     // wait until the end of audio
     do
@@ -506,47 +505,45 @@ void SAMAPP_Audio_loadWavFromMediaFifo()
     } while (result != 0);
 
     //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioMute(s_pHalContext);
     EVE_MediaFifo_close(s_pHalContext);
 }
 
 /**
-* @brief load WAV from SD card
-*
-*/
-void SAMAPP_Audio_loadWavFromSD()
+ * @brief Load WAV from SD card
+ *
+ * Loads a WAV file from an SD card.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_loadWavFromSD()
 {
-    const char *file = "perfect_beauty.wav";
+    const char *file = AUDIO_WAV_FILE;
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: load wav file from SD card");
-
-    Draw_Text(s_pHalContext, "Now you will hear the music");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-	eve_printf_debug("SD attach status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD attach failed\n");
-		return;
-	}
+    eve_printf_debug("SD attach status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD attach failed\n");
+        return;
+    }
 
-	result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
-	eve_printf_debug("file read status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD read failed\n");
-		return;
-	}
+    result = EVE_CoCmd_fssource(s_pHalContext, file, 0);
+    eve_printf_debug("file read status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD read failed\n");
+        return;
+    }
 
-    EVE_CoCmd_loadWav(s_pHalContext, RAM_G, OPT_FS);
+    EVE_CoCmd_loadWav(s_pHalContext, AUDIO_LOAD_ADDR, OPT_FS);
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioStartPlayback(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
 
     // wait until the end of audio
     do
@@ -555,17 +552,18 @@ void SAMAPP_Audio_loadWavFromSD()
     } while (result != 0);
 
     //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioMute(s_pHalContext);
 }
 
 /**
-* @brief load WAV from Flash
-*
-*/
-void SAMAPP_Audio_loadWavFromFlash()
+ * @brief Load WAV from Flash
+ *
+ * Loads a WAV file from Flash memory.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio_loadWavFromFlash()
 {
     uint32_t result = 0;
     if (!FlashHelper_SwitchFullMode(s_pHalContext))
@@ -574,15 +572,12 @@ void SAMAPP_Audio_loadWavFromFlash()
         return;
     }
     Draw_Text(s_pHalContext, "Example for: Video display from Flash");
+    Draw_Text(s_pHalContext, STR_NOW_HEAR_MUSIC);
 
-    Draw_Text(s_pHalContext, "Now you will hear the music");
-
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_loadWav(s_pHalContext, RAM_G, OPT_FLASH);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + AUDIO_FLASH_ADDR);
+    EVE_CoCmd_loadWav(s_pHalContext, AUDIO_LOAD_ADDR, OPT_FLASH);
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 155);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioStartPlayback(s_pHalContext, AUDIO_WAV_VOL, AUDIO_WAV_VOL);
 
     // wait until the end of audio
     do
@@ -591,24 +586,29 @@ void SAMAPP_Audio_loadWavFromFlash()
     } while (result != 0);
 
     //The file is done, mute the audio.
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LENGTH, 0);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
+    helperAudioMute(s_pHalContext);
 }
 
-void SAMAPP_Audio()
+/**
+ * @brief Main entry to run all audio demos
+ *
+ * Calls all audio demonstration functions in sequence.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Audio()
 {
     SAMAPP_Audio_builtin();
     SAMAPP_Audio_fromEABConvertedRaw();
     SAMAPP_Audio_playWavFromCMDB();
-    SAMAPP_Audio_playWavFromMediaFifo();
-    SAMAPP_Audio_playWavFromSD();
-    SAMAPP_Audio_playWavFromFlash();
+    //SAMAPP_Audio_playWavFromMediaFifo();
+    //SAMAPP_Audio_playWavFromSD();
+    //SAMAPP_Audio_playWavFromFlash();
     SAMAPP_Audio_loadWavFromCMDBwithPauseResume();
-    SAMAPP_Audio_loadWavFromMediaFifo();
-    SAMAPP_Audio_loadWavFromSD();
-    SAMAPP_Audio_loadWavFromFlash();
+    //SAMAPP_Audio_loadWavFromMediaFifo();
+    //SAMAPP_Audio_loadWavFromSD();
+    //SAMAPP_Audio_loadWavFromFlash();
 }
 
 

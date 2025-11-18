@@ -7,7 +7,7 @@
 #if defined(MSVC_PLATFORM)
 #define TEST_DIR "..\\..\\..\\Test\\"
 #else
-#define TEST_DIR "/EveApps/SampleApp/Lvdsrx/Test"
+#define TEST_DIR "/EveApps/SampleApp/Lvdsrx/Test/"
 #endif
 
 #define GET_CALIBRATION                     1

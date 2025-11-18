@@ -32,17 +32,34 @@
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
-#define SAMAPP_DELAY EVE_sleep(2000)
+#define SAMAPP_DELAY_MS               2000
+#define SAMAPP_DELAY                  EVE_sleep(SAMAPP_DELAY_MS)
+#define PLAY_CONTROL_ADDR             (1024 * 512)
+#define ANIM_LOAD_ADDR                RAM_G
+#define MEDIAFIFO_ADDR                DDR_BITMAPS_STARTADDR
+#define MEDIAFIFO_LEN                 (16 * 1024)
+#define BUTTON_X                      900
+#define BUTTON_Y1                     250
+#define BUTTON_Y2                     450
+#define BUTTON_W                      200
+#define BUTTON_H                      100
+#define BUTTON_FONT                   30
+#define TEXT_X                        200
+#define TEXT_Y                        100
+#define TEXT_FONT                     31
+#define TEXT_OPT                      0
+#define ANIM_DELAY_MS                 10
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
-void SAMAPP_Animation();
+static void SAMAPP_Animation();
+static uint32_t addr_flash = 0;
 
 int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+    Display_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -50,42 +67,45 @@ int main(int argc, char* argv[])
     Calibration_Save(s_pHalContext);
 #endif
 
-    Flash_Init(s_pHalContext, TEST_DIR "/Flash/flash.bin", "flash.bin");
+    addr_flash = Flash_Init(s_pHalContext, FLASH_FILE);
     EVE_Util_clearScreen(s_pHalContext);
 
     char *info[] =
     {  "EVE Sample Application",
-        "This sample demonstrate the using of animation", 
-        "",
-        ""
-    }; 
+       "This sample demonstrates the use of animation",
+       "",
+       ""
+    };
+    WelcomeScreen(s_pHalContext, info);
 
-    while (true) {
-        WelcomeScreen(s_pHalContext, info);
+    SAMAPP_Animation();
 
-        SAMAPP_Animation();
-
-        EVE_Util_clearScreen(s_pHalContext);
-
-        Gpu_Release(s_pHalContext);
-
-        /* Init HW Hal for next loop*/
-        Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if GET_CALIBRATION == 1
-        Calibration_Restore(s_pHalContext);
-#endif
-    }
+    EVE_Util_clearScreen(s_pHalContext);
+    Gpu_Release(s_pHalContext);
     return 0;
 }
 
-/**
-* @brief API to demonstrate CMD_RUNANIM from Flash
-*/
-void SAMAPP_Animation_flash()
+// Helper to start and play an animation using CMD_RUNANIM
+static void helperRunAnimation(EVE_HalContext *phost, uint32_t play_control, uint32_t ch, uint32_t addr, uint32_t anim_mode)
 {
-    uint32_t waitmask = -1;
-    uint32_t play_control = 1024 * 512;
+    EVE_CoCmd_memZero(phost, play_control, 1);
+    EVE_CoCmd_animStart(phost, ch, addr, anim_mode);
+    EVE_CoCmd_animXY(phost, ch, phost->Width / 2, phost->Height / 2);
+    EVE_CoCmd_runAnim(phost, (uint32_t)-1, play_control);
+    EVE_Cmd_waitFlush(phost);
+    SAMAPP_DELAY;
+    EVE_CoCmd_memSet(phost, play_control, 1, 1);
+}
+
+/**
+ * @brief API to demonstrate CMD_RUNANIM from Flash
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_flash()
+{
+    uint32_t play_control = PLAY_CONTROL_ADDR;
     uint32_t ch = 0;
 
     if (!FlashHelper_SwitchFullMode(s_pHalContext))
@@ -94,29 +114,22 @@ void SAMAPP_Animation_flash()
         return;
     }
     Draw_Text(s_pHalContext, "Example for: Run animation from Flash");
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FLASH);
 
-    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
-    EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
-    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
-    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
-    EVE_Cmd_waitFlush(s_pHalContext);
-
-    SAMAPP_DELAY;
-    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + ANIM_ADDR_FLASH_ABSTRACT);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_FLASH);
+    helperRunAnimation(s_pHalContext, play_control, ch, ANIM_LOAD_ADDR, ANIM_ONCE);
 }
 
 /**
-* @brief API to demonstrate CMD_RUNANIM from Flash
-*/
-void SAMAPP_Animation_flash_no_reloc()
+ * @brief API to demonstrate CMD_RUNANIM from Flash (non-relocatable)
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_flash_no_reloc()
 {
-    uint32_t waitmask = -1;
-    uint32_t play_control = 1024 * 512;
+    uint32_t play_control = PLAY_CONTROL_ADDR;
     uint32_t ch = 0;
-    uint32_t anim_addr = 1454080;
-    uint32_t anim_len = 123956;
 
     if (!FlashHelper_SwitchFullMode(s_pHalContext))
     {
@@ -125,119 +138,96 @@ void SAMAPP_Animation_flash_no_reloc()
     }
     Draw_Text(s_pHalContext, "Example for: Run animation from Flash which is not relocatable");
 
-    EVE_CoCmd_flashRead_flush(s_pHalContext, 0, anim_addr, anim_len);
-    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
-    EVE_CoCmd_animStart(s_pHalContext, ch, 0, ANIM_ONCE);
-    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
-    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
-    EVE_Cmd_waitFlush(s_pHalContext);
-
-    SAMAPP_DELAY;
-    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+    EVE_CoCmd_flashRead_flush(s_pHalContext, ANIM_LOAD_ADDR, addr_flash + ANIM_ADDR_FLASH_BICYCLE, ANIM_LEN_FLASH_BICYCLE);
+    helperRunAnimation(s_pHalContext, play_control, ch, ANIM_LOAD_ADDR, ANIM_ONCE);
 }
 
 /**
-* @brief API to demonstrate CMD_RUNANIM from SD
-*/
-void SAMAPP_Animation_SD()
+ * @brief API to demonstrate CMD_RUNANIM from SD card
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_SD()
 {
-    uint32_t waitmask = -1;
-    uint32_t play_control = 1024 * 512;
+    uint32_t play_control = PLAY_CONTROL_ADDR;
     uint32_t ch = 0;
     uint32_t result = 0;
 
     Draw_Text(s_pHalContext, "Example for: Run animation from SD card");
 
-	result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
-	eve_printf_debug("SD attach status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD attach failed\n");
-		return;
-	}
+    result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+    eve_printf_debug("SD attach status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD attach failed\n");
+        return;
+    }
 
-	result = EVE_CoCmd_fssource(s_pHalContext, "abstract.anim.ram_g.reloc", 0);
-	eve_printf_debug("file read status 0x%x \n", result);
-	if (result != 0)
-	{
-		eve_printf_debug("SD read failed\n");
-		return;
-	}
+    result = EVE_CoCmd_fssource(s_pHalContext, ANIM_ABSTRACT, 0);
+    eve_printf_debug("file read status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD read failed\n");
+        return;
+    }
 
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FS);
-
-    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
-    EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
-    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
-    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
-    EVE_Cmd_waitFlush(s_pHalContext);
-
-    SAMAPP_DELAY;
-    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_FS);
+    helperRunAnimation(s_pHalContext, play_control, ch, ANIM_LOAD_ADDR, ANIM_ONCE);
 }
 
 /**
-* @brief API to demonstrate CMD_RUNANIM from CMDB
-*/
-void SAMAPP_Animation_CMDB()
+ * @brief API to demonstrate CMD_RUNANIM from command buffer
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_CMDB()
 {
-    uint32_t waitmask = -1;
-    uint32_t play_control = 1024 * 512;
+    uint32_t play_control = PLAY_CONTROL_ADDR;
     uint32_t ch = 0;
-    uint32_t transfered = 0;
 
     Draw_Text(s_pHalContext, "Example for: Run animation from command buffer");
 
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, 0);
-    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", &transfered);
-
-    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
-    EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
-    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
-    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
-    EVE_Cmd_waitFlush(s_pHalContext);
-
-    SAMAPP_DELAY;
-    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR ANIM_ABSTRACT, NULL);
+    helperRunAnimation(s_pHalContext, play_control, ch, ANIM_LOAD_ADDR, ANIM_ONCE);
 }
 
 /**
-* @brief API to demonstrate CMD_RUNANIM from Mediafifo
-*/
-void SAMAPP_Animation_mediafifo()
+ * @brief API to demonstrate CMD_RUNANIM from Mediafifo
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_mediafifo()
 {
-    uint32_t waitmask = -1;
-    uint32_t play_control = 1024 * 512;
+    uint32_t play_control = PLAY_CONTROL_ADDR;
     uint32_t ch = 0;
-    uint32_t mediafifo = DDR_BITMAPS_STARTADDR;
-    uint32_t mediafifolen = 16 * 1024;
+    uint32_t mediafifo = MEDIAFIFO_ADDR;
+    uint32_t mediafifolen = MEDIAFIFO_LEN;
 
     Draw_Text(s_pHalContext, "Example for: Run animation from Mediafifo");
 
     EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\abstract.anim.ram_g.reloc", NULL);
-
-    EVE_CoCmd_memZero(s_pHalContext, play_control, 1);
-    EVE_CoCmd_animStart(s_pHalContext, ch, RAM_G, ANIM_ONCE);
-    EVE_CoCmd_animXY(s_pHalContext, ch, s_pHalContext->Width / 2, s_pHalContext->Height / 2);
-    EVE_CoCmd_runAnim(s_pHalContext, waitmask, play_control);
-    EVE_Cmd_waitFlush(s_pHalContext);
-
-    SAMAPP_DELAY;
-    EVE_CoCmd_memSet(s_pHalContext, play_control, 1, 1);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_MEDIAFIFO);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR ANIM_ABSTRACT, NULL);
+    helperRunAnimation(s_pHalContext, play_control, ch, ANIM_LOAD_ADDR, ANIM_ONCE);
     EVE_MediaFifo_close(s_pHalContext);
 }
 
 /**
-* @brief API to demonstrate animation from Flash by AnimDraw
-*/
-void SAMAPP_Animation_control()
+ * @brief API to demonstrate animation from Flash by AnimDraw
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_control()
 {
-    uint8_t txtAnim_ONCE[] = "Playing Animation by ANIM_ONCE";
-    uint8_t txtAnim_LOOP[] = "Playing Animation by ANIM_LOOP";
-    uint8_t txtAnim_HOLD[] = "Playing Animation by ANIM_HOLD";
-    uint8_t txtPress2Stop[] = "Press \"Stop Anim\" again to exit";
+    const char *txtAnim_ONCE = "Playing Animation by ANIM_ONCE";
+    const char *txtAnim_LOOP = "Playing Animation by ANIM_LOOP";
+    const char *txtAnim_HOLD = "Playing Animation by ANIM_HOLD";
+    const char* txtPress2Stop = "Press \"Stop Anim\" again to exit";
 
     uint32_t prAnimLoop = ANIM_ONCE;
     const uint8_t* txtAnimLabel = txtAnim_ONCE;
@@ -257,12 +247,12 @@ void SAMAPP_Animation_control()
     }
     Draw_Text(s_pHalContext, "Example for: ANIM_ONCE, ANIM_LOOP, ANIM_HOLD");
 
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FLASH);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + ANIM_ADDR_FLASH_ABSTRACT);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_FLASH);
 
     while (timeout > 0 && countStop < 2) {
         timeout--;
-        Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
 
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag);
 
@@ -275,26 +265,26 @@ void SAMAPP_Animation_control()
 
         // Show text information
         if (isPlaying) {
-            EVE_CoCmd_text(s_pHalContext, 200, 100, 31, 0, txtAnimLabel);
+            EVE_CoCmd_text(s_pHalContext, TEXT_X, TEXT_Y, TEXT_FONT, TEXT_OPT, txtAnimLabel);
             EVE_CoCmd_animDraw(s_pHalContext, channel);
 
             EVE_CoDl_tag(s_pHalContext, 1);
-            EVE_CoCmd_button(s_pHalContext, 900, 250, 200, 100, 30, 0, "Change Anim");
+            EVE_CoCmd_button(s_pHalContext, BUTTON_X, BUTTON_Y1, BUTTON_W, BUTTON_H, BUTTON_FONT, 0, "Change Anim");
         }
         else {
             if (countStop == 0) {
-                EVE_CoCmd_text(s_pHalContext, 200, 100, 31, 0, "Press \"Start Anim\" to start animation");
+                EVE_CoCmd_text(s_pHalContext, TEXT_X, TEXT_Y, TEXT_FONT, TEXT_OPT, "Press \"Start Anim\" to start animation");
             }
             else if (countStop > 0) {
-                EVE_CoCmd_text(s_pHalContext, 200, 100, 31, 0, txtPress2Stop);
+                EVE_CoCmd_text(s_pHalContext, TEXT_X, TEXT_Y, TEXT_FONT, TEXT_OPT, txtPress2Stop);
             }
 
             EVE_CoDl_tag(s_pHalContext, 1);
-            EVE_CoCmd_button(s_pHalContext, 900, 250, 200, 100, 30, 0, "Start Anim");
+            EVE_CoCmd_button(s_pHalContext, BUTTON_X, BUTTON_Y1, BUTTON_W, BUTTON_H, BUTTON_FONT, 0, "Start Anim");
         }
 
         EVE_CoDl_tag(s_pHalContext, 2);
-        EVE_CoCmd_button(s_pHalContext, 900, 450, 200, 100, 30, 0, "Stop Anim");
+        EVE_CoCmd_button(s_pHalContext, BUTTON_X, BUTTON_Y2, BUTTON_W, BUTTON_H, BUTTON_FONT, 0, "Stop Anim");
 
         if (tag == 1) {
             if (isPlaying == 1) {
@@ -304,7 +294,7 @@ void SAMAPP_Animation_control()
             isPlaying = 1;
             countStop = 0;
 
-            EVE_CoCmd_animStart(s_pHalContext, channel, RAM_G, prAnimLoop);
+            EVE_CoCmd_animStart(s_pHalContext, channel, ANIM_LOAD_ADDR, prAnimLoop);
             EVE_CoCmd_animXY(s_pHalContext, channel, 500, 400);
 
             // change AnimLoop attribute for the next user button press
@@ -337,9 +327,12 @@ void SAMAPP_Animation_control()
 }
 
 /**
-* @brief API to demonstrate 32-bit register REG_ANIM_ACTIVE
-*/
-void SAMAPP_Animation_animAtive() 
+ * @brief API to demonstrate 32-bit register REG_ANIM_ACTIVE
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_animAtive() 
 {
     char str[1000];
 
@@ -355,13 +348,13 @@ void SAMAPP_Animation_animAtive()
     const int16_t yAnim = (uint16_t)(s_pHalContext->Height/ 2);
     uint32_t reg_anim_active = 0;
 
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FLASH);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + ANIM_ADDR_FLASH_ABSTRACT);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_FLASH);
 
-    EVE_CoCmd_animStart(s_pHalContext, channel, RAM_G, ANIM_ONCE);
+    EVE_CoCmd_animStart(s_pHalContext, channel, ANIM_LOAD_ADDR, ANIM_ONCE);
     EVE_CoCmd_animXY(s_pHalContext, channel, xAnim, yAnim);
     for (int i = 0; i < 100; i++) {
-        Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
         EVE_CoCmd_animDraw(s_pHalContext, channel);
 
         EVE_CoCmd_regRead(s_pHalContext, REG_ANIM_ACTIVE, &reg_anim_active);
@@ -378,9 +371,12 @@ void SAMAPP_Animation_animAtive()
 }
 
 /**
-* @brief API to demonstrate animation from Flash by AnimFrame
-*/
-void SAMAPP_Animation_animFrame() 
+ * @brief API to demonstrate animation from Flash by AnimFrame
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation_animFrame() 
 {
     if (!FlashHelper_SwitchFullMode(s_pHalContext))
     {
@@ -389,24 +385,31 @@ void SAMAPP_Animation_animFrame()
     }
     Draw_Text(s_pHalContext, "Example for: ANIMATION from Flash by AnimFrame");
 
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_loadAsset(s_pHalContext, RAM_G, OPT_FLASH);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + ANIM_ADDR_FLASH_ABSTRACT);
+    EVE_CoCmd_loadAsset(s_pHalContext, ANIM_LOAD_ADDR, OPT_FLASH);
 
-    for (uint16_t frame = 0; frame < 40; frame++) {
-        Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
-        EVE_CoCmd_animFrame(s_pHalContext, s_pHalContext->Width / 2, s_pHalContext->Height / 2, RAM_G, frame);
+    for (uint16_t frame = 0; frame < ANIMATION_FRAMES; frame++) {
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+        EVE_CoCmd_animFrame(s_pHalContext, s_pHalContext->Width / 2, s_pHalContext->Height / 2, ANIM_LOAD_ADDR, frame);
         Display_End(s_pHalContext);
+        EVE_sleep(ANIM_DELAY_MS);
     }
     SAMAPP_DELAY;
 }
 
-void SAMAPP_Animation() 
+/**
+ * @brief Main entry to run all animation demos
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Animation() 
 {
-    SAMAPP_Animation_flash();
-    SAMAPP_Animation_flash_no_reloc();
-    SAMAPP_Animation_SD();
-    SAMAPP_Animation_CMDB();
-    SAMAPP_Animation_mediafifo();
+    //SAMAPP_Animation_flash();
+    //SAMAPP_Animation_flash_no_reloc();
+    //SAMAPP_Animation_SD();
+    //SAMAPP_Animation_CMDB();
+    //SAMAPP_Animation_mediafifo();
     SAMAPP_Animation_control();
     SAMAPP_Animation_animAtive();
     SAMAPP_Animation_animFrame();

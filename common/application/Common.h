@@ -67,11 +67,11 @@
 
 typedef enum
 {
-	MODE_PICTURE = 1, /**< 1 */
-	MODE_DIRECTVIDEO, /**< 2 */
-	MODE_VIDEO,       /**< 3 */
-	MODE_LVDSRX,      /**< 4 */
-	MODE_LVDSRX_SC    /**< 5 */
+    MODE_PICTURE = 1, /**< 1 */
+    MODE_DIRECTVIDEO, /**< 2 */
+    MODE_VIDEO,       /**< 3 */
+    MODE_LVDSRX,      /**< 4 */
+    MODE_LVDSRX_SC    /**< 5 */
 } Display_mode;
 
 /**********************
@@ -84,17 +84,16 @@ int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value);
 bool EVE_Calibrate(EVE_HalContext *phost);
 void Calibration_Restore(EVE_HalContext *phost);
 void Calibration_Save(EVE_HalContext *phost);
-void Display_Start(EVE_HalContext *phost);
-void Display_StartColor(EVE_HalContext* phost, uint8_t* bgColor, uint8_t* textColor);
+void Display_Start(EVE_HalContext* phost, uint8_t* bgColor, uint8_t* textColor, uint32_t tag, uint8_t frac);
 void Display_End(EVE_HalContext *phost);
 void Draw_TextColor(EVE_HalContext* phost, const char* str, uint8_t* bgColor, uint8_t* textColor);
 void Draw_Text(EVE_HalContext *phost, const char *str);
 void Play_Sound(EVE_HalContext *phost, uint8_t sound, uint8_t vol, uint8_t midi);
 uint8_t Show_Diaglog_YesNo(EVE_HalContext *phost, const uint8_t* title, const uint8_t *msg);
 void Show_Diaglog_Info(EVE_HalContext *phost, const uint8_t *msg);
-void Flash_Init(EVE_HalContext *phost, const uint8_t *filePath, const uint8_t *fileName);
+uint32_t Flash_Init(EVE_HalContext *phost, const uint8_t *file);
 void WelcomeScreen(EVE_HalContext *phost, char *info[]);
-void LVDS_Config(EVE_HalContext *phost, uint16_t format, uint8_t mode);
+void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode);
 #if defined(RP2040_PLATFORM)
 void strcat_s(char* dest, size_t dest_size, const char* src);
 #endif

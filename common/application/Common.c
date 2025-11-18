@@ -31,6 +31,8 @@
 
 #include "Common.h"
 #include "FileTransfer.h"
+#include "FlashHelper.h"
+#include "PatchDefault.h"
 
 static uint32_t a;
 static uint32_t b;
@@ -58,6 +60,10 @@ void Gpu_Init(EVE_HalContext* phost)
 #if defined(RP2040_PLATFORM)
     EVE_Util_loadSdCard(phost);
 #endif
+    if (EVE_LoadDefaultPatch(phost) != 0)
+        eve_printf_debug("eve_loadpatch failed\n");
+    else
+        eve_printf_debug("load patch ok\n");
 }
 
 /**
@@ -141,7 +147,7 @@ bool EVE_Calibrate(EVE_HalContext *phost)
     eve_printf_debug("App_CoPro_Widget_Calibrate: Start\n");
 
     EVE_CoCmd_watchdog(phost, 72000000); // Countermeasure for watchdog triggering when calibrate
-    Display_StartColor(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
+    Display_Start(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
     EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2), (uint16_t)(phost->Height / 2), 31, OPT_CENTER, "Please Tap on the dot");
     result = EVE_CoCmd_calibrate(phost, 0);
     eve_printf("result %lx\n", result);
@@ -193,24 +199,17 @@ void Calibration_Save(EVE_HalContext* phost)
  * @param phost Pointer to Hal context
  * @param bgColor Background color
  * @param textColor Text color
+ * @param tag Clear value for the tag buffer
+ * @param frac Number of fractional bits in X, Y coordinates
  */
-void Display_StartColor(EVE_HalContext* phost, uint8_t *bgColor, uint8_t *textColor)
+void Display_Start(EVE_HalContext* phost, uint8_t *bgColor, uint8_t *textColor, uint32_t tag, uint8_t frac)
 {
     EVE_CoCmd_dlStart(phost);
+    EVE_CoDl_clearTag(phost, tag);
     EVE_CoDl_clearColorRgb(phost, bgColor[0], bgColor[1], bgColor[2]);
     EVE_CoDl_clear(phost, 1, 1, 1);
     EVE_CoDl_colorRgb(phost, textColor[0], textColor[1], textColor[2]);
-    EVE_CoDl_vertexFormat(phost, 4);
-}
-
-/**
- * @brief Start a display list with white background and text
- *
- * @param phost Pointer to Hal context
- */
-void Display_Start(EVE_HalContext* phost)
-{
-    Display_StartColor(phost, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 });
+    EVE_CoDl_vertexFormat(phost, frac);
 }
 
 /**
@@ -257,7 +256,7 @@ static void Gpu_Text(EVE_HalContext* phost, const char* str, uint8_t *bgColor, u
         font = 27;
     }
 
-    Display_StartColor(phost, bgColor, textColor);
+    Display_Start(phost, bgColor, textColor, 0, 4);
     EVE_CoCmd_fillWidth(phost, phost->Width);
     EVE_CoCmd_text(phost, (uint16_t)(phost->Width / 2),
         (uint16_t)(phost->Height / 2), font, OPT_CENTERX | OPT_FILL, str);
@@ -308,12 +307,13 @@ void Play_Sound(EVE_HalContext* phost, uint8_t sound, uint8_t vol, uint8_t midi)
 
 /**
  * @brief Initialize Flash and program Flash with a file
+ * File should be in PC or MCU connected SD card depend on platform
  *
  * @param phost Pointer to Hal context
- * @param filePath Path of file
- * @param fileName File name
+ * @param file File name, should be full name with path
+ * @return uint32_t flash address where image saved
  */
-void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath, const uint8_t *fileName)
+uint32_t Flash_Init(EVE_HalContext* phost, const uint8_t *file)
 {
 #if defined(_WIN32)
 #define _WHERE "PC"
@@ -323,28 +323,30 @@ void Flash_Init(EVE_HalContext* phost, const uint8_t *filePath, const uint8_t *f
 
     /// show a dialog on the screen with two options: Yes or No?
     if (!Show_Diaglog_YesNo(phost, "Flash programming",
-            "Program the flash with the file in " _WHERE "?")) {
+            "Program the flash with the file in " _WHERE "?\nIf not, the flash assets may not be found\nbecause the flash image offset was not saved.")) {
         /// If No, proceeds to boot up
-        return;
+        return 0;
     }
 
     /// If YES, Program the flash with the file
-    int sent = Ftf_Write_File_To_Flash_With_Progressbar(phost, filePath,
-            fileName, 0);
+    uint32_t addr_flash = 0;
+    uint32_t sent = Write_To_Flash_With_Progressbar(phost, file, &addr_flash, false);
 
     /// If fail to program flash, reset application
     if (0 >= sent) {
         uint8_t count = 5;
-        uint8_t msg[1000];
+        uint8_t msg[100];
         while (count) {
-            snprintf(msg, 1000, "Error: Cannot open file: %s, exit in %u s",
-                fileName, count);
+            snprintf(msg, 100, "Error: Cannot open file: %s, exit in %u s",
+                file, count);
             Show_Diaglog_Info(phost, msg);
             EVE_sleep(1000);
             count--;
         }
         exit(0);
     }
+    eve_printf_debug("flash image programed at 0x%lx\n", addr_flash);
+    return addr_flash;
 }
 
 /**
@@ -388,13 +390,7 @@ void Show_Diaglog_Info(EVE_HalContext* phost, const uint8_t* msg)
         ratio += (100 - ratio) / 2;
     }
 
-    Display_Start(phost);
-
-    // fade the whole LCD
-    EVE_CoDl_colorRgb(phost, 0x3F, 0x3F, 0x3F);
-    EVE_CoDl_begin(phost, RECTS);
-    EVE_CoDl_vertex2f_4(phost, 0, 0);
-    EVE_CoDl_vertex2f_4(phost, phost->Width * 16, phost->Height * 16);
+    Display_Start(phost, (uint8_t[]) { 0x3F, 0x3F, 0x3F }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
 
     // diag border
     EVE_CoDl_colorRgb(phost, 0xE1, 0xE1, 0xE1);
@@ -465,9 +461,9 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
    }
 
     do {
-		Display_StartColor(phost, (uint8_t[]) { 0x3F, 0x3F, 0x3F }, (uint8_t[]) { 0, 0, 0 });
+        Display_Start(phost, (uint8_t[]) { 0x3F, 0x3F, 0x3F }, (uint8_t[]) { 0, 0, 0 }, 0, 4);
 
-		EVE_CoDl_begin(phost, RECTS);
+        EVE_CoDl_begin(phost, RECTS);
         // diag border
         EVE_CoDl_colorRgb(phost, 0xE1, 0xE1, 0xE1);
         EVE_CoDl_vertex2f_4(phost, x * 16, y * 16);
@@ -494,12 +490,8 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
         EVE_CoCmd_text(phost, x + border + 10, y + border + 10, font, 0, title);
 
         EVE_CoDl_colorRgb(phost, 0x78, 0x78, 0x78);
-#if 0 // This can be enabled when basic patch is loaded
         EVE_CoCmd_fillWidth(phost, w);
         EVE_CoCmd_text(phost, x + border + 30, y + h / 2 - 20, font, OPT_FILL, msg);
-#else
-		EVE_CoCmd_text(phost, x + border + 30, y + h / 2 - 20, font, 0, msg);
-#endif
 
         // diag button yes/no
         EVE_CoDl_colorRgb(phost, 0xFF, 0xFF, 0xFF);
@@ -513,12 +505,12 @@ uint8_t Show_Diaglog_YesNo(EVE_HalContext* phost, const uint8_t* title,	const ui
         EVE_CoCmd_button(phost, x + w / 2 + btn_margin,
                 y + h - hbottom + border + (hbottom - btn_h) / 2, btn_w, btn_h,
                 font, 0, "No");
-		EVE_CoDl_tag(phost, 0);
+        EVE_CoDl_tag(phost, 0);
 
         Display_End(phost);
-		EVE_sleep(10);
+        EVE_sleep(10);
 
-		uint32_t tag = EVE_Hal_rd32(phost, REG_TOUCH_TAG) & 0xFFFFFF;
+        uint32_t tag = EVE_Hal_rd32(phost, REG_TOUCH_TAG) & 0xFFFFFF;
         if (tag == tag_y)
         {
             return true;
@@ -555,7 +547,7 @@ void WelcomeScreen(EVE_HalContext *phost, char *info[])
 
     do
     {
-        Display_StartColor(phost, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 });
+        Display_Start(phost, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 }, 0, 4);
         EVE_CoCmd_text(phost, phost->Width / 2, 40, 31, OPT_CENTER, info[0]);
         EVE_CoCmd_text(phost, phost->Width / 2, 80, 31, OPT_CENTER, info[1]);
         EVE_CoCmd_text(phost, phost->Width / 2, 120, 31, OPT_CENTER, info[2]);
@@ -615,12 +607,12 @@ void fadein(EVE_HalContext *phost)
 {
     for (int8_t i = 0; i <= 100; i += 3)
     {
-		EVE_Hal_wr32(phost, REG_PWM_DUTY, (uint32_t)i);
+        EVE_Hal_wr32(phost, REG_PWM_DUTY, (uint32_t)i);
         EVE_sleep(2); //sleep for 2 ms
     }
     /* Finally make the PWM 100% */
     uint8_t i = 128;
-	EVE_Hal_wr32(phost, REG_PWM_DUTY, (uint32_t)i);
+    EVE_Hal_wr32(phost, REG_PWM_DUTY, (uint32_t)i);
 }
 
 /**
@@ -662,7 +654,7 @@ void scanout_single(EVE_HalContext *phost, uint16_t fbformat, uint16_t w, uint16
  * @param format Scanout format
  * @param mode Display mode
  */
-void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
+void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
 {
     uint8_t TXPLLDiv = 0;
     uint8_t lvdspll_cps = 0;
@@ -670,8 +662,8 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     uint8_t lvdspll_cks = 0;
     uint8_t lvdspll_ns = 7;
     uint16_t w, h;
-	w = phost->Width;
-	h = phost->Height;
+    w = phost->Width;
+    h = phost->Height;
     TXPLLDiv = 0x03;
     eve_printf_debug("TXPLLDiv %d\n", TXPLLDiv);
     lvdspll_cks = TXPLLDiv > 4 ? 1 : 2;
@@ -715,38 +707,38 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     {
         scanout_swapping(phost, format, w, h);
     }
-	else if (mode == MODE_LVDSRX)
-	{
-		// This LVDSRX mode is not using Swapchain 2 to display, so only simple address is required
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, DDR_FRAMEBUFFER_STARTADDR);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
+    else if (mode == MODE_LVDSRX)
+    {
+        // This LVDSRX mode is not using Swapchain 2 to display, so only simple address is required
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, DDR_FRAMEBUFFER_STARTADDR);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
 
-		EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
-		EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
-			                                  (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
+        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
+                                              (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
 
-		scanout_swapping(phost, format, w, h);
-	}
-	else if (mode == MODE_LVDSRX_SC)
-	{
-		// This LVDSRX mode is using Swapchain 2 to display
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, SWAPCHAIN_2);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
-		EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
+        scanout_swapping(phost, format, w, h);
+    }
+    else if (mode == MODE_LVDSRX_SC)
+    {
+        // This LVDSRX mode is using Swapchain 2 to display
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_TWO_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, SWAPCHAIN_2);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
 
-		EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
-		EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
-			                                  (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
+        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
+                                              (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
 
-		scanout_swapping(phost, format, w, h);
-	}
+        scanout_swapping(phost, format, w, h);
+    }
     else
     {
         scanout_swapping(phost, format, w, h);
@@ -760,16 +752,16 @@ void LVDS_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
 #if defined(RP2040_PLATFORM)
 void strcat_s(char *dest, size_t dest_size, const char *src)
 {
-	size_t space_left = dest_size - strlen(dest) - 1; // leave space for null terminator
+    size_t space_left = dest_size - strlen(dest) - 1; // leave space for null terminator
 
-	if (space_left > 0)
-	{
-		strncat(dest, src, space_left);
-	}
-	else
-	{
-		// Optional: handle error or truncation
-		eve_printf_debug("Buffer full. Cannot append string.\n");
-	}
+    if (space_left > 0)
+    {
+        strncat(dest, src, space_left);
+    }
+    else
+    {
+        // Optional: handle error or truncation
+        eve_printf_debug("Buffer full. Cannot append string.\n");
+    }
 }
 #endif

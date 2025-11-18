@@ -33,17 +33,53 @@
 #include "FileTransfer.h"
 #include "FlashHelper.h"
 
-#define SAMAPP_DELAY           EVE_sleep(2000);
+#define SAMAPP_DELAY_MS         2000
+#define SAMAPP_DELAY            EVE_sleep(SAMAPP_DELAY_MS)
+#define UTIL_DELAY_MS           10
+#define UTIL_LOAD_ADDR          DDR_BITMAPS_STARTADDR
+#define UTIL_TITLE_FONT         31
+#define UTIL_TITLE_X            10
+#define UTIL_TITLE_Y            50
+#define UTIL_TITLE_Y_INC        50
+#define UTIL_TEXT_LEN           100
+#define UTIL_NO_OF_CALLLIST     5
+#define UTIL_CALLLIST_ADDR      RAM_G
+#define UTIL_CALLLIST_ANGLE     60
+#define UTIL_COPYLIST_X         500
+#define UTIL_COPYLIST_Y         500
+#define UTIL_APPEND_CMD_LEN     16
+#define UTIL_APPEND_TEXT_Y_INC  300
+#define UTIL_BULK_CIRCLE_NUM    100
+#define UTIL_BULK_LOOP          600
+#define UTIL_BULK_PREC          4
+#define UTIL_MEDIAFIFO_ADDR     RAM_G
+#define UTIL_MEDIAFIFO_SZ       (20 * 1024)
+#define UTIL_FILLW_X1           100
+#define UTIL_FILLW_Y1           200
+#define UTIL_FILLW_X2           400
+#define UTIL_FILLW_Y2           600
+#define UTIL_FILLW_W1           100
+#define UTIL_FILLW_W2           2
+#define UTIL_FILLW_W3           300
+#define UTIL_FILLW_H1           300
+#define UTIL_FILLW_H2           200
+#define UTIL_ROTATE_MODE        8
+#define UTIL_NUM_TEXT_X1        (s_pHalContext->Width / 2 - 200)
+#define UTIL_NUM_TEXT_X2        (s_pHalContext->Width / 2 + 100)
+#define UTIL_SKIPCOND_BTN_TAG   1
+#define UTIL_SKIPCOND_EXIT_TAG  2
+#define UTIL_INT_PIC_TAG        1
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
-void SAMAPP_Utility();
+static void SAMAPP_Utility();
+static uint32_t addr_flash = 0;
 
 int main(int argc, char* argv[])
 {
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
-    LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+    Display_Config(s_pHalContext, YCBCR, MODE_PICTURE);
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -51,53 +87,41 @@ int main(int argc, char* argv[])
     Calibration_Save(s_pHalContext);
 #endif
 
-    Flash_Init(s_pHalContext, TEST_DIR "/Flash/flash.bin", "flash.bin");
+    addr_flash = Flash_Init(s_pHalContext, FLASH_FILE);
     EVE_Util_clearScreen(s_pHalContext);
 
     char *info[] =
     {  "EVE Sample Application",
-        "This sample demonstrate the using of utilites of EVE", 
+        "This sample demonstrates the use of utilites of EVE", 
         "",
         ""
-    }; 
+    };
+    WelcomeScreen(s_pHalContext, info);
 
-    while (true) {
-        WelcomeScreen(s_pHalContext, info);
+    SAMAPP_Utility();
 
-        SAMAPP_Utility();
-
-        EVE_Util_clearScreen(s_pHalContext);
-
-        Gpu_Release(s_pHalContext);
-
-        /* Init HW Hal for next loop*/
-        Gpu_Init(s_pHalContext);
-        LVDS_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if GET_CALIBRATION == 1
-        Calibration_Restore(s_pHalContext);
-#endif
-    }
-
+    EVE_Util_clearScreen(s_pHalContext);
+    Gpu_Release(s_pHalContext);
     return 0;
 }
 
 /**
-* @brief Flush a command to REG_CMDB_WRITE
-*
-* @param command Command value
-*
-*/
+ * @brief Flush a command to REG_CMDB_WRITE
+ *
+ * @param command Command value
+ * @return None
+ */
 static void helperCMDBWrite(uint32_t command)
 {
     EVE_Hal_wr32(s_pHalContext, REG_CMDB_WRITE, command);
 }
 
 /**
-* @brief Flush a string to REG_CMDB_WRITE
-*
-* @param str string to write
-*
-*/
+ * @brief Flush a string to REG_CMDB_WRITE
+ *
+ * @param str string to write
+ * @return None
+ */
 static void helperCMDBWriteString(uint8_t* str)
 {
     int textLen = strlen(str);
@@ -125,10 +149,12 @@ static void helperCMDBWriteString(uint8_t* str)
 }
 
 /**
-* @brief API to demonstrate CMD_WAIT
-*
-*/
-void SAMAPP_Utility_wait()
+ * @brief API to demonstrate CMD_WAIT
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_wait()
 {
     const uint32_t delayUs = 1000000;
 
@@ -144,40 +170,40 @@ void SAMAPP_Utility_wait()
 }
 
 /**
-* @brief API to demonstrate for CMD_CALLLIST, CMD_NEWLIST, CMD_ENDLIST, CMD_RETURN
-*
-*/
-void SAMAPP_Utility_callList()
+ * @brief API to demonstrate for CMD_CALLLIST, CMD_NEWLIST, CMD_ENDLIST, CMD_RETURN
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_callList()
 {
-    uint32_t endPtr = 4;
-    uint32_t endPtrArr[5];
-    const uint32_t w = 800;
-    const uint32_t h = 480;
-    const uint16_t x = (s_pHalContext->Width - w) / 2;
-    const uint16_t y = (s_pHalContext->Height - h) / 2;
-    char str[1000];
+    uint32_t endPtr = UTIL_CALLLIST_ADDR + 4;
+    uint32_t endPtrArr[UTIL_NO_OF_CALLLIST];
+    const uint16_t x = (s_pHalContext->Width - UTIL_JPG_FLOWER_W) / 2;
+    const uint16_t y = (s_pHalContext->Height - UTIL_JPG_FLOWER_H) / 2;
+    char str[UTIL_TEXT_LEN];
 
     Draw_Text(s_pHalContext, "Example for: CMD_CALLLIST, CMD_NEWLIST, CMD_ENDLIST and CMD_RETURN");
 
     Draw_TextColor(s_pHalContext, "Constructing 5 lists ...", (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < UTIL_NO_OF_CALLLIST; i++)
     {
         endPtrArr[i] = endPtr;
 
         EVE_CoCmd_newList(s_pHalContext, endPtr);
-        EVE_CoCmd_setBitmap(s_pHalContext, DDR_BITMAPS_STARTADDR, RGB565, w, h);
+        EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, RGB565, UTIL_JPG_FLOWER_W, UTIL_JPG_FLOWER_H);
 
         EVE_CoDl_saveContext(s_pHalContext);
         EVE_CoDl_begin(s_pHalContext, BITMAPS);
         EVE_CoCmd_loadIdentity(s_pHalContext);
-        EVE_CoCmd_rotateAround(s_pHalContext, w / 2, h / 2, i * 60 * 65536 / 360, 65536 * 1);
+        EVE_CoCmd_rotateAround(s_pHalContext, UTIL_JPG_FLOWER_W / 2, UTIL_JPG_FLOWER_H / 2, i * UTIL_CALLLIST_ANGLE * 65536 / 360, 65536 * 1);
         EVE_CoCmd_setMatrix(s_pHalContext);
         EVE_CoDl_vertex2f_4(s_pHalContext, (x) * 16, (y) * 16);
         EVE_CoDl_end(s_pHalContext);
         EVE_CoDl_restoreContext(s_pHalContext);
 
-        snprintf(str, 1000, "Displaying list number %u", i);
-        EVE_CoCmd_text(s_pHalContext, x, y - 100, 31, 0, str);
+        snprintf(str, UTIL_TEXT_LEN, "Displaying list number %u", i);
+        EVE_CoCmd_text(s_pHalContext, x, UTIL_TITLE_Y, UTIL_TITLE_FONT, 0, str);
         EVE_CoCmd_endList(s_pHalContext);
 
         EVE_Cmd_waitFlush(s_pHalContext);
@@ -190,13 +216,13 @@ void SAMAPP_Utility_callList()
     }
     Draw_TextColor(s_pHalContext, "Constructed 5 lists", (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
 
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR, TEST_DIR "\\flower_800x480.jpg", NULL, 0);
-    for (int i = 0; i < 5; i++)
+    EVE_Util_loadImageFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_JPG_FLOWER, NULL, 0);
+    for (int i = 0; i < UTIL_NO_OF_CALLLIST; i++)
     {
-        snprintf(str, 1000, "Calling List number %u", i);
+        snprintf(str, UTIL_TEXT_LEN, "Calling List number %u", i);
         Draw_TextColor(s_pHalContext, str, (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
 
-        Display_Start(s_pHalContext);
+        Display_Start(s_pHalContext, (uint8_t[]) { 125, 125, 125 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
         EVE_CoCmd_callList(s_pHalContext, endPtrArr[i]);
         Display_End(s_pHalContext);
         SAMAPP_DELAY;
@@ -205,7 +231,7 @@ void SAMAPP_Utility_callList()
         if (i == 0)
         {
             uint32_t cmd = 0;
-            EVE_CoCmd_regRead(s_pHalContext, RAM_G + endPtrArr[i] + 108, &cmd);// 108 is the length of the command list from CMD_NEWLIST to CMD_ENDLIST
+            EVE_CoCmd_regRead(s_pHalContext, UTIL_CALLLIST_ADDR + endPtrArr[i] + 108, &cmd); // 108 is the length of the command list from CMD_NEWLIST to CMD_ENDLIST
             eve_printf_debug("Return: 0x%08x\n", cmd);
 
             if (cmd == CMD_RETURN)
@@ -219,49 +245,79 @@ void SAMAPP_Utility_callList()
 }
 
 /**
-* @brief API to demonstrate for command list in RAM_G with alignment
-*
-*/
-void SAMAPP_Utility_callListWithAlignment()
+ * @brief API to demonstrate for command list in RAM_G with alignment
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_callListWithAlignment()
 {
     Draw_Text(s_pHalContext, "Example for: Construct a command list in RAM_G to show a button");
 
     //Construct a command list in RAM_G to show a button
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 0 * 4, SAVE_CONTEXT());
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 1 * 4, CLEAR_COLOR_RGB(255, 255, 255));
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 2 * 4, CLEAR(1, 1, 1));
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 3 * 4, CMD_BUTTON);
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 0 * 4, SAVE_CONTEXT());
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 1 * 4, CLEAR_COLOR_RGB(255, 255, 255));
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 2 * 4, CLEAR(1, 1, 1));
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 3 * 4, CMD_BUTTON);
 
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 4 * 4, 160 << 16 | 160); //y | x coordinate of button
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 5 * 4, 200 << 16 | 324); //h | w
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 6 * 4, 0 << 16 | 31); //options | Font handle
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 7 * 4, 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T');
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 4 * 4, 160 << 16 | 160); //y | x coordinate of button
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 5 * 4, 200 << 16 | 324); //h | w
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 6 * 4, 0 << 16 | 31); //options | Font handle
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 7 * 4, 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T');
 
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 8 * 4, '\0' << 24 | '\0' << 16 | '\0' << 8 | '\0');
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 8 * 4, '\0' << 24 | '\0' << 16 | '\0' << 8 | '\0');
 
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 8 * 4, RESTORE_CONTEXT()); //Assume 3 bytes padding bytes for alignment 
-    EVE_Hal_wr32(s_pHalContext, DDR_BITMAPS_STARTADDR2 + 9 * 4, CMD_RETURN); //return to the command buffer
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 8 * 4, RESTORE_CONTEXT()); //Assume 3 bytes padding bytes for alignment 
+    EVE_Hal_wr32(s_pHalContext, UTIL_LOAD_ADDR + 9 * 4, CMD_RETURN); //return to the command buffer
 
     //Call cmd_list with data in RAM_G
-    Display_Start(s_pHalContext);
-    EVE_CoCmd_callList(s_pHalContext, DDR_BITMAPS_STARTADDR2);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_callList(s_pHalContext, UTIL_LOAD_ADDR);
     Display_End(s_pHalContext);
 
     SAMAPP_DELAY;
 }
 
+/**
+ * @brief API to demonstrate copying a display list
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_copyList()
+{
+    Draw_Text(s_pHalContext, "Example for: Copy a display list to RAM_G");
+
+    /* Create a display list and copy to RAM_G */
+    Display_Start(s_pHalContext, (uint8_t[]) { 100, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(s_pHalContext, UTIL_COPYLIST_X, UTIL_COPYLIST_Y, UTIL_TITLE_FONT, OPT_CENTER, "This is a cached display list");
+    EVE_CoCmd_copyList(s_pHalContext, UTIL_CALLLIST_ADDR);
+
+    /* Display a new display list */
+    Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 100 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(s_pHalContext, UTIL_COPYLIST_X, UTIL_COPYLIST_Y, UTIL_TITLE_FONT, OPT_CENTER, "Displaying a new display list");
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
+
+    /* Display cached display list */
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_callList(s_pHalContext, UTIL_CALLLIST_ADDR);
+    Display_End(s_pHalContext);
+
+    SAMAPP_DELAY;
+}
 
 /**
-* @brief API to demonstrate the use of append commands
-*
-*/
-void SAMAPP_Utility_appendCommand()
+ * @brief API to demonstrate the use of append commands
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_appendCommand()
 {
     uint32_t AppendCmds[16];
     int16_t xoffset;
     int16_t yoffset;
-    uint16_t imgW = 256;
-    uint16_t imgH = 256;
 
     Draw_Text(s_pHalContext, "Example for: Appending DL command");
 
@@ -270,66 +326,61 @@ void SAMAPP_Utility_appendCommand()
     /* mcu specific graphics commands to coprocessor generated graphics commands      */
     /*************************************************************************/
 
-    /* Bitmap construction by MCU - display at 256x256 offset */
+    /* Bitmap construction by MCU */
     /* Construct the bitmap data to be copied in the temp buffer then by using
     coprocessor append command copy it into graphics processor DL memory */
-    xoffset = (int16_t)((s_pHalContext->Width - imgW) / 4);
-    yoffset = (int16_t)((s_pHalContext->Height / 3) - imgH / 2);
+    xoffset = (int16_t)((s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 4);
+    yoffset = (int16_t)((s_pHalContext->Height / 3) - UTIL_JPG_MANDRILL_H / 2);
 
     EVE_CoCmd_dlStart(s_pHalContext);
     AppendCmds[0] = CLEAR_COLOR_RGB(255, 0, 0);
     AppendCmds[1] = CLEAR(1, 1, 1);
     AppendCmds[2] = COLOR_RGB(255, 255, 255);
     AppendCmds[3] = BEGIN(BITMAPS);
-    AppendCmds[4] = BITMAP_SOURCE(DDR_BITMAPS_STARTADDR1);
-    AppendCmds[5] = BITMAP_SOURCEH(DDR_BITMAPS_STARTADDR1 >> 24);
-    AppendCmds[6] = BITMAP_LAYOUT(RGB565, 2 * imgW, imgH);
-    AppendCmds[7] = BITMAP_SIZE(BILINEAR, BORDER, BORDER, imgW, imgH);
+    AppendCmds[4] = BITMAP_SOURCE(UTIL_LOAD_ADDR);
+    AppendCmds[5] = BITMAP_SOURCEH(UTIL_LOAD_ADDR >> 24);
+    AppendCmds[6] = BITMAP_LAYOUT(RGB565, 2 * UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    AppendCmds[7] = BITMAP_SIZE(BILINEAR, BORDER, BORDER, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
     AppendCmds[8] = VERTEX2F(xoffset * 16, yoffset * 16);
     AppendCmds[9] = END();
 
     /* Download the bitmap data*/
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR1, TEST_DIR "\\mandrill256.jpg", NULL, OPT_RGB565);
+    EVE_Util_loadImageFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_JPG_MANDRILL, NULL, OPT_RGB565);
 
-    /* Download the DL data constructed by the MCU to location 40*40*2 in sram */
-    EVE_Hal_wrMem(s_pHalContext, DDR_BITMAPS_STARTADDR1 + imgW * imgH, (uint8_t *)AppendCmds, 9 * 4);
+    /* Download the DL data constructed by the MCU to ram */
+    EVE_Hal_wrMem(s_pHalContext, UTIL_LOAD_ADDR + UTIL_JPG_MANDRILL_W * UTIL_JPG_MANDRILL_H * 2, (uint8_t *)AppendCmds, 9 * 4);
 
-    /* Call the append api for copying the above generated data into graphics processor
-    DL commands are stored at location 40*40*2 offset from the starting of the sram */
-    EVE_CoCmd_append(s_pHalContext, DDR_BITMAPS_STARTADDR1 + imgW * imgH, 9 * 4);
+    /* Call the append api for copying the above generated data into graphics processor DL commands */
+    EVE_CoCmd_append(s_pHalContext, UTIL_LOAD_ADDR + UTIL_JPG_MANDRILL_W * UTIL_JPG_MANDRILL_H * 2, 9 * 4);
     /*  Display the text information */
-    xoffset -= 50;
-    yoffset += 300;
-    EVE_CoCmd_text(s_pHalContext, xoffset, yoffset, 31, 0, "Display bitmap by Append");
+    yoffset += UTIL_APPEND_TEXT_Y_INC;
+    EVE_CoCmd_text(s_pHalContext, xoffset, yoffset, UTIL_TITLE_FONT, 0, "Display bitmap by Append");
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
 }
 
 /**
-* @brief Draw set 11
-*
-*/
-void SAMAPP_Utility_bulkTransfer()
+ * @brief write bulk of data to CMDB
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_bulkTransfer()
 {
-    SAMAPP_Circle_t circles[100];
-    uint32_t precision = 4;
-    uint32_t CNUM = 100; // Disable circles
-    uint32_t ImgW = 256;
-    uint32_t ImgH = 256;
-    uint32_t xoffset = (s_pHalContext->Width - ImgW) / 2;
-    uint32_t yoffset = (s_pHalContext->Height - ImgH) / 2;
+    SAMAPP_Circle_t circles[UTIL_BULK_CIRCLE_NUM];
+    uint32_t xoffset = (s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 2;
+    uint32_t yoffset = (s_pHalContext->Height - UTIL_JPG_MANDRILL_H) / 2;
     int count = 0;
 
     Draw_Text(s_pHalContext, "Example for: Bulk transfer");
     EVE_Util_clearScreen(s_pHalContext);
 
-    for (int i = 0; i < (int)CNUM; i++)
+    for (int i = 0; i < UTIL_BULK_CIRCLE_NUM; i++)
     {
         circles[i].visible = 0;
         circles[i].opacity = 0;
         circles[i].radius = 0;
         circles[i].step = 0;
-        circles[i].visible = 0;
         circles[i].x = 0;
         circles[i].y = 0;
         circles[i].color.b = 0;
@@ -337,9 +388,9 @@ void SAMAPP_Utility_bulkTransfer()
         circles[i].color.r = 0;
     }
 
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR1, TEST_DIR "\\mandrill256.jpg", NULL, OPT_RGB565);
+    EVE_Util_loadImageFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_JPG_MANDRILL, NULL, OPT_RGB565);
 
-    while (count++ < 60 * 10)
+    while (count++ < UTIL_BULK_LOOP)
     {
         /*Display List start*/
         helperCMDBWrite(CMD_DLSTART);
@@ -347,7 +398,7 @@ void SAMAPP_Utility_bulkTransfer()
         helperCMDBWrite(CLEAR(1, 1, 1));
         helperCMDBWrite(VERTEX_FORMAT(2));
         // draw circles
-        for (int i = 0; i < (int)CNUM; i++)
+        for (int i = 0; i < UTIL_BULK_CIRCLE_NUM; i++)
         {
             int visible = rand() % 3;
             int x = rand() % s_pHalContext->Width;
@@ -388,12 +439,11 @@ void SAMAPP_Utility_bulkTransfer()
             if (circles[i].visible)
             {
                 helperCMDBWrite(COLOR_A(circles[i].opacity));
-                helperCMDBWrite(
-                COLOR_RGB(circles[i].color.r, circles[i].color.g, circles[i].color.b));
+                helperCMDBWrite(COLOR_RGB(circles[i].color.r, circles[i].color.g, circles[i].color.b));
 
                 helperCMDBWrite(BEGIN(POINTS));
-                helperCMDBWrite(POINT_SIZE(circles[i].radius * precision));
-                helperCMDBWrite(VERTEX2F(circles[i].x * precision, circles[i].y * precision));
+                helperCMDBWrite(POINT_SIZE(circles[i].radius * UTIL_BULK_PREC));
+                helperCMDBWrite(VERTEX2F(circles[i].x * UTIL_BULK_PREC, circles[i].y * UTIL_BULK_PREC));
                 helperCMDBWrite(END());
             }
         }
@@ -404,29 +454,27 @@ void SAMAPP_Utility_bulkTransfer()
         // draw image
         helperCMDBWrite(BITMAP_HANDLE(2));
         helperCMDBWrite(BEGIN(BITMAPS));
-        helperCMDBWrite(BITMAP_SOURCE(DDR_BITMAPS_STARTADDR1));
-        helperCMDBWrite(BITMAP_SOURCEH(DDR_BITMAPS_STARTADDR1 >> 24));
-        helperCMDBWrite(BITMAP_LAYOUT(RGB565, ImgW * 2, ImgH));
-        helperCMDBWrite(BITMAP_LAYOUT_H((ImgW * 2) >> 10, ImgH >> 9));
-        helperCMDBWrite(BITMAP_SIZE(BILINEAR, BORDER, BORDER, ImgW, ImgH));
-        helperCMDBWrite(BITMAP_SIZE_H(ImgW >> 9, ImgH >> 9));
-        helperCMDBWrite(VERTEX2F(xoffset * precision, yoffset * precision));
+        helperCMDBWrite(BITMAP_SOURCE(UTIL_LOAD_ADDR));
+        helperCMDBWrite(BITMAP_SOURCEH(UTIL_LOAD_ADDR >> 24));
+        helperCMDBWrite(BITMAP_LAYOUT(RGB565, UTIL_JPG_MANDRILL_W * 2, UTIL_JPG_MANDRILL_H));
+        helperCMDBWrite(BITMAP_LAYOUT_H((UTIL_JPG_MANDRILL_W * 2) >> 10, UTIL_JPG_MANDRILL_H >> 9));
+        helperCMDBWrite(BITMAP_SIZE(BILINEAR, BORDER, BORDER, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H));
+        helperCMDBWrite(BITMAP_SIZE_H(UTIL_JPG_MANDRILL_W >> 9, UTIL_JPG_MANDRILL_H >> 9));
+        helperCMDBWrite(VERTEX2F(xoffset * UTIL_BULK_PREC, yoffset * UTIL_BULK_PREC));
         helperCMDBWrite(END());
 
         // Draw the text in top of screen
-        uint32_t x = s_pHalContext->Width / 2 - 120;
-        uint32_t y = 20;
-        uint32_t font = 31;
-        uint32_t opt = OPT_CENTER;
+        uint32_t x = s_pHalContext->Width / 2;
+        uint32_t y = UTIL_TITLE_Y;
         helperCMDBWrite(CMD_TEXT);
         helperCMDBWrite(((y << 16) | (x & 0xffff)));
-        helperCMDBWrite(((opt << 16) | (font & 0xffff)));
+        helperCMDBWrite(((OPT_CENTER << 16) | (UTIL_TITLE_FONT & 0xffff)));
         helperCMDBWriteString("Bulk transfer demostration");
 
-        y = 100;
+        y += UTIL_TITLE_Y_INC;
         helperCMDBWrite(CMD_TEXT);
         helperCMDBWrite(((y << 16) | (x & 0xffff)));
-        helperCMDBWrite(((opt << 16) | (font & 0xffff)));
+        helperCMDBWrite(((OPT_CENTER << 16) | (UTIL_TITLE_FONT & 0xffff)));
         helperCMDBWriteString("Commands are transferd into REG_CMDB_WRITE instead of RAM_CMD");
         helperCMDBWrite(VERTEX_FORMAT(4));
 
@@ -440,69 +488,61 @@ void SAMAPP_Utility_bulkTransfer()
 }
 
 /**
-* @brief API to demonstrate display bitmap by inflate data from flash
-*
-*/
-void SAMAPP_Utility_cmdInflateFromFlash()
+ * @brief API to demonstrate display bitmap by inflate data from flash
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_cmdInflateFromFlash()
 {
     Draw_Text(s_pHalContext, "Example for: CMD_INFLATE with OPT_FLASH");
 
-    /* INFLATED BITMAP information */
-    uint16_t w = 320;
-    uint16_t h = 240;
-
     FlashHelper_SwitchState(s_pHalContext, FLASH_STATUS_FULL); // full mode
 
-    /* Now use cmd_inflate */
-    EVE_CoCmd_flashSource(s_pHalContext, 4096);
-    EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_FLASH);
+    EVE_CoCmd_flashSource(s_pHalContext, addr_flash + UTIL_ADDR_FLASH_MANDRILL);
+    EVE_CoCmd_inflate(s_pHalContext, UTIL_LOAD_ADDR, OPT_FLASH);
 
     /* Display inflated image */
-    Display_Start(s_pHalContext);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_CoCmd_setBitmap(s_pHalContext, RAM_G, ARGB4, w, h);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - w) / 2 * 16, (s_pHalContext->Height - h) / 2 * 16);
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, YCBCR, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 2 * 16, (s_pHalContext->Height - UTIL_JPG_MANDRILL_H) / 2 * 16);
     EVE_CoDl_end(s_pHalContext);
 
-    /*  Display the text information */
+    /* Display the text information */
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, 100, 31, OPT_CENTER, "Display bitmap by inflate (OPT_FLASH)");
+    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, UTIL_TITLE_Y, UTIL_TITLE_FONT, OPT_CENTER, "Display bitmap by inflate (OPT_FLASH)");
     Display_End(s_pHalContext);
 
     SAMAPP_DELAY;
 }
 
 /**
-* @brief API to demonstrate display bitmap by inflate data from media fifo
-*
-*/
-void SAMAPP_Utility_CmdInflateFromFifo()
+ * @brief API to demonstrate display bitmap by inflate data from media fifo
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_CmdInflateFromFifo()
 {
     Draw_Text(s_pHalContext, "Example for: CMD_INFLATE with data from media fifo");
 
-    /* INFLATED BITMAP information */
-    uint16_t w = 320;
-    uint16_t h = 240;
+    /* Clear the memory - any previous bitmap data */
+    EVE_CoCmd_memSet(s_pHalContext, UTIL_LOAD_ADDR, 255L, 1L * UTIL_JPG_MANDRILL_W * 2 * UTIL_JPG_MANDRILL_H);
+    /* Load data to mediafifo */
+    EVE_MediaFifo_set(s_pHalContext, UTIL_MEDIAFIFO_ADDR, UTIL_MEDIAFIFO_SZ);
+    EVE_CoCmd_inflate(s_pHalContext, UTIL_LOAD_ADDR, OPT_MEDIAFIFO);
+    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR UTIL_JPG_MANDRILL_INFLATE, NULL);
 
-    uint32_t mediafifo = w * h * 2; //the starting address of the media fifo
-    uint32_t mediafifolen = 20 * 1024;
-
-    /* Clear the memory at location 0 - any previous bitmap data */
-    EVE_CoCmd_memSet(s_pHalContext, RAM_G, 255L, 1L * w * 2 * h);
-    /*Load data to mediafifo */
-    EVE_MediaFifo_set(s_pHalContext, mediafifo, mediafifolen);
-    EVE_CoCmd_inflate(s_pHalContext, RAM_G, OPT_MEDIAFIFO);
-    EVE_Util_loadMediaFile(s_pHalContext, TEST_DIR "\\bird_320x240_ARGB4.bin", NULL);
-
-    Display_Start(s_pHalContext);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_CoCmd_setBitmap(s_pHalContext, RAM_G, ARGB4, w, h);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - w) / 2 * 16, (s_pHalContext->Height - h) / 2 * 16);
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, YCBCR, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 2 * 16, (s_pHalContext->Height - UTIL_JPG_MANDRILL_H) / 2 * 16);
     EVE_CoDl_end(s_pHalContext);
 
-    /*  Display the text information */
+    /* Display the text information */
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, 100, 31, OPT_CENTER, "Display bitmap by inflate from media fifo");
+    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, UTIL_TITLE_Y, UTIL_TITLE_FONT, OPT_CENTER, "Display bitmap by inflate from media fifo");
     Display_End(s_pHalContext);
     EVE_MediaFifo_close(s_pHalContext);
 
@@ -510,84 +550,80 @@ void SAMAPP_Utility_CmdInflateFromFifo()
 }
 
 /**
-* @brief API to demonstrate the usage of inflate command - compression done via zlib
-*
-*/
-void SAMAPP_Utility_CmdInflateFromCommand()
+ * @brief API to demonstrate the usage of inflate command - compression done via zlib
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_CmdInflateFromCommand()
 {
-    uint16_t w = 320;
-    uint16_t h = 240;
-
     Draw_Text(s_pHalContext, "Example for: CMD_INFLATE with data from command fifo");
 
     /**********************************************************************************/
     /* Below code demonstrates the usage of inflate function                          */
-    /* Download the deflated data into command buffer and in turn coprocessor inflate */
-    /* the deflated data and outputs at 0 location                                    */
     /**********************************************************************************/
-    /* Clear the memory at location 0 - any previous bitmap data */
-    EVE_CoCmd_memSet(s_pHalContext, RAM_G, 255L, 1L * w * 2 * h);
+    /* Clear the memory - any previous bitmap data */
+    EVE_CoCmd_memSet(s_pHalContext, UTIL_LOAD_ADDR, 255L, 1L * UTIL_JPG_MANDRILL_W * 2 * UTIL_JPG_MANDRILL_H);
     /* inflate the data read from binary file */
-    EVE_Util_loadInflateFile(s_pHalContext, RAM_G, TEST_DIR "\\bird_320x240_ARGB4.bin");
+    EVE_Util_loadInflateFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_JPG_MANDRILL_INFLATE);
 
     /* Set the display list for graphics processor */
-    /* Bitmap construction by MCU */
-    /* Transfer the data into coprocessor memory directly word by word */
-    Display_Start(s_pHalContext);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_CoCmd_setBitmap(s_pHalContext, RAM_G, ARGB4, w, h);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - w) / 2 * 16, (s_pHalContext->Height - h) / 2 * 16);
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, YCBCR, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 2 * 16, (s_pHalContext->Height - UTIL_JPG_MANDRILL_H) / 2 * 16);
     EVE_CoDl_end(s_pHalContext);
 
-    /*  Display the text information */
+    /* Display the text information */
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, 100, 31, OPT_CENTER, "Display bitmap by inflate from command fifo");
+    EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, UTIL_TITLE_Y, UTIL_TITLE_FONT, OPT_CENTER, "Display bitmap by inflate from command fifo");
     Display_End(s_pHalContext);
 
     SAMAPP_DELAY;
 }
 
 /**
-* @brief API to demonstrate Coprocessor fault and recover
-*
-*/
-void SAMAPP_Utility_coprocessorFaultRecover()
+ * @brief API to demonstrate Coprocessor fault and recover
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_coprocessorFaultRecover()
 {
-    int32_t bitmapWidth = 128;
-    int32_t bitmapHeight = 128;
     Draw_Text(s_pHalContext, "Example for: Coprocessor fault and recover");
 
-    Display_Start(s_pHalContext);
-	//Fault case: enable interlace option
-	EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_unsupported.png", NULL, 0);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    //Fault case: enable interlace option
+    EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR UTIL_PNG_UNSUPPORT, NULL, 0);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - bitmapWidth / 2) * 16,
-        (s_pHalContext->Height / 2 - bitmapHeight / 2) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - UTIL_PNG_FAILED_W / 2) * 16,
+        (s_pHalContext->Height / 2 - UTIL_PNG_FAILED_H / 2) * 16);
     EVE_CoDl_end(s_pHalContext);
     Display_End(s_pHalContext);
     EVE_sleep(100);
 
     EVE_Util_coprocessorFaultRecover(s_pHalContext);
 
-    Display_Start(s_pHalContext);
-	//Fault case: change bit depth into 7
-	EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR "\\lenaface40_corrupted.png", NULL, 0);
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    //Fault case: change bit depth into 7
+    EVE_Util_loadImageFile(s_pHalContext, RAM_G, TEST_DIR UTIL_PNG_CORRUPT, NULL, 0);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - bitmapWidth / 2) * 16,
-        (s_pHalContext->Height / 2 - bitmapHeight / 2) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (s_pHalContext->Width / 2 - UTIL_PNG_FAILED_W / 2) * 16,
+        (s_pHalContext->Height / 2 - UTIL_PNG_FAILED_H / 2) * 16);
     EVE_CoDl_end(s_pHalContext);
-
-	EVE_Util_coprocessorFaultRecover(s_pHalContext);
-
     Display_End(s_pHalContext);
+
+    EVE_Util_coprocessorFaultRecover(s_pHalContext);
     SAMAPP_DELAY;
 }
 
 /**
-* @brief API to demonstrate CMD_FILLWIDTH
-*
-*/
-void SAMAPP_Utility_fillWidth()
+ * @brief API to demonstrate CMD_FILLWIDTH
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_fillWidth()
 {
     int16_t x;
     int16_t y;
@@ -595,69 +631,71 @@ void SAMAPP_Utility_fillWidth()
 
     Draw_Text(s_pHalContext, "Example for: CMD_FILLWIDTH");
 
-    Display_Start(s_pHalContext);
-    fill_w = 100;
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    fill_w = UTIL_FILLW_W1;
     EVE_CoCmd_fillWidth(s_pHalContext, fill_w);
 
-    x = 100;
-    y = 200;
+    x = UTIL_FILLW_X1;
+    y = UTIL_FILLW_Y1;
     EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0);
     EVE_CoDl_begin(s_pHalContext, RECTS);
     EVE_CoDl_vertex2f_4(s_pHalContext, x * 16, y * 16);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (x + fill_w) * 16, (y + 300) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (x + fill_w) * 16, (y + UTIL_FILLW_H1) * 16);
     EVE_CoDl_end(s_pHalContext);
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, x, y, 31, OPT_FILL, "This test doesn't fit on one line");
+    EVE_CoCmd_text(s_pHalContext, x, y, UTIL_TITLE_FONT, OPT_FILL, "This test doesn't fit on one line");
 
-    x = 400;
-    y = 200;
+    x = UTIL_FILLW_X2;
+    y = UTIL_FILLW_Y1;
     EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0);
     EVE_CoDl_begin(s_pHalContext, RECTS);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (x - fill_w / 2) * 16, (y - 150) * 16);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (x + fill_w / 2) * 16, (y + 150) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (x - fill_w / 2) * 16, (y - UTIL_FILLW_H1 / 2) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (x + fill_w / 2) * 16, (y + UTIL_FILLW_H1 / 2) * 16);
     EVE_CoDl_end(s_pHalContext);
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, x, y, 31, OPT_FILL | OPT_CENTER, "This test doesn't fit on one line");
+    EVE_CoCmd_text(s_pHalContext, x, y, UTIL_TITLE_FONT, OPT_FILL | OPT_CENTER, "This test doesn't fit on one line");
 
-    x = 100;
-    y = 600;
-    fill_w = 2;
+    x = UTIL_FILLW_X1;
+    y = UTIL_FILLW_Y2;
+    fill_w = UTIL_FILLW_W2;
     EVE_CoCmd_fillWidth(s_pHalContext, fill_w);
 
     EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0);
     EVE_CoDl_begin(s_pHalContext, RECTS);
     EVE_CoDl_vertex2f_4(s_pHalContext, x * 16, y * 16);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (x + 100) * 16, (y + 200) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (x + UTIL_FILLW_W1) * 16, (y + UTIL_FILLW_H1) * 16);
     EVE_CoDl_end(s_pHalContext);
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, x, y, 31, OPT_FILL, "line one line two");
+    EVE_CoCmd_text(s_pHalContext, x, y, UTIL_TITLE_FONT, OPT_FILL, "line one line two with fill");
 
-    x = 400;
+    x = UTIL_FILLW_X2;
     EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0);
     EVE_CoDl_begin(s_pHalContext, RECTS);
     EVE_CoDl_vertex2f_4(s_pHalContext, x * 16, y * 16);
-    EVE_CoDl_vertex2f_4(s_pHalContext, (x + 160) * 16, (y + 100) * 16);
+    EVE_CoDl_vertex2f_4(s_pHalContext, (x + UTIL_FILLW_W1) * 16, (y + UTIL_FILLW_H1) * 16);
     EVE_CoDl_end(s_pHalContext);
     EVE_CoDl_colorRgb(s_pHalContext, 0, 0, 0);
-    EVE_CoCmd_text(s_pHalContext, x, y, 31, 0, "line one \nline two");
+    EVE_CoCmd_text(s_pHalContext, x, y, UTIL_TITLE_FONT, 0, "line one \nline two \nwithout fill");
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
 
     // Cover the cmd_button 
-    Display_Start(s_pHalContext);
-    y = 200;
-    fill_w = 300;
+    Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    y = UTIL_FILLW_Y1;
+    fill_w = UTIL_FILLW_W3;
     EVE_CoCmd_fillWidth(s_pHalContext, fill_w);
-    EVE_CoCmd_button(s_pHalContext, 100, y, fill_w, 200, 31, OPT_FILL, "This test doesn't fit on one line");
+    EVE_CoCmd_button(s_pHalContext, UTIL_FILLW_X1, y, fill_w, UTIL_FILLW_H2, UTIL_TITLE_FONT, OPT_FILL, "This test doesn't fit on one line");
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
 }
 
 /**
-* @brief API to demonstrate OTP_FORMAT
-*
-*/
-void SAMAPP_Utility_printType() //must call after SAMAPP_ExtendedFormat_Font
+ * @brief API to demonstrate OTP_FORMAT
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_printType() //must call after SAMAPP_ExtendedFormat_Font
 {
     Draw_Text(s_pHalContext, "Example for: OPT_FORMAT");
     uint8_t c = 51;
@@ -665,40 +703,39 @@ void SAMAPP_Utility_printType() //must call after SAMAPP_ExtendedFormat_Font
     int16_t mV = 1947;
     int32_t t = 680;
 
-    Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
-    EVE_CoCmd_text(s_pHalContext, 10, 20, 31, 0, "%");
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 1, 31, 0, "%%");
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 2, 31, 0, "%d%%%");
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 3, 31, OPT_FORMAT, "%d * %d = %d", 100, 200, 20000);
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 4, 31, OPT_FORMAT, "%3d%% complete", c); /*result:  51 % complete */
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 5, 31, OPT_FORMAT, "base address %06x", a); /*result:  base address 12a000 */
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 6, 31, OPT_FORMAT, "%+5.3d mV", mV); /*result:  + 1947 mV */
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 7, 31, OPT_FORMAT, "Temp. %d.%.1d degrees", t / 10,
+    Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y, UTIL_TITLE_FONT, 0, "%");
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 1, UTIL_TITLE_FONT, 0, "%%");
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 2, UTIL_TITLE_FONT, 0, "%d%%%");
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 3, UTIL_TITLE_FONT, OPT_FORMAT, "%d * %d = %d", 100, 200, 20000);
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 4, UTIL_TITLE_FONT, OPT_FORMAT, "%3d%% complete", c); /*result:  51 % complete */
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 5, UTIL_TITLE_FONT, OPT_FORMAT, "base address %06x", a); /*result:  base address 12a000 */
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 6, UTIL_TITLE_FONT, OPT_FORMAT, "%+5.3d mV", mV); /*result:  + 1947 mV */
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 7, UTIL_TITLE_FONT, OPT_FORMAT, "Temp. %d.%.1d degrees", t / 10,
         t % 10); /*result:  Temp. 68.0 degrees */
 
     EVE_Hal_wrMem(s_pHalContext, RAM_G + 4, "Hello ", 8); //address and length should be aline to 4
-    EVE_CoCmd_text(s_pHalContext, 10, 20 + 50 * 8, 31, OPT_FORMAT, "%s %d times", RAM_G + 4, 5); /*result:  Hello 5 times */
+    EVE_CoCmd_text(s_pHalContext, UTIL_TITLE_X, UTIL_TITLE_Y + UTIL_TITLE_Y_INC * 8, UTIL_TITLE_FONT, OPT_FORMAT, "%s %d times", RAM_G + 4, 5); /*result:  Hello 5 times */
 
     Display_End(s_pHalContext);
     SAMAPP_DELAY;
 }
 
 /**
-* @brief Change screen orientation from landscape to portrait mode.  
-* 
-* Setscratch command is also introduced, it sets the temporary bitmap handle for buttons, 
-* keys, and graidents.
-*
-*/
-void SAMAPP_Utility_screenRotate()
+ * @brief Change screen orientation from landscape to portrait mode.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_screenRotate()
 {
-    uint8_t text[100];
+    uint8_t text[UTIL_TEXT_LEN];
 
     Draw_Text(s_pHalContext, "Example for: Change screen orientation from landscape to portrait mode");
 
-    for (uint32_t rotateMode = 0; rotateMode < 8; rotateMode++)
+    for (uint32_t rotateMode = 0; rotateMode < UTIL_ROTATE_MODE; rotateMode++)
     {
-        Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
         EVE_CoCmd_setRotate(s_pHalContext, rotateMode);
         switch (rotateMode)
         {
@@ -706,17 +743,14 @@ void SAMAPP_Utility_screenRotate()
         case 1:
         case 4:
         case 5:
-            snprintf(text, 100, "Landscape Mode, rotate value= %d", rotateMode);
-            EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 50, 31, OPT_CENTER,
-                text);
+            snprintf(text, UTIL_TEXT_LEN, "Landscape Mode, rotate value= %d", rotateMode);
             break;
         default:
-            snprintf(text, 100, "Portrait Mode\nRotate value= %d", rotateMode);
-            EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Height / 2), 50, 31, OPT_CENTER,
-                text);
+            snprintf(text, UTIL_TEXT_LEN, "Portrait Mode\nRotate value= %d", rotateMode);
+
             break;
         }
-
+        EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), UTIL_TITLE_Y, UTIL_TITLE_FONT, OPT_CENTER, text);
         Display_End(s_pHalContext);
         SAMAPP_DELAY;
     }
@@ -726,38 +760,40 @@ void SAMAPP_Utility_screenRotate()
 }
 
 /**
-* @brief API to demonstrate number base
-*
-*/
-void SAMAPP_Utility_numberBases()
+ * @brief API to demonstrate number base
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_numberBases()
 {
     Draw_Text(s_pHalContext, "Example for: Number base");
 
-    Display_StartColor(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 });
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 50, 32, OPT_CENTER,
+    Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), UTIL_TITLE_Y, UTIL_TITLE_FONT, OPT_CENTER,
         "Built-in bases conversion");
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), 100, 32, OPT_CENTER,
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), UTIL_TITLE_Y + UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, OPT_CENTER,
         "bases from 2 to 32:");
 
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2) - 200, 200, 31, 0,
+    EVE_CoCmd_text(s_pHalContext, UTIL_NUM_TEXT_X1, UTIL_TITLE_Y + 3 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0,
         "Binary(2):");
     EVE_CoCmd_setBase(s_pHalContext, 2);
-    EVE_CoCmd_number(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 + 100), 200, 31, 0, 1000);
+    EVE_CoCmd_number(s_pHalContext, UTIL_NUM_TEXT_X2, UTIL_TITLE_Y + 3 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, 1000);
 
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 - 200), 300, 31, 0,
+    EVE_CoCmd_text(s_pHalContext, UTIL_NUM_TEXT_X1, UTIL_TITLE_Y + 5 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0,
         "Octal(8):");
     EVE_CoCmd_setBase(s_pHalContext, 8);
-    EVE_CoCmd_number(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 + 100), 300, 31, 0, 1000);
+    EVE_CoCmd_number(s_pHalContext, UTIL_NUM_TEXT_X2, UTIL_TITLE_Y + 5 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, 1000);
 
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 - 200), 400, 31, 0,
+    EVE_CoCmd_text(s_pHalContext, UTIL_NUM_TEXT_X1, UTIL_TITLE_Y + 7 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0,
         "Decimal(10):");
     EVE_CoCmd_setBase(s_pHalContext, 10);
-    EVE_CoCmd_number(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 + 100), 400, 31, 0, 1000);
+    EVE_CoCmd_number(s_pHalContext, UTIL_NUM_TEXT_X2, UTIL_TITLE_Y + 7 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, 1000);
 
-    EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 - 200), 500, 31, 0,
+    EVE_CoCmd_text(s_pHalContext, UTIL_NUM_TEXT_X1, UTIL_TITLE_Y + 9 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0,
         "Hex(16):");
     EVE_CoCmd_setBase(s_pHalContext, 16);
-    EVE_CoCmd_number(s_pHalContext, (int16_t) (s_pHalContext->Width / 2 + 100), 500, 31, 0, 1000);
+    EVE_CoCmd_number(s_pHalContext, UTIL_NUM_TEXT_X2, UTIL_TITLE_Y + 9 * UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, 1000);
 
     //Revert the base back to decimal because numeric base is part of the global context.
     EVE_CoCmd_setBase(s_pHalContext, 10);
@@ -767,10 +803,12 @@ void SAMAPP_Utility_numberBases()
 }
 
 /**
-* @brief read back the result of a command
-*
-*/
-void SAMAPP_Utility_crcCheck()
+ * @brief CRC check
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_crcCheck()
 {
     const uint32_t memWrite = 0x66666666; // 66 = 'f'
     const uint32_t memSizeTest = 1024; // bytes
@@ -782,7 +820,7 @@ void SAMAPP_Utility_crcCheck()
     EVE_CoCmd_memSet(s_pHalContext, RAM_G, memWrite, memSizeTest);
     EVE_Cmd_waitFlush(s_pHalContext);/*reset cmd index*/
 
-    EVE_CoCmd_memCrc(s_pHalContext, 0, memSizeTest, &memcrcRet);
+    EVE_CoCmd_memCrc(s_pHalContext, RAM_G, memSizeTest, &memcrcRet);
     EVE_Cmd_waitFlush(s_pHalContext);
     eve_printf_debug("current CRC number [0,1023) is 0x%x \r\n", memcrcRet);
     if (memcrcRet == crcExpected)
@@ -794,28 +832,28 @@ void SAMAPP_Utility_crcCheck()
 }
 
 /**
-* @brief API to demonstrate CMD_SKIPCOND
-*
-*/
-void SAMAPP_Utility_skipcond()
+ * @brief API to demonstrate CMD_SKIPCOND
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_skipcond()
 {
     Draw_Text(s_pHalContext, "Example for: Construct a command list with CMD_SKIPCOND");
     uint32_t tag = 0;
-    uint32_t btnTag = 1;
-    uint32_t exitTag = 2;
     bool pressed = 0;
     bool exit = 0;
-    uint8_t txtPause[2][25] = { "PRESS TO CHANGE COLOR", "PRESSED" };
+    uint8_t txtPause[2][UTIL_TEXT_LEN] = { "PRESS TO CHANGE COLOR", "PRESSED" };
 
     do
     {
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag);
         //only change the button when a release happened
-        if ((tag & 0xFFFFFF) == btnTag)
+        if ((tag & 0xFFFFFF) == UTIL_SKIPCOND_BTN_TAG)
         {
             pressed = 1;
         }
-        else if ((tag & 0xFFFFFF) == exitTag)
+        else if ((tag & 0xFFFFFF) == UTIL_SKIPCOND_EXIT_TAG)
         {
             exit = 1;
         }
@@ -827,39 +865,39 @@ void SAMAPP_Utility_skipcond()
             }
         }
 
-        Display_Start(s_pHalContext);
+        Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
 
         /*** Show a button ***/
-        EVE_CoCmd_skipCond(s_pHalContext, REG_TOUCH_TAG, NOTEQUAL, 0x1, 0xFFFFFF, 4 + 24); // colorRgb 4 bytes, CMD_SKIPCOND 24 bytes, so skip to the second colorRgb command if not ewual to 1
+        EVE_CoCmd_skipCond(s_pHalContext, REG_TOUCH_TAG, NOTEQUAL, 0x1, 0xFFFFFF, 4 + 24); // colorRgb 4 bytes, CMD_SKIPCOND 24 bytes, so skip to the second colorRgb command if not equal to 1
         EVE_CoDl_colorRgb(s_pHalContext, 255, 0, 0); // red
         EVE_CoCmd_skipCond(s_pHalContext, 0, ALWAYS, 0x0, 0x0, 4); // unconditional branch
         EVE_CoDl_colorRgb(s_pHalContext, 0, 255, 0); // green
-        EVE_CoDl_tag(s_pHalContext, btnTag);
+        EVE_CoDl_tag(s_pHalContext, UTIL_SKIPCOND_BTN_TAG);
         EVE_CoCmd_button(s_pHalContext, 160, 160, 600, 200, 31, 0, txtPause[pressed]);
         /*** Show exit button ***/
-        EVE_CoDl_tag(s_pHalContext, exitTag);
+        EVE_CoDl_tag(s_pHalContext, UTIL_SKIPCOND_EXIT_TAG);
         EVE_CoDl_colorRgb(s_pHalContext, 255, 255, 255); // white
         EVE_CoCmd_button(s_pHalContext, 160, 460, 300, 200, 31, 0, "EXIT");
         /*** Done button ***/
         Display_End(s_pHalContext);
 
-        EVE_sleep(10);
+        EVE_sleep(UTIL_DELAY_MS);
     } while (!exit);
 }
 
 /**
-* @brief API to demonstrate CMD_WAITCOND
-*
-*/
-void SAMAPP_Utility_waitcond()
+ * @brief API to demonstrate CMD_WAITCOND
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_waitcond()
 {
     Draw_Text(s_pHalContext, "Example for: Construct a command list with CMD_WAITCOND");
 
-    Display_StartColor(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 0, 0, 0 });
-    EVE_CoCmd_text(s_pHalContext, (uint16_t)(s_pHalContext->Width / 2), (uint16_t)(s_pHalContext->Height / 2), 31, OPT_CENTERX | OPT_FILL, "Now you will hear the music");
-    Display_End(s_pHalContext);
-    EVE_CoCmd_loadWav(s_pHalContext, RAM_G, 0);
-    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR "\\perfect_beauty.wav", NULL);
+    Draw_Text(s_pHalContext, "Now you will hear the music ");
+    EVE_CoCmd_loadWav(s_pHalContext, UTIL_LOAD_ADDR, 0);
+    EVE_Util_loadCmdFile(s_pHalContext, TEST_DIR UTIL_WAV, NULL);
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_LOOP, 0);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, 155);
@@ -876,26 +914,30 @@ void SAMAPP_Utility_waitcond()
     EVE_CoCmd_regWrite(s_pHalContext, REG_PLAYBACK_PLAY, 1);
 }
 
-void SAMAPP_Utility_interrupt()
+/**
+ * @brief API to demonstrate interrupt usage
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_interrupt()
 {
     Draw_Text(s_pHalContext, "Example for: Interrupt driven rendering");
 
-    uint32_t pic_tag = 1;
     uint32_t int_flags = 0;
 
     /* Copy the display list */
-    Display_StartColor(s_pHalContext, (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 });
-    EVE_CoDl_vertexFormat(s_pHalContext, 2);
+    Display_Start(s_pHalContext, (uint8_t[]) { 0x77, 0x77, 0x77 }, (uint8_t[]) { 255, 255, 255 }, 0, 2);
     /* Send command screen saver */
     EVE_CoDl_tagMask(s_pHalContext, 1);
-    EVE_CoDl_tag(s_pHalContext, pic_tag);
+    EVE_CoDl_tag(s_pHalContext, UTIL_INT_PIC_TAG);
     EVE_CoDl_begin(s_pHalContext, BITMAPS);
-    EVE_Util_loadImageFile(s_pHalContext, DDR_BITMAPS_STARTADDR1, TEST_DIR "\\mandrill256.jpg", NULL, OPT_RGB565);
+    EVE_Util_loadImageFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_JPG_MANDRILL, NULL, OPT_RGB565);
     EVE_CoDl_macro(s_pHalContext, 0);
     EVE_CoDl_end(s_pHalContext);
     EVE_CoDl_tagMask(s_pHalContext, 0);
     /* Display the text */
-    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), (int16_t)(s_pHalContext->Height / 2), 31, OPT_CENTER, "Touch the picture to exit ...");
+    EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), (int16_t)(s_pHalContext->Height / 2), UTIL_TITLE_FONT, OPT_CENTER, "Touch the picture to exit ...");
     EVE_CoDl_display(s_pHalContext);
     EVE_CoCmd_screenSaver(s_pHalContext); //screen saver command will continuously update the macro0 with vertex2f command
 
@@ -906,7 +948,7 @@ void SAMAPP_Utility_interrupt()
 
     while ((!EVE_Hal_getInterrupt(s_pHalContext)) 
        || ((EVE_Hal_rd32(s_pHalContext, REG_INT_FLAGS) & (1 << INT_TAG)) != (1 << INT_TAG)) 
-       || (EVE_Hal_rd32(s_pHalContext, REG_TOUCH_TAG) != pic_tag))
+       || (EVE_Hal_rd32(s_pHalContext, REG_TOUCH_TAG) != UTIL_INT_PIC_TAG))
         ;
 
     /* Send the stop command */
@@ -915,11 +957,18 @@ void SAMAPP_Utility_interrupt()
     Draw_Text(s_pHalContext, "Tag touched interrupt detected");
 }
 
-
-void SAMAPP_Utility() {
+/**
+ * @brief Main entry to run all utility demos
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility()
+{
     SAMAPP_Utility_wait();
     SAMAPP_Utility_callList();
     SAMAPP_Utility_callListWithAlignment();
+    SAMAPP_Utility_copyList();
     SAMAPP_Utility_appendCommand();
     SAMAPP_Utility_bulkTransfer();
     SAMAPP_Utility_cmdInflateFromFlash();
@@ -931,8 +980,8 @@ void SAMAPP_Utility() {
     SAMAPP_Utility_screenRotate();
     SAMAPP_Utility_numberBases();
     SAMAPP_Utility_crcCheck();
-	SAMAPP_Utility_skipcond();
-	SAMAPP_Utility_waitcond();
+    SAMAPP_Utility_skipcond();
+    SAMAPP_Utility_waitcond();
     SAMAPP_Utility_interrupt();
 }
 

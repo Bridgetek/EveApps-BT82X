@@ -1,7 +1,6 @@
-bt82x.blob                                          : 0       : 4096   
-Roboto-BoldCondensed_30_L4.reloc                    : 4096    : 5864   
-Roboto-BoldCondensed_30_L4.reloc.pad                : 9960    : 24     
-NotoSerifSC-VariableFont_wght_30_L2.raw             : 9984    : 3094068
-NotoSerifSC-VariableFont_wght_30_L2.raw.pad         : 3104052 : 12     
-NotoSerifSC-VariableFont_wght_30_L1_ordinal.raw     : 3104064 : 1535888
-NotoSerifSC-VariableFont_wght_30_L1_ordinal.raw.pad : 4639952 : 48     
+Name                                              : Offset  : Size   
+
+bt82x.blob                                        : 0       : 4096   
+Roboto-BoldCondensed_30_L4.reloc                  : 4096    : 5864   
+NotoSerifSC-VariableFont_wght_30_L2.reloc         : 9984    : 3094068
+NotoSerifSC-VariableFont_wght_30_L1_ordinal.reloc : 3104064 : 1535888

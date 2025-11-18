@@ -29,12 +29,11 @@
  * SOFTWARE.
  */
 
-#include "Common.h"
 #include "FlashHelper.h"
 
 #define FREAD_BLOCK           (8 * 1024)
-
 #define BLOBSIZE              4096
+#define FILE_BLOB             (EVE_FLASH_DIR "\\bt82x.blob")
 
 #if defined(MSVC_PLATFORM)
 #define EVE_FLASH_DIR         __FILE__ "\\..\\..\\..\\common\\eve_flash"
@@ -42,22 +41,204 @@
 #define EVE_FLASH_DIR         "/Test/common/eve_flash"
 #endif
 
-#define FILE_BLOB (EVE_FLASH_DIR "\\bt82x.blob")
+#define FTF_PROGESS_READ      1
+#define FTF_PROGESS_WRITE     2
+#define MSG_SIZE              200
+#define FLASH_DELAY_MS        1000
 
-#define FTF_PROGESS_READ 1
-#define FTF_PROGESS_WRITE 2
-#define MSG_SIZE 200
+#ifdef EVE_FLASH_NAND
+typedef struct Flash_Progress
+{
+    char message[MSG_SIZE];
+    char stage;
+    uint32_t fileSize;
+} Flash_Progress_t;
 
+typedef enum
+{
+    COPY_FROM, /**< 0 */
+    GET_FLASH_ADDR, /**< 1 */
+    ERASE_FLASH, /**< 2 */
+    COPY_TO_FLASH, /**< 3 */
+    VERIFY, /**< 4 */
+
+    LAST_STAGE = 5, /**< 5 */
+} Flash_stage;
+
+/**
+ * @brief Default UI for the progress bar
+ *
+ * @param phost Pointer to Hal context
+ * @param progress Flash_Progress_t struct
+ * @return uint32_t 1 on successful, 0 on error
+ */
+uint32_t Flash_Progress_Ui(EVE_HalContext *phost, const Flash_Progress_t *progress)
+{
+    char s[MSG_SIZE];
+    uint16_t w = (uint16_t)(phost->Width * 8 / 10);
+    uint16_t h = (uint16_t)(phost->Height * 1 / 10);
+    uint16_t x = (uint16_t)((phost->Width - w) / 2);
+    uint16_t y = (uint16_t)((phost->Height - h) / 2);
+    uint16_t val = (uint16_t)(progress->stage * 100 / LAST_STAGE);
+    const uint32_t range = 100;
+
+    Display_Start(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(phost, x, y - 50, 31, 0, progress->message);
+    EVE_CoCmd_progress(phost, x, y, w, h, 0, val, range);
+
+    snprintf(s, MSG_SIZE, "%u %%", val * 100 / range);
+    EVE_CoDl_colorRgb(phost, 0, 200, 0);
+    EVE_CoCmd_text(phost, x + w / 2, y + 10, 31, 0, s);
+    EVE_CoDl_colorRgb(phost, 255, 255, 255);
+
+    Display_End(phost);
+    EVE_sleep(FLASH_DELAY_MS);
+
+    return 1;
+}
+
+/**
+ * @brief Write file to flash and show default progress bar on LCD
+ *
+ * @param phost Pointer to Hal context
+ * @param file File to transfer, should include path if not from EVE connected SD card
+ * @param address Address on flash
+ * @param fromEveSD Copy file from EVE connected SD card or not
+ * @return uint32_t Number of bytes transfered
+ */
+uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file, uint32_t *address, bool fromEveSD)
+{
+    Flash_Progress_t progress;
+    uint32_t result = 0;
+    uint32_t addr_from = RAM_G; // DDR address to save the file read from SDcard/PC
+    uint32_t addr_from_flash = 128 << 20; // DDR address to save the file read back from flash
+
+    progress.stage = COPY_FROM;
+    if (fromEveSD)
+    {
+        snprintf(progress.message, MSG_SIZE, "Reading EVE connected SD card");
+        Flash_Progress_Ui(phost, &progress);
+        result = EVE_CoCmd_sdattach(phost, OPT_4BIT | OPT_IS_SD, 0);
+        eve_printf_debug("SD attach status 0x%x \n", result);
+        if (result != 0)
+        {
+            eve_printf_debug("SD attach failed\n");
+            snprintf(progress.message, MSG_SIZE, "Flash failed - SD card not attached");
+            Flash_Progress_Ui(phost, &progress);
+            EVE_sleep(FLASH_DELAY_MS);
+            return 0;
+        }
+        result = EVE_CoCmd_fssource(phost, file, 0);
+        eve_printf_debug("file read status 0x%x \n", result);
+        if (result != 0)
+        {
+            eve_printf_debug("SD read failed\n");
+            snprintf(progress.message, MSG_SIZE, "Flash failed - can't find file in SD card");
+            Flash_Progress_Ui(phost, &progress);
+            EVE_sleep(FLASH_DELAY_MS);
+            return 0;
+        }
+        progress.fileSize = EVE_CoCmd_fssize(phost, file, 0);
+        if (progress.fileSize > 0)
+        {
+            result = EVE_CoCmd_fsread(phost, addr_from, file, 0);
+            if (result != 0)
+            {
+                eve_printf_debug("file read failed\n");
+                snprintf(progress.message, MSG_SIZE, "Flash failed - can't read file");
+                Flash_Progress_Ui(phost, &progress);
+                EVE_sleep(FLASH_DELAY_MS);
+                return 0;
+            }
+        }
+        else
+        {
+            eve_printf_debug("file size is not large than 0\n");
+            snprintf(progress.message, MSG_SIZE, "Flash failed - file size is not correct");
+            Flash_Progress_Ui(phost, &progress);
+            EVE_sleep(FLASH_DELAY_MS);
+            return 0;
+        }
+    }
+    else
+    {
+#if defined(MSVC_PLATFORM)
+        snprintf(progress.message, MSG_SIZE, "Reading from PC");
+#else
+        snprintf(progress.message, MSG_SIZE, "Reading from MCU's SD card");
+#endif
+        Flash_Progress_Ui(phost, &progress);
+        progress.fileSize = EVE_Util_loadRawFile(phost, addr_from, file);
+        if (progress.fileSize == 0)
+        {
+            eve_printf_debug("file size is not large than 0\n");
+            snprintf(progress.message, MSG_SIZE, "Flash failed - file can't be found");
+            Flash_Progress_Ui(phost, &progress);
+            EVE_sleep(FLASH_DELAY_MS);
+            return 0;
+        }
+    }
+
+    EVE_sleep(FLASH_DELAY_MS);
+    progress.stage = GET_FLASH_ADDR;
+    snprintf(progress.message, MSG_SIZE, "Search for an available flash address");
+    Flash_Progress_Ui(phost, &progress);
+    *address = FlashHelper_GetAddrAvail(phost, progress.fileSize, *address);
+
+    EVE_sleep(FLASH_DELAY_MS);
+    progress.stage = ERASE_FLASH;
+    snprintf(progress.message, MSG_SIZE, "Erasing flash");
+    Flash_Progress_Ui(phost, &progress);
+    FlashHelper_EraseBlocks(phost, *address, progress.fileSize);
+
+    progress.stage = COPY_TO_FLASH;
+    snprintf(progress.message, MSG_SIZE, "Writing to flash");
+    Flash_Progress_Ui(phost, &progress);
+    FlashHelper_Program(phost, *address, addr_from, progress.fileSize);
+
+    progress.stage = VERIFY;
+    snprintf(progress.message, MSG_SIZE, "Verifying");
+    Flash_Progress_Ui(phost, &progress);
+    if (Show_Diaglog_YesNo(phost, "Flash programming",
+            "Verify the data in Flash?"))
+    {
+        uint32_t crc_from_sd = 0;
+        uint32_t crc_from_flash = 0;
+        EVE_CoCmd_memCrc(phost, addr_from, progress.fileSize, &crc_from_sd);
+        FlashHelper_Read(phost, addr_from_flash, *address, progress.fileSize, NULL);
+        EVE_CoCmd_memCrc(phost, addr_from_flash, progress.fileSize, &crc_from_flash);
+        if (crc_from_sd == crc_from_flash)
+        {
+            snprintf(progress.message, MSG_SIZE, "Verify success");
+            Flash_Progress_Ui(phost, &progress);
+        }
+        else
+        {
+            snprintf(progress.message, MSG_SIZE, "Verify failed");
+            Flash_Progress_Ui(phost, &progress);
+            EVE_sleep(FLASH_DELAY_MS);
+            return 0;
+        }
+    }
+
+    progress.stage = LAST_STAGE;
+    snprintf(progress.message, MSG_SIZE, "Flash success");
+    Flash_Progress_Ui(phost, &progress);
+    EVE_sleep(FLASH_DELAY_MS);
+    return progress.fileSize;
+}
+
+#else
 typedef struct Ftf_Progress
 {
-	char file[200];
-	char fileName[200];
-	char message[MSG_SIZE];
-	uint32_t fileSize;
-	uint32_t sent;
-	uint32_t bytesPerPercent;
-	uint32_t addr;
-	uint8_t direction;
+    char file[200];
+    char fileName[200];
+    char message[MSG_SIZE];
+    uint32_t fileSize;
+    uint32_t sent;
+    uint32_t bytesPerPercent;
+    uint32_t addr;
+    uint8_t direction;
 } Ftf_Progress_t;
 
 /**
@@ -75,29 +256,29 @@ typedef struct Ftf_Progress
  */
 uint32_t Ftf_Update_Blob(EVE_HalContext* phost, const char* pbuff) 
 {
-	eve_printf("Updating blob\n");
-	char buf[BLOBSIZE] = { 0 };
+    eve_printf("Updating blob\n");
+    char buf[BLOBSIZE] = { 0 };
 
-	FlashHelper_SwitchState(phost, FLASH_STATUS_BASIC); // basic mode
-	EVE_Hal_wrMem(phost, RAM_G, pbuff, BLOBSIZE);
-	printf("REMG: 0x%lx\n", EVE_Hal_rd32(phost, RAM_G));
-	EVE_Cmd_waitFlush(phost);
-	FlashHelper_Update(phost, 0, RAM_G, BLOBSIZE);
-	EVE_Cmd_waitFlush(phost);
-	FlashHelper_Read(phost, 4096, 0, BLOBSIZE, buf);
-	printf("REMG+4096: 0x%lx, buf: 0x%lx\n", EVE_Hal_rd32(phost, 4096), buf[0]);
+    FlashHelper_SwitchState(phost, FLASH_STATUS_BASIC); // basic mode
+    EVE_Hal_wrMem(phost, RAM_G, pbuff, BLOBSIZE);
+    printf("REMG: 0x%lx\n", EVE_Hal_rd32(phost, RAM_G));
+    EVE_Cmd_waitFlush(phost);
+    FlashHelper_Update(phost, 0, RAM_G, BLOBSIZE);
+    EVE_Cmd_waitFlush(phost);
+    FlashHelper_Read(phost, 4096, 0, BLOBSIZE, buf);
+    printf("REMG+4096: 0x%lx, buf: 0x%lx\n", EVE_Hal_rd32(phost, 4096), buf[0]);
 
-	int ret = FlashHelper_SwitchFullMode(phost);
+    int ret = FlashHelper_SwitchFullMode(phost);
 
-	if (ret == 1) {
-		eve_printf("Blob updated successful\n");
-		return 1;
-	}
-	else {
-		eve_printf("Failed to update Blob\n");
-	}
+    if (ret == 1) {
+        eve_printf("Blob updated successful\n");
+        return 1;
+    }
+    else {
+        eve_printf("Failed to update Blob\n");
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -108,12 +289,12 @@ uint32_t Ftf_Update_Blob(EVE_HalContext* phost, const char* pbuff)
  */
 uint32_t Ftf_Write_Blob_Default(EVE_HalContext *phost)
 {
-	char pBuff[BLOBSIZE];
-	eve_printf("Writing blob default\n");
+    char pBuff[BLOBSIZE];
+    eve_printf("Writing blob default\n");
 
-	EVE_Util_readFile(phost, pBuff, BLOBSIZE, FILE_BLOB);
+    EVE_Util_readFile(phost, pBuff, BLOBSIZE, FILE_BLOB);
 
-	return Ftf_Update_Blob(phost, pBuff);
+    return Ftf_Update_Blob(phost, pBuff);
 }
 
 /**
@@ -125,84 +306,75 @@ uint32_t Ftf_Write_Blob_Default(EVE_HalContext *phost)
  */
 uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile)
 {
-	char pBuff[BLOBSIZE];
+    char pBuff[BLOBSIZE];
 
-	eve_printf("Writing blob from file %s\n", blobfile);
+    eve_printf("Writing blob from file %s\n", blobfile);
 
-	EVE_Util_readFile(phost, pBuff, BLOBSIZE, blobfile);
+    EVE_Util_readFile(phost, pBuff, BLOBSIZE, blobfile);
 
-	int ret = Ftf_Update_Blob(phost, pBuff);
+    int ret = Ftf_Update_Blob(phost, pBuff);
 
-	/// fail to default Blob
-	if (!ret) {
-		return Ftf_Write_Blob_Default(phost);
-	}
+    /// fail to default Blob
+    if (!ret) {
+        return Ftf_Write_Blob_Default(phost);
+    }
 
-	return 1;
+    return 1;
 }
 
 /**
  * @brief File transfer progress bar initialization
  *
  * @param phost Pointer to Hal context
- * @param filePath Path to the file
- * @param fileName Filename on Progress bar
+ * @param file File to transfer
  * @param addr Address on flash
  * @param direction FTF_PROGESS_READ or FTF_PROGESS_WRITE
  * @return Ftf_Progress_t*
  */
-Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, const char* fileName, uint32_t addr, uint8_t direction)
+Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* file, uint32_t addr, uint8_t direction)
 {
-	static Ftf_Progress_t progress;
-	uint32_t range = 0;
-	int32_t fileSize = 0;
+    static Ftf_Progress_t progress;
+    uint32_t range = 0;
+    int32_t fileSize = 0;
 
-	progress.sent = 0;
-	progress.addr = addr;
-	progress.direction = direction;
+    progress.sent = 0;
+    progress.addr = addr;
+    progress.direction = direction;
 #pragma warning(push)
 #pragma warning(disable : 4996)
-	strcpy(progress.file, filePath);
-	strcpy(progress.fileName, fileName);
+    strcpy(progress.file, file);
 #pragma warning(pop)
 
-	if (direction == FTF_PROGESS_READ) {
-		snprintf(progress.message, MSG_SIZE, "Reading %s from flash", progress.fileName);
-	}
-	else {
-#ifdef EVE_FLASH_NAND
-		progress.fileSize = EVE_Util_loadRawFile(phost, RAM_G, filePath);
-		progress.sent = progress.fileSize / 2; // assume half is done
-#else
-		// update blob from file first
-		if (addr == 0) {
-			Ftf_Write_BlobFile(phost, filePath);
-		}
-		else {
-			Ftf_Write_Blob_Default(phost);
-		}
-		
-		// Jump to real data
-		if (addr == 0) {
-			progress.sent = progress.addr = (uint32_t)EVE_Util_loadFile(phost, RAM_G, BLOBSIZE, filePath, progress.sent);
-		}
+    if (direction == FTF_PROGESS_READ) {
+        snprintf(progress.message, MSG_SIZE, "Reading from flash");
+    }
+    else {
+        // update blob from file first
+        if (addr == 0) {
+            Ftf_Write_BlobFile(phost, file);
+        }
+        else {
+            Ftf_Write_Blob_Default(phost);
+        }
 
-		snprintf(progress.message, MSG_SIZE, "Writing %s to flash", progress.fileName);
-		progress.fileSize = phost->LoadFileRemaining;
+        // Jump to real data
+        if (addr == 0) {
+            progress.sent = progress.addr = (uint32_t)EVE_Util_loadFile(phost, RAM_G, BLOBSIZE, file, progress.sent);
+        }
 
-#endif
-	}
+        snprintf(progress.message, MSG_SIZE, "Writing to flash");
+        progress.fileSize = phost->LoadFileRemaining;
 
-#ifndef EVE_FLASH_NAND
-	/// Destination address in flash memory must be 4096-byte aligned
-	progress.bytesPerPercent = ALIGN(progress.fileSize / 100, 4096);
+    }
 
-	if (progress.bytesPerPercent < FREAD_BLOCK) {
-		progress.bytesPerPercent = FREAD_BLOCK;
-	}
-#endif
+    /// Destination address in flash memory must be 4096-byte aligned
+    progress.bytesPerPercent = ALIGN(progress.fileSize / 100, 4096);
 
-	return &progress;
+    if (progress.bytesPerPercent < FREAD_BLOCK) {
+        progress.bytesPerPercent = FREAD_BLOCK;
+    }
+
+    return &progress;
 }
 
 /**
@@ -214,28 +386,28 @@ Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* filePath, c
  */
 uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress)
 {
-	uint32_t bytes;
-	uint32_t sent = 0;
-	uint32_t ramGSent = 0;
-	uint32_t blockSize = 0;
+    uint32_t bytes;
+    uint32_t sent = 0;
+    uint32_t ramGSent = 0;
+    uint32_t blockSize = 0;
 
-	// Tranfer 1 percent of file
-	blockSize = FREAD_BLOCK > progress->bytesPerPercent ? progress->bytesPerPercent : FREAD_BLOCK;
+    // Tranfer 1 percent of file
+    blockSize = FREAD_BLOCK > progress->bytesPerPercent ? progress->bytesPerPercent : FREAD_BLOCK;
 
-	// Tranfer to ram_g
-	while (progress->sent < progress->fileSize && sent < progress->bytesPerPercent) {
-		bytes = EVE_Util_loadFile(phost, ramGSent, blockSize, progress->file, NULL);
-		ramGSent += bytes;
-		sent += bytes;
-		progress->sent += bytes;
-	}
+    // Tranfer to ram_g
+    while (progress->sent < progress->fileSize && sent < progress->bytesPerPercent) {
+        bytes = EVE_Util_loadFile(phost, ramGSent, blockSize, progress->file, NULL);
+        ramGSent += bytes;
+        sent += bytes;
+        progress->sent += bytes;
+    }
 
-	// Update flash from ram_g
-	ramGSent = (ramGSent + 4095) & (~4095);//to ensure 4KB alignment
-	FlashHelper_Update(phost, progress->addr, 0, ramGSent);
-	progress->addr += ramGSent;
+    // Update flash from ram_g
+    ramGSent = (ramGSent + 4095) & (~4095);//to ensure 4KB alignment
+    FlashHelper_Update(phost, progress->addr, 0, ramGSent);
+    progress->addr += ramGSent;
 
-	return progress->sent * 100 / progress->fileSize; /* Percent */
+    return progress->sent * 100 / progress->fileSize; /* Percent */
 }
 
 
@@ -249,93 +421,72 @@ uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress
  */
 uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress_t* progress)
 {
-	char s[100];
-	uint16_t x;
-	uint16_t y;
-	uint16_t w;
-	uint16_t h;
-	uint16_t opt;
-	uint16_t font = 30;
-	uint16_t val;
-	const uint32_t range = 1000;
-	uint64_t sent64 = progress->sent;
+    char s[100];
+    uint16_t x;
+    uint16_t y;
+    uint16_t w;
+    uint16_t h;
+    uint16_t opt;
+    uint16_t font = 30;
+    uint16_t val;
+    const uint32_t range = 1000;
+    uint64_t sent64 = progress->sent;
 
-	if (progress->fileSize == 0) {
-		return 1;
-	}
-	opt = 0;
-	val = (uint16_t)(sent64 * 1000 / progress->fileSize);
+    if (progress->fileSize == 0) {
+        return 1;
+    }
+    opt = 0;
+    val = (uint16_t)(sent64 * 1000 / progress->fileSize);
 
-	w = (uint16_t)(phost->Width * 8 / 10);
-	h = (uint16_t)(phost->Height * 1 / 10);
-	x = (uint16_t)((phost->Width - w) / 2);
-	y = (uint16_t)((phost->Height - h) / 2);
+    w = (uint16_t)(phost->Width * 8 / 10);
+    h = (uint16_t)(phost->Height * 1 / 10);
+    x = (uint16_t)((phost->Width - w) / 2);
+    y = (uint16_t)((phost->Height - h) / 2);
 
-	Display_StartColor(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 });
-	EVE_CoCmd_text(phost, x, y - 50, font, opt, progress->message);
-	EVE_CoCmd_progress(phost, x, y, w, h, opt, val, range);
+    Display_Start(phost, (uint8_t[]) { 64, 64, 64 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+    EVE_CoCmd_text(phost, x, y - 50, font, opt, progress->message);
+    EVE_CoCmd_progress(phost, x, y, w, h, opt, val, range);
 
-	snprintf(s, 100, "%u %%", val * 100 / range);
-	EVE_CoDl_colorRgb(phost, 0, 200, 0);
-	EVE_CoCmd_text(phost, x + w / 2, y + 5, font, opt, s);
-	EVE_CoDl_colorRgb(phost, 255, 255, 255);
+    snprintf(s, 100, "%u %%", val * 100 / range);
+    EVE_CoDl_colorRgb(phost, 0, 200, 0);
+    EVE_CoCmd_text(phost, x + w / 2, y + 5, font, opt, s);
+    EVE_CoDl_colorRgb(phost, 255, 255, 255);
 
-	Display_End(phost);
+    Display_End(phost);
 
-	return 1;
+    return 1;
 }
 
 /**
  * @brief Write file to flash and show default progress bar on LCD
  *
  * @param phost Pointer to Hal context
- * @param filePath File to transfer
- * @param fileName File name on the progress bar
+ * @param file File to transfer
  * @param address Address on flash
+ * @param fromEveSD Copy file from EVE connected SD card or not
  * @return uint32_t Number of bytes transfered
  */
-uint32_t Ftf_Write_File_To_Flash_With_Progressbar(EVE_HalContext* phost, const char* filePath, const char* fileName, uint32_t address) 
+uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file, uint32_t *address, bool fromEveSD)
 {
-#ifdef EVE_FLASH_NAND
-	// display a start loading page
-	Ftf_Progress_t progress_init;
-	progress_init.sent = 0;
-	progress_init.fileSize = 1;
-	snprintf(progress_init.message, MSG_SIZE, "Reading %s", fileName);
-	Ftf_Progress_Ui(phost, &progress_init);
-	EVE_sleep(1000);
-	snprintf(progress_init.message, MSG_SIZE, "Erasing flash before writing %s", fileName);
-	Ftf_Progress_Ui(phost, &progress_init);
-	FlashHelper_Erase(phost);
-	snprintf(progress_init.message, MSG_SIZE, "Loading %s", fileName);
-	Ftf_Progress_Ui(phost, &progress_init);
-#endif
-	Ftf_Progress_t* progress = Ftf_Progress_Init(phost, filePath, fileName, address, FTF_PROGESS_WRITE);
+    //TODO: program flash from EVE connected SD card
+    Ftf_Progress_t* progress = Ftf_Progress_Init(phost, file, *address, FTF_PROGESS_WRITE);
 
-	if (!progress) {
-		return -1; /// error
-	}
+    if (!progress) {
+        return -1; /// error
+    }
 
-#ifdef EVE_FLASH_NAND
-	snprintf(progress->message, MSG_SIZE, "Writing %s to flash", progress->fileName);
-	Ftf_Progress_Ui(phost, progress);
-	FlashHelper_Program(phost, 0, RAM_G, progress->fileSize);
-	progress->sent = progress->fileSize;
-	Ftf_Progress_Ui(phost, progress);
-	EVE_sleep(1000);
-#else
-	while (1)
-	{
-		uint32_t pc = Ftf_Progress_Write_Next(phost, progress);
-		Ftf_Progress_Ui(phost, progress);
+    while (1)
+    {
+        uint32_t pc = Ftf_Progress_Write_Next(phost, progress);
+        Ftf_Progress_Ui(phost, progress);
 
-		if (pc >= 100) {
-			break;
-		}
-	}
-#endif
+        if (pc >= 100) {
+            break;
+        }
+    }
 
-	return progress->fileSize;
+    return progress->fileSize;
 }
+#endif
 
 

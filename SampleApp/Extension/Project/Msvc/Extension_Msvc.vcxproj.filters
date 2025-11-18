@@ -77,8 +77,11 @@
     <ClCompile Include="..\..\..\..\common\application\FlashHelper.c">
       <Filter>Common\application</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\base.c">
+    <ClCompile Include="..\..\Src\Patch_Base.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\application\PatchDefault.c">
+      <Filter>Common\application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,8 +167,11 @@
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalImpl.h">
       <Filter>Common\eve_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Hdr\base.h">
+    <ClInclude Include="..\..\Hdr\Patch.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\common\application\PatchDefault.h">
+      <Filter>Common\application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

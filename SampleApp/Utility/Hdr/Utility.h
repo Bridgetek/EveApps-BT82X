@@ -7,21 +7,31 @@
 #if defined(MSVC_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
 #else
-#define TEST_DIR                            "/EveApps/SampleApp/Utility/Test"
+#define TEST_DIR                            "/EveApps/SampleApp/Utility/Test/"
 #endif
+/************** flash map ******************
+ * mandrill256_256x256_YCBCR.zlib : 4096   : 59304
+ ******************************************/
+#define FLASH_FILE                          TEST_DIR "/Flash/flash.bin"
+#define UTIL_ADDR_FLASH_MANDRILL            4096
+
+// assets information list
+#define UTIL_JPG_FLOWER                     "flower_800x480.jpg"
+#define UTIL_JPG_FLOWER_W                   800
+#define UTIL_JPG_FLOWER_H                   480
+#define UTIL_JPG_MANDRILL                   "mandrill256.jpg"
+#define UTIL_JPG_MANDRILL_W                 256
+#define UTIL_JPG_MANDRILL_H                 256
+#define UTIL_JPG_MANDRILL_INFLATE           "mandrill256_256x256_YCBCR.zlib"
+#define UTIL_PNG_UNSUPPORT                  "lenaface40_unsupported.png"
+#define UTIL_PNG_CORRUPT                    "lenaface40_corrupted.png"
+#define UTIL_PNG_FAILED_W                   128
+#define UTIL_PNG_FAILED_H                   128
+#define UTIL_WAV                            "perfect_beauty.wav"
 
 #define GET_CALIBRATION                     1
 
 /* sample app structure definitions */
-typedef struct SAMAPP_Bitmap_header
-{
-    uint8_t Format;
-    int16_t Width;
-    int16_t Height;
-    int16_t Stride;
-    int32_t Arrayoffset;
-}SAMAPP_Bitmap_header_t;
-
 typedef struct SAMAPP_ColorRGB {
     int r;
     int g;

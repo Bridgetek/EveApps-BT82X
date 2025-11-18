@@ -1,0 +1,52 @@
+# This starter workflow is for widget sample application project running on windows MSVC.
+name: CMake on Windows (MSVC)
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        platform: [MPSSE, FT4222]
+
+    steps:
+    # Checkout source
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Set up MSVC environment (VS Developer Tools)
+    - name: Configure MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+          arch: ${{ matrix.arch }}
+
+    - name: Create build folder
+      run: mkdir build
+
+    # Configure CMake
+    - name: CMake Configure
+      working-directory: build
+      run: >
+        cmake -G "NMake Makefiles"
+        -DEVE_APPS_PLATFORM=EVE_PLATFORM_${{ matrix.platform }}
+        -DEVE_APPS_GRAPHICS=EVE_GRAPHICS_BT820
+        -DEVE_APPS_DISPLAY=EVE_DISPLAY_WUXGA
+        -DEVE_APPS_SPI=EVE_SPI_QUAD
+        -DCMAKE_BUILD_TYPE=Debug
+        ..
+
+    # Build
+    - name: Build with nmake
+      working-directory: build
+      run: nmake SampleApp_Widget
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SampleApp-${{ matrix.platform }}-${{ matrix.arch }}
+        path: build/deploy/SampleApp_Widget/

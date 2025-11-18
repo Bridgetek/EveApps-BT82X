@@ -1,3 +1,4 @@
-bt82x.blob          : 0     : 4096 
-mandrill256.jpg     : 4096  : 14368
-mandrill256.jpg.pad : 18464 : 32   
+Name            : Offset : Size 
+
+bt82x.blob      : 0      : 4096 
+mandrill256.jpg : 4096   : 14368

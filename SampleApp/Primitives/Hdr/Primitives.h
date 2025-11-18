@@ -7,8 +7,14 @@
 #if defined(MSVC_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
 #else
-#define TEST_DIR                            "/EveApps/SampleApp/Primitives/Test"
+#define TEST_DIR                            "/EveApps/SampleApp/Primitives/Test/"
 #endif
+
+//assets information list
+#define PRIM_BITMAP                         "mandrill256.jpg"
+#define PRIM_BITMAP_W                       256
+#define PRIM_BITMAP_H                       256
+#define PRIM_BITMAP_CAL                     "lavender-1920x1200.jpg"
 
 #define GET_CALIBRATION                     1
 

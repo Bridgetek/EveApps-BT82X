@@ -38,19 +38,15 @@
 #if defined(MSVC_PLATFORM)
 #define TEST_DIR                            "..\\..\\..\\Test\\"
 #else
-#define TEST_DIR                            "/EveApps/SampleApp/Widget/Test"
+#define TEST_DIR                            "/EveApps/SampleApp/Widget/Test/"
 #endif
 
 #define GET_CALIBRATION                     1
 
-/* sample app structure definitions */
-typedef struct SAMAPP_Bitmap_header
-{
-    uint8_t Format;
-    int16_t Width;
-    int16_t Height;
-    int16_t Stride;
-    int32_t Arrayoffset;
-}SAMAPP_Bitmap_header_t;
+// assets information list
+#define WIDGET_BITMAP                       "Lenna_40x40_RGB8.raw"
+#define WIDGET_BITMAP_FORMAT                RGB8
+#define WIDGET_BITMAP_W                     40
+#define WIDGET_BITMAP_H                     40
 
 #endif /* APP_H_ */

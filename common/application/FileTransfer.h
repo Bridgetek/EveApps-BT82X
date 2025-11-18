@@ -2,7 +2,7 @@
  * @file FileTransfer.h
  * @brief File transfer interface from host to flash
  *
- * @author Tuan Nguyen <tuan.nguyen@brtchip.com>
+ * @author
  *
  * @date 2024
  * 
@@ -33,7 +33,7 @@
 #define FILETRANSFER_H_
 #include <stdint.h>
 
-uint32_t Ftf_Write_File_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *filePath, const char *fileName, uint32_t address);
+uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file, uint32_t *address, bool fromEveSD);
 
 #endif /* FILETRANSFER_H_ */
 
