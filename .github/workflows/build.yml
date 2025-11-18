@@ -3,7 +3,7 @@ name: CMake on Windows (MSVC)
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   build:
