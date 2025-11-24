@@ -150,7 +150,7 @@ This version is v1.1.0_RC1
 
 ## Release log
 ```
-v1.2.0_pre_release
+v1.2.0_RC1
     - Refactored sample application code
     - Added default patch loading support
     - Introduced new functions for NAND flash
