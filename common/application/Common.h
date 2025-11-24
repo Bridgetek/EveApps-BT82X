@@ -79,7 +79,7 @@ typedef enum
  **********************/
 void Gpu_Init(EVE_HalContext *phost);
 void Gpu_Release(EVE_HalContext *phost);
-int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value);
+int32_t Gpu_Hal_Dec2Ascii(char *pSrc, size_t buf_size, int32_t value);
 
 bool EVE_Calibrate(EVE_HalContext *phost);
 void Calibration_Restore(EVE_HalContext *phost);

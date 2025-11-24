@@ -373,85 +373,98 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 {
 	/* IMPORTANT: Do not use EVE_CoCmd functions here, as they can be overridden by hooks */
-
-	const uint32_t expectedChipId = EVE_CHIPID;
+	uint32_t bootStatus;
+	uint32_t chipId = 0;
 	uint8_t engineStatus;
-	uint32_t chipId;
-	uint8_t id;
+	uint8_t regId;
 	double syspll;
 	uint32_t freqbyte;
-	EVE_CMD_SYS_CLK_DIV sys_clk_div = { 0 };
-	EVE_CMD_BOOT_CFG boot_cfg = { 0 };
-	EVE_CMD_BOOT_CFG_EN boot_cfg_en = { 0 };
-	EVE_CMD_DDR_TYPE ddr_type = { 0 };
+	EVE_CMD_SYS_CLK_DIV sysClkDiv = { 0 };
+	EVE_CMD_BOOT_CFG bootCfg = { 0 };
+	EVE_CMD_BOOT_CFG_EN bootCfgEn = { 0 };
+	EVE_CMD_DDR_TYPE ddrType = { 0 };
+	uint32_t retryBootStatus = 100;
+	uint32_t retryChipId = 100;
+	uint32_t retryRegId = 100;
+	uint32_t retryCpuReset = 100;
 
-	do
+	/* EVE will be in SPI Single channel after POR */
+	if (!EVE_Hal_powerCycle(phost, true))
+		return false;
+
+	bootCfgEn.boot = 1;
+	bootCfgEn.DDRtype = 1;
+	bootCfgEn.GPREG = 0;
+	bootCfgEn.enable = 1;
+	EVE_Hal_SPICmd_bootcfgen(phost, bootCfgEn);
+	bootCfg.DDR = 1;
+	bootCfg.touch = 1;
+	bootCfg.audio = 1;
+	bootCfg.watchdog = 1;
+	bootCfg.source = 0;
+	EVE_Hal_SPICmd_setbootcfg(phost, bootCfg);
+	ddrType.speed = 0; //1333
+	ddrType.type = 1;
+	ddrType.size = EVE_DDR_SIZE;
+	EVE_Hal_SPICmd_setddrtype(phost, ddrType);
+	bootCfgEn.boot = 1;
+	bootCfgEn.DDRtype = 1;
+	bootCfgEn.GPREG = 0;
+	bootCfgEn.enable = 0;
+	EVE_Hal_SPICmd_bootcfgen(phost, bootCfgEn); // enable(0)
+	syspll = SYS_PLL_FREQ;
+	freqbyte = (uint32_t)((round(syspll / SYS_CLK_FREQ) - 1));
+	sysClkDiv.SYSPLL_CPS = 1; // default b'001'
+	sysClkDiv.freq = freqbyte; // system clock: 72MHz or 36MHz
+	EVE_Hal_SPICmd_sysclkdiv(phost, sysClkDiv);
+	EVE_Hal_SPICmd_pwr_state(phost, EVE_PWR_STATE_ACTIVE);
+	EVE_sleep(40);
+
+	while (((bootStatus = EVE_Hal_rd32(phost, REG_BOOT_STATUS)) != 0x522e2e2e) && (retryBootStatus > 0)) // Polling to indicate EVE is in normal running operation state
 	{
-		/* EVE will be in SPI Single channel after POR */
-		if (!EVE_Hal_powerCycle(phost, true))
-			return false;
-
-		boot_cfg_en.boot = 1;
-		boot_cfg_en.DDRtype = 1;
-		boot_cfg_en.GPREG = 0;
-		boot_cfg_en.enable = 1;
-		EVE_Hal_SPICmd_bootcfgen(phost, boot_cfg_en);
-		boot_cfg.DDR = 1;
-		boot_cfg.touch = 1;
-		boot_cfg.audio = 1;
-		boot_cfg.watchdog = 1;
-		boot_cfg.source = 0;
-		EVE_Hal_SPICmd_setbootcfg(phost, boot_cfg);
-		ddr_type.speed = 0; //1333
-		ddr_type.type = 1;
-		ddr_type.size = EVE_DDR_SIZE;
-		EVE_Hal_SPICmd_setddrtype(phost, ddr_type);
-		boot_cfg_en.boot = 1;
-		boot_cfg_en.DDRtype = 1;
-		boot_cfg_en.GPREG = 0;
-		boot_cfg_en.enable = 0;
-		EVE_Hal_SPICmd_bootcfgen(phost, boot_cfg_en); // enable(0)
-		syspll = 576000000;
-		freqbyte = (uint32_t)((round(syspll / FREQUENCY) - 1));
-		sys_clk_div.SYSPLL_CPS = 1; // default b'001'
-		sys_clk_div.freq = freqbyte; // system clock: 72MHz or 36MHz
-		EVE_Hal_SPICmd_sysclkdiv(phost, sys_clk_div);
-		EVE_Hal_SPICmd_pwr_state(phost, EVE_PWR_STATE_ACTIVE);
-		EVE_sleep(40);
-
-		while (EVE_Hal_rd32(phost, REG_BOOT_STATUS) != 0x522e2e2e) // Polling to indicate EVE is in normal running operation state
-		{
-			EVE_sleep(10);
-			eve_printf_debug("Boot status %lx \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
-		}
-		eve_printf_debug("Boot status %lx \n", EVE_Hal_rd32(phost, REG_BOOT_STATUS));
-		chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
-		eve_printf_debug("chipID %lx \n", chipId);
-
-		while (EXTRACT_CHIPID(chipId) != EVE_BT820)
-		{
-			eve_printf_debug("EVE REG_CHIP_ID after wake up %lx\n", (unsigned long)chipId);
-
-			EVE_sleep(20);
-			chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
-		}
-	} while (!chipId);
-
-	/* Validate chip ID to ensure the correct HAL is used */
-	/* ROM_CHIPID is valid across all EVE devices */
-	if (expectedChipId && EXTRACT_CHIPID(chipId) != expectedChipId)
-		eve_printf_debug("Mismatching EVE chip id %lx, expect model %lx\n", (unsigned long)((chipId >> 8) & 0xFF) | ((chipId & 0xFF) << 8), (unsigned long)expectedChipId);
-	eve_printf_debug("EVE chip id %lx %lx.%lx (EVE gen %i)\n", (unsigned long)EVE_shortChipId(EXTRACT_CHIPID(chipId)), (unsigned long)((chipId >> 16) & 0xFF), (unsigned long)((chipId >> 24) & 0xFF), EVE_gen(EXTRACT_CHIPID(chipId)));
-
-	/* Read Register ID to check if EVE is ready. */
-	while ((id = (uint8_t)EVE_Hal_rd32(phost, REG_ID)) != 0x7C)
+		EVE_sleep(10);
+		eve_printf_debug("Boot status %lx \n", bootStatus);
+		retryBootStatus--;
+	}
+	if (retryBootStatus == 0)
 	{
-		eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
+		eve_printf("Failed to get valid boot status, exit \n");
+		return false;
+	}
+	eve_printf_debug("Boot status %lx \n", bootStatus);
+
+	chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
+	while ((EXTRACT_CHIPID(chipId) != EVE_CHIPID) && (retryChipId > 0))
+	{
+		eve_printf_debug("EVE REG_CHIP_ID after wake up %lx\n", (unsigned long)chipId);
 
 		EVE_sleep(20);
+		chipId = EVE_Hal_rd32(phost, REG_CHIP_ID);
+		retryChipId--;
 	}
-	eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
-	eve_assert(chipId == EVE_Hal_rd32(phost, REG_CHIP_ID));
+	if (retryChipId == 0)
+	{
+		eve_printf("Chip ID is not correct, REG_CHIP_ID is %lx, exit \n", chipId);
+		return false;
+	}
+
+	eve_printf_debug("EVE chip id %lx (EVE gen %i)\n", (unsigned long)EVE_shortChipId(EXTRACT_CHIPID(chipId)), EVE_gen(EXTRACT_CHIPID(chipId)));
+
+	/* Read Register ID to check if EVE is ready. */
+	while (((regId = (uint8_t)EVE_Hal_rd32(phost, REG_ID)) != 0x7C) && (retryRegId > 0))
+	{
+		eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)regId);
+
+		EVE_sleep(20);
+		retryRegId--;
+	}
+	if (retryRegId == 0)
+	{
+		eve_printf("EVE is not ready, REG_ID value is %x, exit \n", regId);
+		return false;
+	}
+
+	eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)regId);
 
 
 	/* Read REG_CPURESET to check if engines are ready.
@@ -459,7 +472,7 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		Bit 1 for touch engine,
 		Bit 2 for audio engine.
 	*/
-	while ((engineStatus = (uint8_t)EVE_Hal_rd32(phost, REG_CPURESET)) != 0x00)
+	while (((engineStatus = (uint8_t)EVE_Hal_rd32(phost, REG_CPURESET)) != 0x00) && (retryCpuReset > 0))
 	{
 		if (engineStatus & 0x01)
 		{
@@ -475,6 +488,12 @@ bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters *bootup)
 		}
 
 		EVE_sleep(20);
+		retryCpuReset--;
+	}
+	if (retryCpuReset == 0)
+	{
+		eve_printf("EVE engine is not ready, engine status is %x, exit \n", engineStatus);
+		return false;
 	}
 	eve_printf_debug("All engines are ready\n");
 

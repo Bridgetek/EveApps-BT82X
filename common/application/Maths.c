@@ -164,7 +164,7 @@ uint32_t Math_Points_Nearby_NextX(uint32_t x1, uint32_t y1, uint32_t y2, uint32_
   * 
   * @param p Vector p
   */
-void Normalise(Math_3d_Xyz_t* p)
+void Normalise(Math_3d_Xyz* p)
 {
 	double length;
 
@@ -193,9 +193,9 @@ void Normalise(Math_3d_Xyz_t* p)
   * @param r Axis
   * @return Math_3d_Xyz_t Vector
   */
-Math_3d_Xyz_t Math_3D_ArbitraryRotate(Math_3d_Xyz_t p, double theta, Math_3d_Xyz_t r)
+Math_3d_Xyz Math_3D_ArbitraryRotate(Math_3d_Xyz p, double theta, Math_3d_Xyz r)
 {
-	Math_3d_Xyz_t q = { 0.0,0.0,0.0 };
+	Math_3d_Xyz q = { 0.0,0.0,0.0 };
 	double costheta;
 	double sintheta;
 
@@ -231,12 +231,12 @@ Math_3d_Xyz_t Math_3D_ArbitraryRotate(Math_3d_Xyz_t p, double theta, Math_3d_Xyz
   * @param p2 Vector p2
   * @return Math_3d_Xyz_t Vector
   */
-Math_3d_Xyz_t Math_3D_ArbitraryRotate2(Math_3d_Xyz_t p, double theta, Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
+Math_3d_Xyz Math_3D_ArbitraryRotate2(Math_3d_Xyz p, double theta, Math_3d_Xyz p1, Math_3d_Xyz p2)
 {
-	Math_3d_Xyz_t q = { 0.0,0.0,0.0 };
+	Math_3d_Xyz q = { 0.0,0.0,0.0 };
 	double costheta;
 	double sintheta;
-	Math_3d_Xyz_t r;
+	Math_3d_Xyz r;
 
 	r.x = p2.x - p1.x;
 	r.y = p2.y - p1.y;
@@ -274,9 +274,9 @@ Math_3d_Xyz_t Math_3D_ArbitraryRotate2(Math_3d_Xyz_t p, double theta, Math_3d_Xy
   * @param p2 Vector p2
   * @return Math_3d_Xyz_t Vector
   */
-static Math_3d_Xyz_t subVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
+static Math_3d_Xyz subVector(Math_3d_Xyz p1, Math_3d_Xyz p2)
 {
-	Math_3d_Xyz_t ret;
+	Math_3d_Xyz ret;
 	ret.x = p1.x - p2.x;
 	ret.y = p1.y - p2.y;
 	ret.z = p1.z - p2.z;
@@ -291,9 +291,9 @@ static Math_3d_Xyz_t subVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
   * @param p2 Vector p2
   * @return Math_3d_Xyz_t Vector
   */
-static Math_3d_Xyz_t normalVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
+static Math_3d_Xyz normalVector(Math_3d_Xyz p1, Math_3d_Xyz p2)
 {
-	Math_3d_Xyz_t n;
+	Math_3d_Xyz n;
 
 	n.x = p1.y * p2.z - p1.z * p2.y;
 	n.y = p1.z * p2.x - p1.x * p2.z;
@@ -309,7 +309,7 @@ static Math_3d_Xyz_t normalVector(Math_3d_Xyz_t p1, Math_3d_Xyz_t p2)
   * @param b Vector b
   * @return double Dot product
   */
-static double dotProduct(Math_3d_Xyz_t a, Math_3d_Xyz_t b) {
+static double dotProduct(Math_3d_Xyz a, Math_3d_Xyz b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
@@ -320,11 +320,11 @@ static double dotProduct(Math_3d_Xyz_t a, Math_3d_Xyz_t b) {
   * @param view Viewpoint
   * @return int True on visible or otherwise
   */
-int Math_3D_Backface_Find_Visible(Math_3d_Face_t face, Math_3d_Xyz_t view) {
-	Math_3d_Xyz_t v12 = subVector(face.p2, face.p1);
-	Math_3d_Xyz_t v13 = subVector(face.p3, face.p1);
-	Math_3d_Xyz_t N = normalVector(v12, v13);
-	Math_3d_Xyz_t S = subVector(view, face.p1);
+int Math_3D_Backface_Find_Visible(Math_3d_Face face, Math_3d_Xyz view) {
+	Math_3d_Xyz v12 = subVector(face.p2, face.p1);
+	Math_3d_Xyz v13 = subVector(face.p3, face.p1);
+	Math_3d_Xyz N = normalVector(v12, v13);
+	Math_3d_Xyz S = subVector(view, face.p1);
 
 	double Dot = dotProduct(N, S);
 

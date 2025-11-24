@@ -53,7 +53,7 @@ The following values are set based on the input definitions.
 Do not set these values manually; instead, use the specific user definitions.
 
 Graphics target:
-- EVE_SUPPORT_CHIPID=EVE_BT820
+- EVE_BT820
 
 Platform target:
 - FT4222_PLATFORM (set EVE_PLATFORM_FT4222)
@@ -107,6 +107,9 @@ It may also set platform, display, and flash values if none are configured.
 /** graphics module config **/
 #if defined(EVE_GRAPHICS_BT820)
 
+#define EVE_CHIPID EVE_BT820
+#define EVE_GEN EVE5
+
 #define BT820_ENABLE
 
 #ifndef EVE_DISPLAY_AVAILABLE
@@ -115,6 +118,10 @@ It may also set platform, display, and flash values if none are configured.
 #endif
 
 #elif defined(VM820B156)
+
+#define EVE_CHIPID EVE_BT820
+#define EVE_GEN EVE5
+
 #define BT820_ENABLE
 
 #ifndef EVE_DISPLAY_AVAILABLE
@@ -122,12 +129,6 @@ It may also set platform, display, and flash values if none are configured.
 #define DISPLAY_RESOLUTION_FHD
 #endif
 #define TOUCH_PATCH_REQUIRED
-#endif
-
-// Re-Mapping BT820 Series to BT82X
-#if defined(BT820_ENABLE)
-#define EVE_SUPPORT_CHIPID EVE_BT820
-#define EVE_SUPPORT_GEN EVE5
 #endif
 
 /** Display config **/
@@ -195,12 +196,6 @@ These may only be set by one of the platform target definitions, and should not 
 
 #define EVE_CONFIG__STR(x) #x
 #define EVE_CONFIG_STR(x) EVE_CONFIG__STR(x)
-
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-#define EVE_CHIPID EVE_SUPPORT_CHIPID
-#define EVE_GEN EVE_SUPPORT_GEN
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -276,10 +271,6 @@ These may only be set by one of the platform target definitions, and should not 
 ///////////////////////////////////////////////////////////////////////
 
 /// Configuration sanity checks
-#if !defined(EVE_SUPPORT_CHIPID)
-#pragma message(__FILE__ "(" EVE_CONFIG_STR(__LINE__) "): error EVE_SUPPORT_CHIPID: " \
-                                                      "No EVE device model has been selected")
-#endif
 #if !defined(EVE_DISPLAY_AVAILABLE)
 #pragma message(__FILE__ "(" EVE_CONFIG_STR(__LINE__) "): error EVE_DISPLAY_AVAILABLE: " \
                                                       "No display model has been selected")

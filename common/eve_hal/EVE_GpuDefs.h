@@ -56,7 +56,8 @@
 #define SPI_WIDTH_2bit           0x000100 /**< DUAL mode */
 #define SPI_WIDTH_4bit           0X000200 /**< QUAD mode */
 
-#define FREQUENCY                72000000UL
+#define SYS_CLK_FREQ             72000000UL
+#define SYS_PLL_FREQ             576000000UL
 
 /**************
 ** Addresses **

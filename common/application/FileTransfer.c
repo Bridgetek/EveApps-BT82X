@@ -31,10 +31,6 @@
 
 #include "FlashHelper.h"
 
-#define FREAD_BLOCK           (8 * 1024)
-#define BLOBSIZE              4096
-#define FILE_BLOB             (EVE_FLASH_DIR "\\bt82x.blob")
-
 #if defined(MSVC_PLATFORM)
 #define EVE_FLASH_DIR         __FILE__ "\\..\\..\\..\\common\\eve_flash"
 #else
@@ -52,7 +48,7 @@ typedef struct Flash_Progress
     char message[MSG_SIZE];
     char stage;
     uint32_t fileSize;
-} Flash_Progress_t;
+} Flash_Progress;
 
 typedef enum
 {
@@ -72,7 +68,7 @@ typedef enum
  * @param progress Flash_Progress_t struct
  * @return uint32_t 1 on successful, 0 on error
  */
-uint32_t Flash_Progress_Ui(EVE_HalContext *phost, const Flash_Progress_t *progress)
+uint32_t Flash_Progress_Ui(EVE_HalContext *phost, const Flash_Progress *progress)
 {
     char s[MSG_SIZE];
     uint16_t w = (uint16_t)(phost->Width * 8 / 10);
@@ -108,10 +104,10 @@ uint32_t Flash_Progress_Ui(EVE_HalContext *phost, const Flash_Progress_t *progre
  */
 uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file, uint32_t *address, bool fromEveSD)
 {
-    Flash_Progress_t progress;
+    Flash_Progress progress;
     uint32_t result = 0;
     uint32_t addr_from = RAM_G; // DDR address to save the file read from SDcard/PC
-    uint32_t addr_from_flash = 128 << 20; // DDR address to save the file read back from flash
+    uint32_t addr_from_flash = 64 << 20; // DDR address to save the file read back from flash
 
     progress.stage = COPY_FROM;
     if (fromEveSD)
@@ -229,6 +225,11 @@ uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file
 }
 
 #else
+
+#define FREAD_BLOCK               (8 * 1024)
+#define BLOBSIZE                  4096
+#define FILE_BLOB                 (EVE_FLASH_DIR "\\bt82x.blob")
+
 typedef struct Ftf_Progress
 {
     char file[200];
@@ -239,7 +240,7 @@ typedef struct Ftf_Progress
     uint32_t bytesPerPercent;
     uint32_t addr;
     uint8_t direction;
-} Ftf_Progress_t;
+} Ftf_Progress;
 
 /**
  * @brief Write blob file to flash
@@ -329,11 +330,11 @@ uint32_t Ftf_Write_BlobFile(EVE_HalContext* phost, const char* blobfile)
  * @param file File to transfer
  * @param addr Address on flash
  * @param direction FTF_PROGESS_READ or FTF_PROGESS_WRITE
- * @return Ftf_Progress_t*
+ * @return Ftf_Progress*
  */
-Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* file, uint32_t addr, uint8_t direction)
+Ftf_Progress* Ftf_Progress_Init(EVE_HalContext* phost, const char* file, uint32_t addr, uint8_t direction)
 {
-    static Ftf_Progress_t progress;
+    static Ftf_Progress progress;
     uint32_t range = 0;
     int32_t fileSize = 0;
 
@@ -381,10 +382,10 @@ Ftf_Progress_t* Ftf_Progress_Init(EVE_HalContext* phost, const char* file, uint3
  * @brief Write a block data of file to flash
  *
  * @param phost Pointer to Hal context
- * @param progress Ftf_Progress_t struct
+ * @param progress Ftf_Progress struct
  * @return uint32_t Percent of data transfered, 100 mean file transfer is done
  */
-uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress)
+uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress* progress)
 {
     uint32_t bytes;
     uint32_t sent = 0;
@@ -416,10 +417,10 @@ uint32_t Ftf_Progress_Write_Next(EVE_HalContext* phost, Ftf_Progress_t* progress
  * User may construct their own UI for the progress bar with Ftf_Progress_Init and Ftf_Progress_Write_Next
  *
  * @param phost Pointer to Hal context
- * @param progress Ftf_Progress_t struct
+ * @param progress Ftf_Progress struct
  * @return uint32_t 1 on successful, 0 on error
  */
-uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress_t* progress)
+uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress* progress)
 {
     char s[100];
     uint16_t x;
@@ -469,7 +470,7 @@ uint32_t Ftf_Progress_Ui(EVE_HalContext* phost, const Ftf_Progress_t* progress)
 uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file, uint32_t *address, bool fromEveSD)
 {
     //TODO: program flash from EVE connected SD card
-    Ftf_Progress_t* progress = Ftf_Progress_Init(phost, file, *address, FTF_PROGESS_WRITE);
+    Ftf_Progress* progress = Ftf_Progress_Init(phost, file, *address, FTF_PROGESS_WRITE);
 
     if (!progress) {
         return -1; /// error

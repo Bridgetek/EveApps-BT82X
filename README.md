@@ -158,7 +158,7 @@ v1.2.0_pre_release
     - Removed Display_StartColor
     - Added new sample applications:
       Video playback from SD card with pause/resume functionality
-      CCMD_COPYLIST example
+      CMD_COPYLIST example
     - Fixed font indexer issue on RP2040
     - Corrected configuration errors in Release mode
     - Removed unused code

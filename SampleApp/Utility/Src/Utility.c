@@ -367,7 +367,7 @@ static void SAMAPP_Utility_appendCommand()
  */
 static void SAMAPP_Utility_bulkTransfer()
 {
-    SAMAPP_Circle_t circles[UTIL_BULK_CIRCLE_NUM];
+    SAMAPP_Circle circles[UTIL_BULK_CIRCLE_NUM];
     uint32_t xoffset = (s_pHalContext->Width - UTIL_JPG_MANDRILL_W) / 2;
     uint32_t yoffset = (s_pHalContext->Height - UTIL_JPG_MANDRILL_H) / 2;
     int count = 0;

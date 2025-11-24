@@ -78,56 +78,44 @@ void Gpu_Release(EVE_HalContext* phost)
 }
 
 /**
- * @brief Convert the value to ASCII code and append it to the string
- * 
- * @param pSrc Pointer to source string
- * @param value Value addend to string
- * 
- * @return 0
+ * @brief Appends the decimal representation of `value` to the string in `pSrc`.
+ * Ensures no buffer overflow by using snprintf.
+ *
+ * @param pSrc      Destination buffer containing a null-terminated string.
+ * @param buf_size  Total size of the destination buffer in bytes.
+ * @param value     Value to append as decimal ASCII.
+ *
+ * @return Number of characters appended (excluding the final '\0'),
+ *         or a negative value on error.
  */
-int32_t Gpu_Hal_Dec2Ascii(char *pSrc, int32_t value)
+int32_t Gpu_Hal_Dec2Ascii(char *pSrc, size_t buf_size, int32_t value)
 {
-    int16_t Length;
-    char *pdst;
-    char charval;
-    int32_t CurrVal = value;
-    int32_t tmpval;
-    int32_t i;
-    char tmparray[16];
-    char idx = 0;
+    size_t len;
+    int written;
 
-    Length = (int16_t)strlen((char *)pSrc);
-    pdst = pSrc + Length;
+    if (pSrc == NULL || buf_size == 0)
+        return -1;
 
-    if (0 == value)
+    len = strlen(pSrc);
+    if (len >= buf_size)
     {
-        *pdst++ = '0';
-        *pdst++ = '\0';
-        return 0;
+        // No space left, string already uses whole buffer
+        return -1;
     }
 
-    if (CurrVal < 0)
-    {
-        *pdst++ = '-';
-        CurrVal = -CurrVal;
-    }
-    /* insert the value */
-    while (CurrVal > 0)
-    {
-        tmpval = CurrVal;
-        CurrVal /= 10;
-        tmpval = tmpval - CurrVal * 10;
-        charval = '0' + tmpval;
-        tmparray[idx++] = charval;
-    }
+    // Append decimal representation at the end of existing string
+    written = snprintf(pSrc + len, buf_size - len, "%ld", value);
 
-    for (i = 0; i < idx; i++)
-    {
-        *pdst++ = tmparray[idx - i - 1];
-    }
-    *pdst++ = '\0';
+    // snprintf returns number of characters that would have been written
+    // (excluding '\0'), or a negative value on encoding error.
+    if (written < 0)
+        return -1;
 
-    return 0;
+    // If written >= buf_size - len, output was truncated
+    if ((size_t)written >= buf_size - len)
+        return -1;
+
+    return (int32_t)written;
 }
 
 /**

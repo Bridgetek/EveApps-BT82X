@@ -29,8 +29,8 @@
  * SOFTWARE.
  */
 
-#ifndef APP_H_
-#define APP_H_
+#ifndef WIDGET_H_
+#define WIDGET_H_
 
 #include "Common.h"
 
@@ -49,4 +49,4 @@
 #define WIDGET_BITMAP_W                     40
 #define WIDGET_BITMAP_H                     40
 
-#endif /* APP_H_ */
+#endif /* WIDGET_H_ */

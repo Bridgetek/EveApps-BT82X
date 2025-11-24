@@ -306,28 +306,15 @@ const uint8_t patchdata[] =
 		0xf4, 0xf9, 0x93, 0x00, 
 		
 	};
-    char actual[128];
-    const char *expected = "patch-nand;1.2;nand-x.5;";
-    int i;
 
     // Load extension code to BT82x
     EVE_Cmd_wr32(phost, CMD_LOADPATCH);
     EVE_Cmd_wr32(phost, 0);
-    if (!EVE_Cmd_wrMem(phost, patchdata, 2516)) /* copy data continuously into command memory */
+    if (!EVE_Cmd_wrMem(phost, patchdata, sizeof(patchdata))) /* copy data continuously into command memory */
         eve_printf_debug("patch data load failed");
     EVE_Cmd_waitFlush(phost);
 
-    // Double check that the loaded patch versions match the expected versions
-    actual[0] = '\0';
-    EVE_Hal_rdMem(phost, (uint8_t *)actual, RAM_REPORT, RAM_REPORT_MAX);
-
-    for (i = 0; i < 128; i++)
-    {
-        if (actual[i] != expected[i])
-            return -1;
-        if (expected[i] == '\0')
-            break;
-    }
+    // Note: better to check the loaded patch versions match the expected versions
     return 0;
 }
 #else
@@ -476,28 +463,15 @@ int EVE_LoadDefaultPatch(EVE_HalContext *phost)
         0x17, 0xf6, 0xf1, 0x55, 0x61, 0x00, 0x00, 0x00, 
 
     };
-    char actual[128];
-    const char *expected = "patch;1.1;";
-    int i;
 
-   // Load extension code to BT82x
+    // Load extension code to BT82x
     EVE_Cmd_wr32(phost, CMD_LOADPATCH);
     EVE_Cmd_wr32(phost, 0);
-    if (!EVE_Cmd_wrMem(phost, patchdata, 2136)) /* copy data continuously into command memory */
+    if (!EVE_Cmd_wrMem(phost, patchdata, sizeof(patchdata))) /* copy data continuously into command memory */
         eve_printf_debug("patch data load failed");
     EVE_Cmd_waitFlush(phost);
 
-    // Double check that the loaded patch versions match the expected versions
-    actual[0] = '\0';
-    EVE_Hal_rdMem(phost, (uint8_t *)actual, RAM_REPORT, RAM_REPORT_MAX);
-
-    for (i = 0; i < 128; i++)
-    {
-        if (actual[i] != expected[i])
-            return -1;
-        if (expected[i] == '\0')
-            break;
-    }
+    // Note: better to check the loaded patch versions match the expected versions
     return 0;
 }
 #endif

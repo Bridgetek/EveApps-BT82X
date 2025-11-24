@@ -224,8 +224,10 @@ void EVE_Hal_flush(EVE_HalContext *phost)
  * @param phost Pointer to Hal context
  * @param buffer Buffer to get result
  * @param size Number of bytes to read
+ * @return true True if ok
+ * @return false False if error
  */
-static inline void rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t size)
+static inline bool rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t size)
 {
 	uint8_t buffer_readybyte[8];
 	uint8_t retry = 0;
@@ -256,12 +258,14 @@ static inline void rdBuffer(EVE_HalContext *phost, uint8_t *buffer, uint32_t siz
 
 		retry++;
 		if (retry >= READ_TIMEOUT)
-			return;
+			return false;
 	}
 
     if (sizeTransferred < size)
 	    spi_read_blocking(phost->SpiPort, 0, buffer + sizeTransferred, size - sizeTransferred);
-    }
+
+	return true;
+}
 
 /**
  * @brief Write a block data
@@ -451,7 +455,7 @@ void setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 	gpio_put(phost->SpiCsPin, 1);
 
 	/* Only support single channel */
-	phost->SpiChannels = EVE_SPI_SINGLE_CHANNEL;
+	phost->SpiChannels = numchnls;
 }
 
 /**
@@ -463,29 +467,8 @@ void setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
  */
 void EVE_Hal_setSPI(EVE_HalContext *phost, EVE_SPI_CHANNELS_T numchnls)
 {
-	int32_t syscfg;
-
-	if (numchnls > EVE_SPI_QUAD_CHANNEL)
-		return; // error
-
-	// Switch EVE to multi channel SPI mode
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_READ, REG_SYS_CFG);
-	syscfg = EVE_Hal_transfer32(phost, 0);
-	EVE_Hal_endTransfer(phost);
-	if (numchnls == EVE_SPI_DUAL_CHANNEL)
-	{
-		syscfg |= SPI_WIDTH_2bit;
-	}
-	else if (numchnls == EVE_SPI_QUAD_CHANNEL)
-	{
-		syscfg |= SPI_WIDTH_4bit;
-	}
-	EVE_Hal_startTransfer(phost, EVE_TRANSFER_WRITE, REG_SYS_CFG);
-	EVE_Hal_transfer32(phost, syscfg);
-	EVE_Hal_endTransfer(phost);
-
-	// Switch RP2040 to multi channel SPI mode
-	setSPI(phost, numchnls);
+	// RP2040 only support single SPI mode
+	setSPI(phost, EVE_SPI_SINGLE_CHANNEL);
 }
 
 void EVE_Hal_restoreSPI(EVE_HalContext *phost)

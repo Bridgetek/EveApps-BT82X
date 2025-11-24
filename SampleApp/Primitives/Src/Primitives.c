@@ -1000,10 +1000,10 @@ static void SAMAPP_Primitives_region()
         if (i % 4 == 0)
         {
             string[0] = '\0';
-            Gpu_Hal_Dec2Ascii(string, (int32_t)i);
+            Gpu_Hal_Dec2Ascii(string, sizeof(string), (int32_t) i);
             EVE_CoCmd_text(s_pHalContext, PRIM_REGION_X, y, PRIM_TITLE_FONT, OPT_CENTERY | OPT_RIGHTX, string);
             string[0] = '\0';
-            Gpu_Hal_Dec2Ascii(string, y);
+            Gpu_Hal_Dec2Ascii(string, sizeof(string), y);
             EVE_CoCmd_text(s_pHalContext, PRIM_REGION_W - PRIM_REGION_X, y, PRIM_TITLE_FONT, OPT_CENTERY, string);
             EVE_CoDl_lineWidth(s_pHalContext, 16);
         }

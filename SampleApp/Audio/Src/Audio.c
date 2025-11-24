@@ -253,7 +253,7 @@ static void SAMAPP_Audio_builtin()
         /* Draw vertical slider bar for frequency control */
         StringArray[0] = '\0';
         strcat_s(StringArray, sizeof(StringArray), "Pt ");
-        Gpu_Hal_Dec2Ascii(StringArray, (int32_t) (currfreq + 21));
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), (int32_t)(currfreq + 21));
         EVE_CoDl_tagMask(s_pHalContext, 0);
         EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width - AUDIO_SLIDER_MARGIN), AUDIO_SLIDER_MARGIN / 4, AUDIO_STR_FONT, OPT_CENTER, StringArray);
         EVE_CoDl_tagMask(s_pHalContext, 1);

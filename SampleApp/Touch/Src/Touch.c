@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
  * @param TouchNo Touch number order
  * @return None
  */
-static void helperDrawTouchPt(SAMAPP_Squares_t *Sq, int32_t TouchXY, uint8_t TouchNo)
+static void helperDrawTouchPt(SAMAPP_Squares *Sq, int32_t TouchXY, uint8_t TouchNo)
 {
     if (TouchXY != 0x80008000)
     {
@@ -154,7 +154,7 @@ static void helperDrawTouchPt(SAMAPP_Squares_t *Sq, int32_t TouchXY, uint8_t Tou
  * @param Arrayno Rectangle id
  * @return None
  */
-static void helperRectangleCalc(SAMAPP_BouncingSquares_t *context, uint8_t Arrayno)
+static void helperRectangleCalc(SAMAPP_BouncingSquares *context, uint8_t Arrayno)
 {
     if (context->RectTouched[Arrayno] == 1)
     {
@@ -179,7 +179,7 @@ static void helperRectangleCalc(SAMAPP_BouncingSquares_t *context, uint8_t Array
  * @param val Multi touch value
  * @return None
  */
-static void helperCheckTouch(SAMAPP_BouncingSquares_t *context, int32_t val)
+static void helperCheckTouch(SAMAPP_BouncingSquares *context, int32_t val)
 {
     int8_t Arrayno = -1;
 
@@ -228,7 +228,7 @@ static void helperCheckTouch(SAMAPP_BouncingSquares_t *context, int32_t val)
  * @param SqNumber
  * @return None
  */
-static void helperDrawBouncingSquares(SAMAPP_BouncingSquares_t *context, int16_t *RectX)
+static void helperDrawBouncingSquares(SAMAPP_BouncingSquares *context, int16_t *RectX)
 {
     int8_t R1 = 0;
     int8_t G1 = 0;
@@ -352,7 +352,7 @@ static void helperDrawPlotXY()
  * @param i Circle number
  * @return None
  */
-static void helperCheckCircleTouchCood(SAMAPP_BouncingCircles_t *context, int32_t val, uint8_t TouchNum,
+static void helperCheckCircleTouchCood(SAMAPP_BouncingCircles *context, int32_t val, uint8_t TouchNum,
     uint8_t i)
 {
     float CX = (float)(val >> 16);
@@ -389,7 +389,7 @@ static void helperCheckCircleTouchCood(SAMAPP_BouncingCircles_t *context, int32_
  * @param Val Circle number
  * @return None
  */
-static void helperCirclePlot(SAMAPP_BouncingCircles_t *context, uint8_t Val)
+static void helperCirclePlot(SAMAPP_BouncingCircles *context, uint8_t Val)
 {
     uint32_t Xsq;
     uint32_t Ysq;
@@ -457,7 +457,7 @@ static void helperDrawTouchPoints(int16_t CX, int16_t CY, uint8_t i)
  * @param TouchXY Touch value
  * @return None
  */
-static void helperBlobColor(SAMAPP_BlobsInst_t *pBInst, int32_t TouchXY)
+static void helperBlobColor(SAMAPP_BlobsInst *pBInst, int32_t TouchXY)
 {
     uint8_t j = 0;
     // if there is touch store the values
@@ -560,7 +560,7 @@ static int16_t helperLinear(float p1, float p2, uint16_t t, uint16_t rate)
  * @param context MovingPpoints context
  * @return None
  */
-static void helperPointsCalc(SAMAPP_MovingPoints_t* context)
+static void helperPointsCalc(SAMAPP_MovingPoints* context)
 {
     uint8_t touchNo = 0;
     uint16_t tempDeltaX;
@@ -601,7 +601,7 @@ static void SAMAPP_Touch_touchToPlaySong()
     Draw_Text(s_pHalContext, "Example for: Touch test\n\n\nPlease touch on screen (1-5 fingers)");
     uint32_t val[5];
 
-    SAMAPP_Squares_t SqCall;
+    SAMAPP_Squares SqCall;
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_CTOUCH_EXTENDED, CTOUCH_MODE_EXTENDED);
 
@@ -663,7 +663,7 @@ static void SAMAPP_Touch_BouncingSquares()
     int16_t RectX[NO_OF_RECTS];
     int32_t Touchval[NO_OF_RECTS];
 
-    SAMAPP_BouncingSquares_t context;
+    SAMAPP_BouncingSquares context;
 
     Draw_Text(s_pHalContext, "Example for: Draw Bouncing squares\n\n\nPlease touch on screen (1-5 fingers)");
 
@@ -722,7 +722,7 @@ static void SAMAPP_Touch_BouncingCircles()
 {
 #if defined(EVE_SUPPORT_CAPACITIVE)
     int32_t Touchval[NO_OF_CIRCLE];
-    SAMAPP_BouncingCircles_t context;
+    SAMAPP_BouncingCircles context;
 
     Draw_Text(s_pHalContext, "Example for: Draw Bouncing Circles\n\n\nPlease touch on screen (1-5 fingers)");
 
@@ -786,8 +786,8 @@ static void SAMAPP_Touch_BouncingPoints()
 {
 #if defined(EVE_SUPPORT_CAPACITIVE)
     int32_t Touchval[NO_OF_TOUCH];
-    SAMAPP_BlobsInst_t gBlobsInst[NO_OF_TOUCH];
-    SAMAPP_BlobsInst_t* pBInst;
+    SAMAPP_BlobsInst gBlobsInst[NO_OF_TOUCH];
+    SAMAPP_BlobsInst* pBInst;
 
     Draw_Text(s_pHalContext, "Example for: Draw Bouncing points\n\n\nPlease touch on screen (1-5 fingers)");
 
@@ -841,7 +841,7 @@ static void SAMAPP_Touch_BouncingPoints()
 static void SAMAPP_Touch_MovingPoints()
 {
 #if defined(EVE_SUPPORT_CAPACITIVE)
-    SAMAPP_MovingPoints_t context;
+    SAMAPP_MovingPoints context;
     Draw_Text(s_pHalContext, "Example for: Draw Moving points\n\n\nPlease touch on screen (1-5 fingers)");
 
     EVE_CoCmd_regWrite(s_pHalContext, REG_CTOUCH_EXTENDED, CTOUCH_MODE_EXTENDED);
@@ -1032,9 +1032,9 @@ static void SAMAPP_Touch_touchInfo()
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_RAW_XY, &touchVal);
         yvalue = (uint16_t)(touchVal & 0xffff);
         xvalue = (uint16_t)((touchVal >> 16) & 0xffff);
-        Gpu_Hal_Dec2Ascii(StringArray, (uint32_t) xvalue);
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), (uint32_t)xvalue);
         strcat_s(StringArray, sizeof(StringArray), ",");
-        Gpu_Hal_Dec2Ascii(StringArray, (uint32_t) yvalue);
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), (uint32_t)yvalue);
         strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t) (s_pHalContext->Width / 2), TOUCH_TITLE_Y, TOUCH_TITLE_FONT, OPT_CENTER,
             StringArray);
@@ -1044,9 +1044,9 @@ static void SAMAPP_Touch_touchInfo()
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_SCREEN_XY, &touchVal);
         yvalue = (int16_t)(touchVal & 0xffff);
         xvalue = (int16_t)((touchVal >> 16) & 0xffff);
-        Gpu_Hal_Dec2Ascii(StringArray, (int32_t) xvalue);
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), (int32_t)xvalue);
         strcat_s(StringArray, sizeof(StringArray), ",");
-        Gpu_Hal_Dec2Ascii(StringArray, (int32_t) yvalue);
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), (int32_t)yvalue);
         strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), TOUCH_TITLE_Y + TOUCH_TITLE_Y_INC, TOUCH_TITLE_FONT, OPT_CENTER,
             StringArray);
@@ -1054,7 +1054,7 @@ static void SAMAPP_Touch_touchInfo()
         StringArray[0] = '\0';
         strcat_s(StringArray, sizeof(StringArray), "Touch TAG (");
         EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &touchVal);
-        Gpu_Hal_Dec2Ascii(StringArray, touchVal);
+        Gpu_Hal_Dec2Ascii(StringArray, sizeof(StringArray), touchVal);
         strcat_s(StringArray, sizeof(StringArray), ")");
         EVE_CoCmd_text(s_pHalContext, (int16_t)(s_pHalContext->Width / 2), TOUCH_TITLE_Y + 2 * TOUCH_TITLE_Y_INC, TOUCH_TITLE_FONT, OPT_CENTER,
             StringArray);
