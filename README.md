@@ -146,7 +146,7 @@ $ nmake
 | GND | GND | | |
 
 ## Version
-This version is v1.1.0_RC1
+This version is v1.2.0_RC1
 
 ## Release log
 ```
