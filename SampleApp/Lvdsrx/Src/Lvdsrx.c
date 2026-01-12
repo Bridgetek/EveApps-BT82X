@@ -40,6 +40,8 @@
 #define LVDSRX_TITLE_Y      100
 #define LVDSRX_TITLE_FONT   31
 #define LVDSRX_LOOP         2000
+#define LVDSRX_W_L          800
+#define LVDSRX_H_L          600
 
 typedef enum
 {
@@ -83,12 +85,23 @@ int main(int argc, char* argv[])
 }
 
 // helper function to check LVDSRX connection
-static uint8_t helperCheckLvdsConn()
+static uint8_t helperCheckLvdsConn(uint8_t ch)
 {
     uint32_t reg_val;
-    reg_val = (EVE_Hal_rd32(s_pHalContext, REG_LVDSRX_STAT) & ((CHn_DLL_LOCKED << 25) | (CHn_DLL_LOCKED << 24)));
+    uint32_t lock = 0;
+    if (ch == 2) // two channel
+        lock = (CHn_DLL_LOCKED << 25) | (CHn_DLL_LOCKED << 24);
+    else if (ch == 1) // one channel
+        lock = (CHn_DLL_LOCKED << 24);
+    else
+    {
+        eve_printf_debug("channel set wrong, only accept 1 or 2.\n");
+        return LVDSRX_DISCONNECT;
+    }
 
-    if (reg_val != ((CHn_DLL_LOCKED << 25) | (CHn_DLL_LOCKED << 24)))
+    reg_val = (EVE_Hal_rd32(s_pHalContext, REG_LVDSRX_STAT) & lock);
+
+    if (reg_val != lock)
     {
         if (LVDS_connected == LVDSRX_CONNECTED) // lost connection
         {
@@ -145,7 +158,7 @@ static void SAMAPP_LvdsRx_withoutSC()
     uint32_t counter = LVDSRX_LOOP;
     while (counter > 0)
     {
-        if (helperCheckLvdsConn() != LVDSRX_CONNECTED)
+        if (helperCheckLvdsConn(2) != LVDSRX_CONNECTED)
             continue;
 
         Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
@@ -184,7 +197,7 @@ static void SAMAPP_LvdsRx_withSC()
 
     while (counter > 0)
     {
-        if (helperCheckLvdsConn() != LVDSRX_CONNECTED)
+        if (helperCheckLvdsConn(2) != LVDSRX_CONNECTED)
             continue;
 
         EVE_CoCmd_waitCond(s_pHalContext, REG_SC2_STATUS, EQUAL, 0x1, 0x1);
@@ -207,6 +220,41 @@ static void SAMAPP_LvdsRx_withSC()
 }
 
 /**
+ * @brief Use LVDSRX with lower resolution
+ * 
+ * In this case, LVDSRX is configured for an 800*600 resolution using a single channel, RGB565 format
+ * LVDSRX will directly use swapchain 2 instead of manually updating the bitmap address
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_LvdsRx_lower_resolution()
+{
+    Draw_Text(s_pHalContext, "Example for: LVDSRX with lower resolution");
+    Display_Config(s_pHalContext, YCBCR, MODE_LVDSRX_LOW_RESOLUTION);
+    LVDS_connected = LVDSRX_CONNECTING;
+
+    uint32_t counter = LVDSRX_LOOP;
+
+    while (counter > 0)
+    {
+        if (helperCheckLvdsConn(1) != LVDSRX_CONNECTED)
+            continue;
+
+        Display_Start(s_pHalContext, (uint8_t[]) { 255, 255, 255 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+        EVE_CoCmd_setBitmap(s_pHalContext, SWAPCHAIN_2, RGB565, LVDSRX_W_L, LVDSRX_H_L);
+        EVE_CoDl_begin(s_pHalContext, BITMAPS);
+        EVE_CoDl_vertex2f_4(s_pHalContext, 16 * (s_pHalContext->Width - LVDSRX_W_L) / 2, 0);
+        EVE_CoDl_end(s_pHalContext);
+
+        EVE_CoCmd_text(s_pHalContext, s_pHalContext->Width / 2, LVDSRX_TITLE_Y, LVDSRX_TITLE_FONT, OPT_CENTERX, "LVDSRX with Lower resolution");
+        Display_End(s_pHalContext);
+        counter--;
+    }
+    SAMAPP_DELAY;
+}
+
+/**
  * @brief Main entry to run all LVDSRX demos
  *
  * @param None
@@ -216,4 +264,5 @@ static void SAMAPP_LvdsRx()
 {
     SAMAPP_LvdsRx_withoutSC();
     SAMAPP_LvdsRx_withSC();
+    SAMAPP_LvdsRx_lower_resolution();
 }

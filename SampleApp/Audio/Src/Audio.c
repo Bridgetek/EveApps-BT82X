@@ -602,13 +602,13 @@ static void SAMAPP_Audio()
     SAMAPP_Audio_builtin();
     SAMAPP_Audio_fromEABConvertedRaw();
     SAMAPP_Audio_playWavFromCMDB();
-    //SAMAPP_Audio_playWavFromMediaFifo();
-    //SAMAPP_Audio_playWavFromSD();
-    //SAMAPP_Audio_playWavFromFlash();
+    SAMAPP_Audio_playWavFromMediaFifo();
+    SAMAPP_Audio_playWavFromSD();
+    SAMAPP_Audio_playWavFromFlash();
     SAMAPP_Audio_loadWavFromCMDBwithPauseResume();
-    //SAMAPP_Audio_loadWavFromMediaFifo();
-    //SAMAPP_Audio_loadWavFromSD();
-    //SAMAPP_Audio_loadWavFromFlash();
+    SAMAPP_Audio_loadWavFromMediaFifo();
+    SAMAPP_Audio_loadWavFromSD();
+    SAMAPP_Audio_loadWavFromFlash();
 }
 
 

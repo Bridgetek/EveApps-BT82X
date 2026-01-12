@@ -95,6 +95,8 @@ uint32_t Flash_Progress_Ui(EVE_HalContext *phost, const Flash_Progress *progress
 
 /**
  * @brief Write file to flash and show default progress bar on LCD
+ * 
+ * @note Limitation: Due to the existing EveApps memory map design, it cannot process flash writes for images exceeding 36 MB.
  *
  * @param phost Pointer to Hal context
  * @param file File to transfer, should include path if not from EVE connected SD card
@@ -107,7 +109,7 @@ uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file
     Flash_Progress progress;
     uint32_t result = 0;
     uint32_t addr_from = RAM_G; // DDR address to save the file read from SDcard/PC
-    uint32_t addr_from_flash = 64 << 20; // DDR address to save the file read back from flash
+    uint32_t addr_from_flash = 81 << 20; // DDR address to save the file read back from flash
 
     progress.stage = COPY_FROM;
     if (fromEveSD)
@@ -135,7 +137,7 @@ uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file
             return 0;
         }
         progress.fileSize = EVE_CoCmd_fssize(phost, file, 0);
-        if (progress.fileSize > 0)
+        if ((progress.fileSize > 0) && (progress.fileSize <= 36 * 1024 * 1024))
         {
             result = EVE_CoCmd_fsread(phost, addr_from, file, 0);
             if (result != 0)
@@ -149,7 +151,7 @@ uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file
         }
         else
         {
-            eve_printf_debug("file size is not large than 0\n");
+            eve_printf_debug("file size is %ld, can't be larger than 36M Bytes\n", progress.fileSize);
             snprintf(progress.message, MSG_SIZE, "Flash failed - file size is not correct");
             Flash_Progress_Ui(phost, &progress);
             EVE_sleep(FLASH_DELAY_MS);
@@ -180,6 +182,8 @@ uint32_t Write_To_Flash_With_Progressbar(EVE_HalContext *phost, const char *file
     snprintf(progress.message, MSG_SIZE, "Search for an available flash address");
     Flash_Progress_Ui(phost, &progress);
     *address = FlashHelper_GetAddrAvail(phost, progress.fileSize, *address);
+    if (*address == -1)
+        return 0;
 
     EVE_sleep(FLASH_DELAY_MS);
     progress.stage = ERASE_FLASH;
@@ -262,12 +266,12 @@ uint32_t Ftf_Update_Blob(EVE_HalContext* phost, const char* pbuff)
 
     FlashHelper_SwitchState(phost, FLASH_STATUS_BASIC); // basic mode
     EVE_Hal_wrMem(phost, RAM_G, pbuff, BLOBSIZE);
-    printf("REMG: 0x%lx\n", EVE_Hal_rd32(phost, RAM_G));
+    printf("RAMG: 0x%lx\n", EVE_Hal_rd32(phost, RAM_G));
     EVE_Cmd_waitFlush(phost);
     FlashHelper_Update(phost, 0, RAM_G, BLOBSIZE);
     EVE_Cmd_waitFlush(phost);
     FlashHelper_Read(phost, 4096, 0, BLOBSIZE, buf);
-    printf("REMG+4096: 0x%lx, buf: 0x%lx\n", EVE_Hal_rd32(phost, 4096), buf[0]);
+    printf("RAMG+4096: 0x%lx, buf: 0x%lx\n", EVE_Hal_rd32(phost, 4096), buf[0]);
 
     int ret = FlashHelper_SwitchFullMode(phost);
 

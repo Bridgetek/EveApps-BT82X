@@ -46,6 +46,7 @@
 #define EVE_CMD_FIFO_COUNT            (EVE_CMD_FIFO_SIZE / 4)
 #define EVE_CMD_FIFO_MASK             (EVE_CMD_FIFO_SIZE - 1)
 #define EVE_CMD_FIFO_ALIGNMENT_MASK   (EVE_CMD_FIFO_SIZE - ((4) - 1))
+#define EVE_CMD_FIFO_SPACE            (EVE_CMD_FIFO_SIZE - 4)
 #define EVE_CMD_FAULT(rp)             (rp & 0x3)
 
 #define SWAPCHAIN_0              0xFFFF00FF
@@ -436,7 +437,7 @@
 #define BITMAP_EXT_FORMAT(format)   ((0x2E << 24) | ((format) & 0xFFFF))
 #define BITMAP_HANDLE(handle)       ((0x05 << 24) | ((handle) & 0x3F))
 #define BITMAP_LAYOUT(format, linestride, height)  ((0x07 << 24) | (((format) & 0x1F) << 19) | (((linestride) & 0x3FF) << 9) | ((height) & 0x1FF))
-#define BITMAP_LAYOUT_H(linestride, height)        ((0x28 << 24) | (((linestride) & 0x3) << 2) | ((height) & 0x3))
+#define BITMAP_LAYOUT_H(linestride, height)        ((0x28 << 24) | (((linestride) & 0x7) << 2) | ((height) & 0x3))
 #define BITMAP_SIZE(filter, wrapx, wrapy, width, height)   ((0x08 << 24) | (((filter) & 0x1) << 20) | (((wrapx) & 0x1) << 19) | (((wrapy) & 0x1) << 18) | (((width) & 0x1FF) << 9) | ((height) & 0x1FF))
 #define BITMAP_SIZE_H(width, height)               ((0x29 << 24) | (((width) & 0x3) << 2) | ((height) & 0x3))
 #define BITMAP_SOURCE(addr)         ((0x01 << 24) | ((addr) & 0xFFFFFF))
@@ -467,7 +468,7 @@
 #define SAVE_CONTEXT()              ((0x22 << 24))
 #define SCISSOR_SIZE(width, height) ((0x1C << 24) | (((width) & 0xFFF) << 12) | ((height) & 0xFFF))
 #define SCISSOR_XY(x, y)            ((0x1B << 24) | (((x) & 0x7FF) << 11) | ((y) & 0x7FF))
-#define STENCIL_FUNC(func, ref, mask)             ((0x0A << 24) | (((func) & 0xF) << 16) | (((ref) & 0xFF) << 8) | ((mask) & 0xFF))
+#define STENCIL_FUNC(func, ref, mask)             ((0x0A << 24) | (((func) & 0x7) << 16) | (((ref) & 0xFF) << 8) | ((mask) & 0xFF))
 #define STENCIL_MASK(mask)          ((0x13 << 24) | ((mask) & 0xFF))
 #define STENCIL_OP(sfail, spass)    ((0x0C << 24) | (((sfail) & 0x7) << 3) | ((spass) & 0x7))
 #define TAG(s)                      ((0x03 << 24) | ((s) & 0xFFFFFF))
@@ -741,9 +742,9 @@
 
 /** @name for REG_LVDSRX_SETUP */
 ///@{
-#define LVDS_MODE_JEIDA_18         0UL
-#define LVDS_MODE_JEIDA_24         1UL
-#define LVDS_MODE_VESA_24          2UL
+#define LVDSRX_MODE_JEIDA_18       0UL
+#define LVDSRX_MODE_JEIDA_24       1UL
+#define LVDSRX_MODE_VESA_24        2UL
 #define VS_POL_LOW                 0UL
 #define VS_POL_HIGH                1UL
 ///@}
@@ -764,6 +765,14 @@
 ///@{
 #define SIG_VALUE                  15UL /**< 0xF */
 #define CHn_DLL_LOCKED             1UL
+///@}
+
+/** @name for REG_LVDSTX__CTRL_CHx */
+///@{
+#define LVDSTX_MODE_JEIDA_18       0UL
+#define LVDSTX_MODE_JEIDA_24       1UL
+#define LVDSTX_MODE_VESA_24        2UL
+#define LVDSTX_MODE_VESA_18        3UL
 ///@}
 
 /** @name for REG_INT_FLAGS and REG_INT_MASK */

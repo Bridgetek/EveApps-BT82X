@@ -84,6 +84,7 @@ int main(int argc, char* argv[])
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
     Display_Config(s_pHalContext, YCBCR, MODE_PICTURE);
+#if 0 // This is for showcase purposes only - the patch has already been loaded in Common.c
     if (eve_loadpatch(s_pHalContext) != 0)
     {
         eve_printf_debug("eve_loadpatch failed\n");
@@ -93,6 +94,7 @@ int main(int argc, char* argv[])
     {
         eve_printf_debug("eve_loadpatch OK\n");
     }
+#endif
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1

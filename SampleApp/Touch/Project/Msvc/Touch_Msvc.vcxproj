@@ -29,7 +29,6 @@
     <ClCompile Include="..\..\..\..\common\application\FileTransfer.c" />
     <ClCompile Include="..\..\..\..\common\application\Common.c" />
     <ClCompile Include="..\..\..\..\common\application\Maths.c" />
-    <ClCompile Include="..\..\Src\Patch_Base_Touch.c" />
     <ClCompile Include="..\..\Src\Touch.c" />
   </ItemGroup>
   <ItemGroup>
@@ -61,7 +60,6 @@
     <ClInclude Include="..\..\..\..\common\application\Common.h" />
     <ClInclude Include="..\..\..\..\common\application\FileTransfer.h" />
     <ClInclude Include="..\..\..\..\common\application\Maths.h" />
-    <ClInclude Include="..\..\Hdr\Patch.h" />
     <ClInclude Include="..\..\Hdr\Touch.h" />
   </ItemGroup>
   <!--# end header file list-->

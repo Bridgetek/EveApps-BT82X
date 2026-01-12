@@ -773,7 +773,7 @@ inline static void EVE_CoDl_region(EVE_HalContext *phost, uint16_t y, uint16_t h
  * @param phost Pointer to Hal context
  * @param o z-order code
  */
-inline static void EVE_CoDl_zorder(EVE_HalContext *phost, uint8_t o)
+inline static void EVE_CoDl_bitmapZorder(EVE_HalContext *phost, uint8_t o)
 {
 	EVE_CoCmd_dl(phost, BITMAP_ZORDER(o));
 }

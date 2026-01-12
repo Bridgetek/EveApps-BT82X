@@ -32,9 +32,6 @@
 #include "Touch.h"
 #include "FileTransfer.h"
 #include "FlashHelper.h"
-#if defined(TOUCH_PATCH_REQUIRED)
-#include "Patch.h"
-#endif
 
 #define TOUCH_BITMAP_LOAD         RAM_G
 #define TOUCH_LOOP                1500
@@ -88,12 +85,6 @@ int main(int argc, char* argv[])
     s_pHalContext = &s_halContext;
     Gpu_Init(s_pHalContext);
     Display_Config(s_pHalContext, YCBCR, MODE_PICTURE);
-#if defined(TOUCH_PATCH_REQUIRED)
-    if (eve_loadpatch(s_pHalContext) != 0)
-        eve_printf_debug("eve_loadpatch failed\n");
-    else
-        eve_printf_debug("load patch ok\n");
-#endif
 
     // read and store calibration setting
 #if GET_CALIBRATION == 1
@@ -1019,7 +1010,6 @@ static void SAMAPP_Touch_touchInfo()
     /* Below code demonstrates the usage of touch function. Display info     */
     /* touch raw, touch screen, touch tag, raw adc and resistance values     */
     /*************************************************************************/
-    LoopFlag = 300;
     wbutton = s_pHalContext->Width / 8;
     hbutton = s_pHalContext->Height / 8;
     while (LoopFlag--)

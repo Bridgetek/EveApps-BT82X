@@ -11,7 +11,7 @@
 # 3. Build for RP2040 example:
 #  set PICO_SDK_PATH=[path-to-pico-sdk]
 #  set PICO_TOOLCHAIN_PATH=[path-to-gnu-arm-toolchain]
-#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=MM2040EV -DEVE_APPS_GRAPHICS=VM820B156 -DEVE_APPS_DISPLAY=EVE_DISPLAY_FHD -DEVE_APPS_SPI=EVE_SPI_SINGLE -DCMAKE_BUILD_TYPE=Debug ..
+#  cd build && cmake  -G "NMake Makefiles" -DEVE_APPS_PLATFORM=MM2040EV -DEVE_APPS_GRAPHICS=VM820B15A -DEVE_APPS_DISPLAY=EVE_DISPLAY_FHD -DEVE_APPS_SPI=EVE_SPI_SINGLE -DCMAKE_BUILD_TYPE=Debug ..
 #  nmake SampleApp
 #
 
@@ -53,7 +53,8 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/")
 
 # Valid option input ###########################################################
 set(LIST_GRAPHICS EVE_GRAPHICS_BT820
-                  VM820B156
+                  VM820B15A
+                  VM820B10A
   )
 set(LIST_PLATFORM EVE_PLATFORM_FT4222
                   EVE_PLATFORM_MPSSE
@@ -62,6 +63,7 @@ set(LIST_PLATFORM EVE_PLATFORM_FT4222
   )
 set(LIST_DISPLAY  EVE_DISPLAY_WUXGA
                   EVE_DISPLAY_FHD
+                  EVE_DISPLAY_WXGA
   )
 
 # Validate input ###############################################################

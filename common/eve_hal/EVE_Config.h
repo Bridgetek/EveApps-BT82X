@@ -63,6 +63,7 @@ Platform target:
 Display resolution:
 - DISPLAY_RESOLUTION_WUXGA
 - DISPLAY_RESOLUTION_FHD
+- DISPLAY_RESOLUTION_WXGA
 
 Additionally, the following support flags are set:
 - EVE_SUPPORT_UNICODE
@@ -76,11 +77,11 @@ Additionally, the following support flags are set:
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 /* Validate the configured options. */
-#if defined(EVE_GRAPHICS_BT820) || defined(VM820B156)
+#if defined(EVE_GRAPHICS_BT820) || defined(VM820B15A) || defined(VM820B10A)
 #define EVE_GRAPHICS_AVAILABLE
 #endif
 
-#if defined(EVE_DISPLAY_WUXGA) || defined(EVE_DISPLAY_FHD)
+#if defined(EVE_DISPLAY_WUXGA) || defined(EVE_DISPLAY_FHD) || defined(EVE_DISPLAY_WXGA)
 #define EVE_DISPLAY_AVAILABLE
 #endif
 
@@ -106,29 +107,31 @@ It may also set platform, display, and flash values if none are configured.
 
 /** graphics module config **/
 #if defined(EVE_GRAPHICS_BT820)
-
 #define EVE_CHIPID EVE_BT820
 #define EVE_GEN EVE5
-
 #define BT820_ENABLE
-
 #ifndef EVE_DISPLAY_AVAILABLE
 #define EVE_DISPLAY_AVAILABLE
 #define DISPLAY_RESOLUTION_WUXGA
 #endif
 
-#elif defined(VM820B156)
-
+#elif defined(VM820B15A)
 #define EVE_CHIPID EVE_BT820
 #define EVE_GEN EVE5
-
 #define BT820_ENABLE
-
 #ifndef EVE_DISPLAY_AVAILABLE
 #define EVE_DISPLAY_AVAILABLE
 #define DISPLAY_RESOLUTION_FHD
 #endif
-#define TOUCH_PATCH_REQUIRED
+
+#elif defined(VM820B10A)
+#define EVE_CHIPID EVE_BT820
+#define EVE_GEN EVE5
+#define BT820_ENABLE
+#ifndef EVE_DISPLAY_AVAILABLE
+#define EVE_DISPLAY_AVAILABLE
+#define DISPLAY_RESOLUTION_WXGA
+#endif
 #endif
 
 /** Display config **/
@@ -137,6 +140,8 @@ It may also set platform, display, and flash values if none are configured.
 #elif defined(EVE_DISPLAY_FHD)
 #define DISPLAY_RESOLUTION_FHD
 #define TOUCH_PATCH_REQUIRED
+#elif defined(EVE_DISPLAY_WXGA)
+#define DISPLAY_RESOLUTION_WXGA
 #endif
 
 /** Platform config **/

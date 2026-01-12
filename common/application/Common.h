@@ -71,7 +71,8 @@ typedef enum
     MODE_DIRECTVIDEO, /**< 2 */
     MODE_VIDEO,       /**< 3 */
     MODE_LVDSRX,      /**< 4 */
-    MODE_LVDSRX_SC    /**< 5 */
+    MODE_LVDSRX_SC,   /**< 5 */
+    MODE_LVDSRX_LOW_RESOLUTION /**< 6 */
 } Display_mode;
 
 /**********************

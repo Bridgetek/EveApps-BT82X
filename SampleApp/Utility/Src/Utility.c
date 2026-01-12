@@ -69,6 +69,10 @@
 #define UTIL_SKIPCOND_BTN_TAG   1
 #define UTIL_SKIPCOND_EXIT_TAG  2
 #define UTIL_INT_PIC_TAG        1
+#define UTIL_LOAD_ADDR1         DDR_BITMAPS_STARTADDR1
+#define UTIL_ZORDER_X1          50
+#define UTIL_ZORDER_X2          500
+#define UTIL_ZORDER_Y           100
 
 static EVE_HalContext s_halContext;
 static EVE_HalContext* s_pHalContext;
@@ -958,6 +962,77 @@ static void SAMAPP_Utility_interrupt()
 }
 
 /**
+ * @brief API to demonstrate zorder usage for RGB8 format
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_zorder_RGB()
+{
+    Draw_Text(s_pHalContext, "Example for: simple zorder exercise for RGB format");
+    uint8_t z = 0xAA;
+
+    EVE_Util_loadRawFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_RAW_MANDRILL); // normal bitmap
+    EVE_Util_loadRawFile(s_pHalContext, UTIL_LOAD_ADDR1, TEST_DIR UTIL_RAW_ZORDER_RGB8); //z-ordered bitmap with zorder = 0xaa
+
+    Display_Start(s_pHalContext, (uint8_t[]) { 20, 0, 30 }, (uint8_t[]) { 255, 255, 255 }, 0, 0);
+
+    EVE_CoDl_bitmapHandle(s_pHalContext, 0);
+    EVE_CoCmd_text(s_pHalContext, UTIL_ZORDER_X1, UTIL_ZORDER_Y + UTIL_JPG_MANDRILL_H + UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, "normal bitmap");
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, RGB8, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    EVE_CoDl_begin(s_pHalContext, BITMAPS);
+    EVE_CoDl_vertex2f(s_pHalContext, UTIL_ZORDER_X1, UTIL_ZORDER_Y);
+    EVE_CoDl_end(s_pHalContext);
+
+    EVE_CoDl_bitmapHandle(s_pHalContext, 1);
+    EVE_CoDl_bitmapZorder(s_pHalContext, z); // after set bitmap handler
+    EVE_CoCmd_text(s_pHalContext, UTIL_ZORDER_X2, UTIL_ZORDER_Y + UTIL_JPG_MANDRILL_H + UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, "z-ordered bitmap");
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR1, RGB8, UTIL_JPG_MANDRILL_W, UTIL_JPG_MANDRILL_H);
+    EVE_CoDl_begin(s_pHalContext, BITMAPS);
+    EVE_CoDl_vertex2f(s_pHalContext, UTIL_ZORDER_X2, UTIL_ZORDER_Y);
+    EVE_CoDl_end(s_pHalContext);
+
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
+}
+
+/**
+ * @brief API to demonstrate zorder usage for ASTC format
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Utility_zorder_ASTC()
+{
+    Draw_Text(s_pHalContext, "Example for: simple zorder exercise for ASTC format");
+    uint8_t z = 0xAA;
+
+    EVE_Util_loadRawFile(s_pHalContext, UTIL_LOAD_ADDR, TEST_DIR UTIL_RAW_CASE); // normal bitmap
+    EVE_Util_loadRawFile(s_pHalContext, UTIL_LOAD_ADDR1, TEST_DIR UTIL_RAW_ZORDER_ASTC); // z-ordered bitmap
+
+    Display_Start(s_pHalContext, (uint8_t[]) { 20, 0, 30 }, (uint8_t[]) { 255, 255, 255 }, 0, 0);
+
+    EVE_CoDl_bitmapHandle(s_pHalContext, 0);
+    EVE_CoCmd_text(s_pHalContext, UTIL_ZORDER_X1, UTIL_ZORDER_Y + UTIL_BITMAP_CASE_H + UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, "normal bitmap");
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR, COMPRESSED_RGBA_ASTC_8x8_KHR, UTIL_BITMAP_CASE_W, UTIL_BITMAP_CASE_H);
+    EVE_CoDl_begin(s_pHalContext, BITMAPS);
+    EVE_CoDl_vertex2f(s_pHalContext, UTIL_ZORDER_X1, UTIL_ZORDER_Y);
+    EVE_CoDl_end(s_pHalContext);
+
+    EVE_CoDl_bitmapHandle(s_pHalContext, 1);
+    EVE_CoDl_bitmapZorder(s_pHalContext, z); // after set bitmap handler
+    EVE_CoCmd_text(s_pHalContext, UTIL_ZORDER_X2, UTIL_ZORDER_Y + UTIL_BITMAP_CASE_H + UTIL_TITLE_Y_INC, UTIL_TITLE_FONT, 0, "z-ordered bitmap");
+    EVE_CoCmd_setBitmap(s_pHalContext, UTIL_LOAD_ADDR1, COMPRESSED_RGBA_ASTC_8x8_KHR, UTIL_BITMAP_CASE_W, UTIL_BITMAP_CASE_H);
+    EVE_CoDl_bitmapLayout(s_pHalContext, 31, 447 * 16, UTIL_BITMAP_CASE_H / 8); // The value 447 is the z-order width, as obtained from the z-order conversion
+    EVE_CoDl_begin(s_pHalContext, BITMAPS);
+    EVE_CoDl_vertex2f(s_pHalContext, UTIL_ZORDER_X2, UTIL_ZORDER_Y);
+    EVE_CoDl_end(s_pHalContext);
+
+    Display_End(s_pHalContext);
+    SAMAPP_DELAY;
+}
+
+/**
  * @brief Main entry to run all utility demos
  *
  * @param None
@@ -983,6 +1058,8 @@ static void SAMAPP_Utility()
     SAMAPP_Utility_skipcond();
     SAMAPP_Utility_waitcond();
     SAMAPP_Utility_interrupt();
+    SAMAPP_Utility_zorder_RGB();
+    SAMAPP_Utility_zorder_ASTC();
 }
 
 

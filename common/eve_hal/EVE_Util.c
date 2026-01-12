@@ -44,6 +44,7 @@ static const uint16_t s_DisplayResolutions[EVE_DISPLAY_NB][4] = {
 	{ 480, 272, 60, 0 }, /* EVE_DISPLAY_DEFAULT (values ignored) */
 
 	/* Landscape */
+	{ 1280, 800, 57, 0 }, /* EVE_DISPLAY_WXGA_1280x800_57Hz */
 	{ 1920, 1080, 60, 0 }, /* EVE_DISPLAY_FHD_1920x1080_60Hz */
 	{ 1920, 1200, 60, 0 }, /* EVE_DISPLAY_WUXGA_1920x1200_60Hz */
 };
@@ -277,6 +278,8 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 		display = EVE_DISPLAY_FHD_1920x1080_60Hz;
 #elif defined(DISPLAY_RESOLUTION_WUXGA)
 		display = EVE_DISPLAY_WUXGA_1920x1200_60Hz;
+#elif defined(DISPLAY_RESOLUTION_WXGA)
+		display = EVE_DISPLAY_WXGA_1280x800_57Hz;
 #endif
 	}
 
@@ -334,6 +337,31 @@ void EVE_Util_configDefaults(EVE_HalContext *phost, EVE_ConfigParameters *config
 			config->VOffset = 10;
 			config->VSync0 = 0;
 			config->VSync1 = 3;
+			config->PCLK = 1;
+		}
+#endif
+		config->PCLKPol = 0;
+	}
+	else if (display == EVE_DISPLAY_WXGA_1280x800_57Hz)
+	{
+		/*
+		BT820 known values:
+		Resolution: 1280x800
+		Refresh rate: 57.393Hz
+		*/
+#if EVE_HARDCODED_DISPLAY_TIMINGS
+		if (supportedResolution)
+		{
+			config->Width = 1280;
+			config->Height = 800;
+			config->HCycle = 1440;
+			config->HOffset = 10;
+			config->HSync0 = 0;
+			config->HSync1 = 2;
+			config->VCycle = 823;
+			config->VOffset = 10;
+			config->VSync0 = 0;
+			config->VSync1 = 2;
 			config->PCLK = 1;
 		}
 #endif
@@ -572,14 +600,6 @@ bool EVE_Util_config(EVE_HalContext *phost, EVE_ConfigParameters *config)
 	EVE_Hal_wr32(phost, REG_VSIZE, config->Height);
 	EVE_Hal_wr32(phost, REG_DISP, 1);
 	EVE_Hal_wr32(phost, REG_PWM_DUTY, 128);
-
-#if defined(DISPLAY_RESOLUTION_WSVGA)
-	EVE_Hal_wr32(phost, REG_DISP, 1);
-	EVE_Hal_wr32(phost, REG_PCLK_POL, 1);
-
-	EVE_Hal_wr32(phost, REG_GPIO, 0x808b | (1 << 12));
-	EVE_Hal_wr32(phost, REG_DISP, 1);
-#endif
 
 	EVE_Util_clearScreen(phost);
 

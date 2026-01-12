@@ -230,94 +230,68 @@ bool computeCLK(EVE_HalContext *phost, FT4222_ClockRate *sysclk, FT4222_SPIClock
 bool EVE_HalImpl_open(EVE_HalContext *phost, const EVE_HalParameters *parameters)
 {
 	FT_STATUS status;
-	FT4222_Version pversion;
+	FT4222_Version version;
 	FT4222_ClockRate ftclk = 0;
 	FT4222_ClockRate selclk = 0;
 	FT4222_SPIClock seldiv = 0;
-	/* GPIO0         , GPIO1      , GPIO2       , GPIO3         } */
+
+	                        /* GPIO0    , GPIO1     , GPIO2     , GPIO3 } */
 	GPIO_Dir gpio_dir[4] = { GPIO_OUTPUT, GPIO_INPUT, GPIO_INPUT, GPIO_INPUT };
 
-	DWORD deviceIdxA = parameters->DeviceIdx;
-	FT_DEVICE_LIST_INFO_NODE devInfoA;
-	DWORD deviceIdxB;
-	FT_DEVICE_LIST_INFO_NODE devInfoB;
-
 	bool ret = true;
-
 	phost->SpiHandle = phost->GpioHandle = NULL;
 
-	memset(&devInfoA, 0, sizeof(devInfoA));
-	status = FT_GetDeviceInfoDetail(deviceIdxA,
-	    &devInfoA.Flags, &devInfoA.Type, &devInfoA.ID, &devInfoA.LocId,
-	    devInfoA.SerialNumber, devInfoA.Description, &devInfoA.ftHandle);
-	if (status != FT_OK)
-	{
-		eve_printf_debug("FT_GetDeviceInfoDetail failed\n");
-		ret = false;
-	}
-	if (devInfoA.Flags & FT_FLAGS_OPENED)
-	{
-		eve_printf_debug("Device FT4222 A already opened\n");
-		ret = false;
-	}
-	eve_printf_debug("FT4222 open '%s'\n", devInfoA.Description);
 
-	if (ret)
+
+	for (DWORD deviceId = 0; deviceId < s_NumDevsD2XX; deviceId++)
 	{
-		for (deviceIdxB = deviceIdxA + 1; deviceIdxB < s_NumDevsD2XX; ++deviceIdxB)
+		FT_DEVICE_LIST_INFO_NODE devInfo;
+		status = FT_GetDeviceInfoDetail(deviceId,
+		    &devInfo.Flags, &devInfo.Type, &devInfo.ID, &devInfo.LocId,
+		    &devInfo.SerialNumber, devInfo.Description, &devInfo.ftHandle);
+		if (status != FT_OK)
+			continue;
+
+		if (!strcmp(devInfo.Description, "FT4222 A"))
 		{
-			memset(&devInfoB, 0, sizeof(devInfoB));
-			status = FT_GetDeviceInfoDetail(deviceIdxB,
-			    &devInfoB.Flags, &devInfoB.Type, &devInfoB.ID, &devInfoB.LocId,
-			    devInfoB.SerialNumber, devInfoB.Description, &devInfoB.ftHandle);
+			eve_printf_debug("FT4222 A found at index %d\n", (int)deviceId);
+			status = FT_Open(deviceId, &phost->SpiHandle);
 			if (status != FT_OK)
-				continue;
-			if (!strcmp(devInfoB.Description, "FT4222 B"))
-				break;
+			{
+				eve_printf_debug("FT_Open FT4222 A failed %d\n", (int)status);
+				FT_Close(phost->GpioHandle);
+				phost->GpioHandle = NULL;
+				phost->SpiHandle = NULL;
+			}
 		}
-		if (deviceIdxB >= s_NumDevsD2XX)
+		if (!strcmp(devInfo.Description, "FT4222 B"))
 		{
-			eve_printf_debug("FT4222 B not found\n");
-			ret = false;
-		}
-		else if (devInfoB.Flags & FT_FLAGS_OPENED)
-		{
-			eve_printf_debug("Device FT4222 B already opened\n");
-			ret = false;
-		}
+			eve_printf_debug("FT4222 B found at index %d\n", (int)deviceId);
+			status = FT_Open(deviceId, &phost->GpioHandle);
+			if (status != FT_OK)
+			{
+				eve_printf_debug("FT_Open FT4222 B failed %d\n", (int)status);
+				FT_Close(phost->SpiHandle);
+				phost->GpioHandle = NULL;
+				phost->SpiHandle = NULL;
+			}
+		}	
 	}
+
+	if (phost->GpioHandle == NULL || phost->SpiHandle == NULL)
+	{
+		eve_printf_debug("FT4222 A/B open failed\n");
+		ret = false;
+	}
+
 
 	if (ret)
 	{
-		status = FT_Open(deviceIdxA, &phost->SpiHandle);
-		if (status != FT_OK)
-		{
-			eve_printf_debug("FT_Open FT4222 A failed %d\n", (int)status);
-			phost->SpiHandle = NULL;
-			ret = false;
-		}
-	}
-
-	if (ret)
-	{
-		status = FT_Open(deviceIdxB, &phost->GpioHandle);
-		if (status != FT_OK)
-		{
-			eve_printf_debug("FT_Open FT4222 B failed %d\n", (int)status);
-			FT_Close(phost->SpiHandle);
-			phost->GpioHandle = NULL;
-			phost->SpiHandle = NULL;
-			ret = false;
-		}
-	}
-
-	if (ret)
-	{
-		status = FT4222_GetVersion(phost->SpiHandle, &pversion);
+		status = FT4222_GetVersion(phost->SpiHandle, &version);
 		if (status != FT4222_OK)
 			eve_printf_debug("FT4222_GetVersion failed\n");
 		else
-			eve_printf_debug("SPI:chipversion = 0x%x\t dllversion = 0x%x\n", (unsigned int)pversion.chipVersion, (unsigned int)pversion.dllVersion);
+			eve_printf_debug("SPI:chipversion = 0x%x\t dllversion = 0x%x\n", (unsigned int)version.chipVersion, (unsigned int)version.dllVersion);
 	}
 
 	if (ret)

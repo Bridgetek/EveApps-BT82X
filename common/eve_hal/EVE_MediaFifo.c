@@ -220,7 +220,7 @@ bool EVE_MediaFifo_wrMem(EVE_HalContext *phost, const uint8_t *buffer, uint32_t 
 			if (transfered)
 			{
 				*transfered = done;
-				if (EVE_Cmd_rp(phost) == EVE_Cmd_wp(phost))
+				if (EVE_Cmd_space(phost) == EVE_CMD_FIFO_SPACE)
 					return true; /* Early exit, finished processing. */
 			}
 		}

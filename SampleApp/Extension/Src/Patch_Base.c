@@ -2,7 +2,7 @@
 
 /* 
  * Patch information
- * - base patch v1.1
+ * - base patch v1.4
  */
 
 #include "patch.h"
@@ -195,7 +195,10 @@ int eve_loadpatch(EVE_HalContext *phost)
     EVE_Cmd_wr32(phost, CMD_LOADPATCH);
     EVE_Cmd_wr32(phost, 0);
     if (!EVE_Cmd_wrMem(phost, patchdata, sizeof(patchdata))) /* copy data continuously into command memory */
+    {
         eve_printf_debug("patch data load failed");
+        return 1;
+    }
     EVE_Cmd_waitFlush(phost);
 
     // Note: better to check the loaded patch versions match the expected versions

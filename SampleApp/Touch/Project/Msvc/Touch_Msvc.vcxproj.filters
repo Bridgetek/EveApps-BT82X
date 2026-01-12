@@ -77,9 +77,6 @@
     <ClCompile Include="..\..\..\..\common\eve_hal\EVE_CoCmd_Widgets.c">
       <Filter>Common\eve_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\Patch_Base_Touch.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\common\application\PatchDefault.c">
       <Filter>Common\application</Filter>
     </ClCompile>
@@ -166,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\eve_hal\EVE_HalDefs.h">
       <Filter>Common\eve_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Hdr\Patch.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\application\PatchDefault.h">
       <Filter>Common\application</Filter>

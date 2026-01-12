@@ -236,6 +236,10 @@ static void Gpu_Text(EVE_HalContext* phost, const char* str, uint8_t *bgColor, u
     {
         font = 31;
     }
+    else if (phost->Width == 1280)
+    {
+        font = 31;
+    } 
     else if (phost->Width == 1920)
     {
         font = 31;
@@ -656,8 +660,11 @@ void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     eve_printf_debug("TXPLLDiv %d\n", TXPLLDiv);
     lvdspll_cks = TXPLLDiv > 4 ? 1 : 2;
     EVE_Hal_wr32(phost, REG_LVDSTX_PLLCFG, LVDSTX_PLLCFG(lvdspll_cps, lock_delay, lvdspll_cks, lvdspll_ns, TXPLLDiv));
-    EVE_Hal_wr32(phost, REG_LVDSTX_EN, 0);
+#ifdef DISPLAY_RESOLUTION_WXGA
+    EVE_Hal_wr32(phost, REG_LVDSTX_EN, LVDS_CH0_EN);
+#else
     EVE_Hal_wr32(phost, REG_LVDSTX_EN, LVDS_CH1_EN | LVDS_CH0_EN);
+#endif
     EVE_sleep(10);
     eve_printf_debug("LVDSTX_EN: %lx \n", EVE_Hal_rd32(phost, REG_LVDSTX_EN));
     eve_printf_debug("LVDSTX_PLLCFG: %lx \n", EVE_Hal_rd32(phost, REG_LVDSTX_PLLCFG));
@@ -677,7 +684,12 @@ void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
     EVE_Hal_wr32(phost, REG_SC2_PTR1, SC2_PTR1_STARTADDR);
     EVE_Cmd_waitFlush(phost);
 
+#ifdef DISPLAY_RESOLUTION_WXGA
+    EVE_Hal_wr32(phost, REG_SO_MODE, TWO_PIXEL_SINGLE_LVDS);
+#else
     EVE_Hal_wr32(phost, REG_SO_MODE, FOUR_PIXEL_DUAL_LVDS);
+#endif
+
     if (mode == MODE_PICTURE)
     {
         scanout_single(phost, format, w, h);
@@ -705,7 +717,7 @@ void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
         EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
         EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
 
-        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDSRX_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
         EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
                                               (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
 
@@ -721,8 +733,24 @@ void Display_Config(EVE_HalContext *phost, uint16_t format, Display_mode mode)
         EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB8);
         EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
 
-        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDS_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDSRX_MODE_VESA_24 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_TWO_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
         EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) | 
+                                              (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
+
+        scanout_swapping(phost, format, w, h);
+    }
+    else if (mode == MODE_LVDSRX_LOW_RESOLUTION)
+    {
+        // This LVDSRX mode is using Swapchain 2 to display with lower resolution (800*600)
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_ENABLE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_CAPTURE, 1);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_SETUP, ((LVDSRX_ONE_CHANNEL << 1) | (LVDSRX_ONE_PIXEL_PER_CLK & 0x1)));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DEST, SWAPCHAIN_2);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_FORMAT, RGB565);
+        EVE_Hal_wr32(phost, REG_LVDSRX_CORE_DITHER, 0);
+
+        EVE_Hal_wr32(phost, REG_LVDSRX_SETUP, ((LVDSRX_MODE_JEIDA_18 << 3) | (VS_POL_HIGH << 2) | (LVDSRX_ONE_CHANNEL) << 1 | LVDSRX_ONE_PIXEL_PER_CLK));
+        EVE_Hal_wr32(phost, REG_LVDSRX_CTRL, ((8 << 12) | (CHn_CLKSEL_FALLING << 11) | (CHn_FRANGE_10_30 << 9) | (CHn_PWDN_B_ON << 8) |
                                               (8 << 4) | (CHn_CLKSEL_FALLING << 3) | (CHn_FRANGE_10_30 << 1) | CHn_PWDN_B_ON));
 
         scanout_swapping(phost, format, w, h);

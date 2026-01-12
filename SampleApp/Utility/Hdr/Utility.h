@@ -59,6 +59,12 @@
 #define UTIL_PNG_FAILED_W                   128
 #define UTIL_PNG_FAILED_H                   128
 #define UTIL_WAV                            "perfect_beauty.wav"
+#define UTIL_RAW_MANDRILL                   "mandrill256_256x256_RGB8.raw"
+#define UTIL_RAW_ZORDER_RGB8                "mandrill256_256x256_RGB8_z_0xaa.raw"
+#define UTIL_RAW_CASE                       "case_184x192_ASTC_8X8.raw"
+#define UTIL_RAW_ZORDER_ASTC                "case_184x192_ASTC_8X8_z_0xaa.raw"
+#define UTIL_BITMAP_CASE_W                  184
+#define UTIL_BITMAP_CASE_H                  192
 
 #define GET_CALIBRATION                     1
 

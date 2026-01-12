@@ -1,19 +1,15 @@
 
 
 # EveApps-BT82X
-EveApps-BT82X is a collection of applications designed as reference resources for Bridgetek's 5th-generation graphics controller, the BT82X.
+**EveApps-BT82X** is a collection of sample applications created as reference materials for Bridgetek’s 5th-generation graphics controller, the **BT82X**.
 
-The collection is divided into two categories: **Sample** and **Demo** applications. Both are written in ANSI C, with complete source code provided.
+The samples are implemented in ANSI C with full source code provided. They are primarily instructional, focusing on demonstrating individual display lists and commands.
 
-- **Sample applications** focus on instructional use, demonstrating individual display lists or commands. 
-- **Demo applications** are more complex, closely resembling real-world projects.  (To be updated) 
+All applications share common resources located in the *“common”* folder.
 
-All applications rely on shared resources located in the "common" folder.
+Each sample includes a *“project”* subfolder that contains the required files for building the application with **Microsoft Visual Studio 2019**.
 
-Each application includes a "project" subfolder containing the necessary files for building the application using the MS Visual Studio 2019.
-
-Users are expected to have familiarity with the BT82X programming guide and datasheet.
-
+Users should be familiar with the BT82X programming guide and datasheet before using these examples.
 
 
 ## Folder introduction
@@ -40,8 +36,9 @@ Users are expected to have familiarity with the BT82X programming guide and data
 ```
 
 Note:
-- For Eve registers and commands/instructions definition, user can find it at the file common/eve_hal/EVE_GpuDef.h and common/eve_hal/Eve_CoCmd.h.
-- For flash blob file used to access the eve connected flash chip, user can find it at common/eve_flash.
+- Definitions for Eve registers, commands, and instructions can be found in common/eve_hal/EVE_GpuDef.h and common/eve_hal/EVE_CoCmd.h.
+- The flash blob used for accessing the EVE-connected NOR flash chip is located in common/eve_flash.
+- By default, NAND flash settings are defined in common/eve_hal/EVE_Config.h.
 
 ## Hardware dependency 
 Unless specified otherwise, the default hardware platform is the VM820C.  You may refer to the details at www.brtchip.com

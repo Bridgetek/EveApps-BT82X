@@ -87,11 +87,13 @@ static void helperSetVolume(EVE_HalContext *phost, uint8_t left, uint8_t right)
 {
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_L_PB, left);
     EVE_CoCmd_regWrite(s_pHalContext, REG_VOL_R_PB, right);
-    EVE_CoCmd_regWrite(s_pHalContext, REG_PLAY_CONTROL, 1); // restore default value
 }
 
 /**
  * @brief Test AVI video playback full screen from flash
+ * 
+ * @note When using CMD_PLAYVIDEO/EVE_CoCmd_playVideo for video playback, SwapChain1(SC1) with double buffers is used by default. \n
+ *  For configuration details, refer to 'Display_Config()' in Common.c.
  *
  * @param None
  * @return None
@@ -212,6 +214,59 @@ static void SAMAPP_Video_frameByFrameFlashPauseResume()
 }
 
 /**
+ * @brief API used to demonstrate looping frame-by-frame Flash video playback with a stop button.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Video_frameByFrameFlashLoop()
+{
+    const uint32_t completionPtr = RAM_G;
+    const uint32_t videoSource = RAM_G + 4;
+    uint32_t btnW = VIDEO_BTN_W;
+    uint32_t btnH = VIDEO_BTN_H;
+    uint32_t btnX = VIDEO_FLOWERS_1024_W / 2 - btnW / 2;
+    uint32_t btnY = VIDEO_FLOWERS_1024_H + VIDEO_BTN_Y_INC;
+    bool stop = false;
+    const uint32_t btnStopTag = VIDEO_BTN_TAG;
+    uint32_t tag = 0;
+
+    if (!FlashHelper_SwitchFullMode(s_pHalContext))
+    {
+        eve_printf("SwitchFullMode failed");
+        return;
+    }
+    Draw_Text(s_pHalContext, "Example for: Looping frame by frame Flash video playback with a stop button");
+
+    while (!stop)
+    {
+        EVE_CoCmd_flashSource(s_pHalContext, addr_flash + VIDEO_FLASH_ADDR_FLOWER);
+        EVE_CoCmd_videoStart(s_pHalContext, OPT_FLASH);
+        do
+        {
+            if ((EVE_CoCmd_regRead(s_pHalContext, REG_TOUCH_TAG, &tag)) && ((tag & 0xFFFFFF) == btnStopTag))
+            {
+                stop = true;
+                break;
+            }
+
+            EVE_CoCmd_videoFrame(s_pHalContext, videoSource, completionPtr);
+            Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+            EVE_CoCmd_setBitmap(s_pHalContext, videoSource, RGB565, VIDEO_FLOWERS_1024_W, VIDEO_FLOWERS_1024_H);
+            EVE_CoDl_begin(s_pHalContext, BITMAPS);
+            EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
+            EVE_CoDl_end(s_pHalContext);
+
+            /*** Show a button ***/
+            EVE_CoDl_tag(s_pHalContext, btnStopTag);
+            EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, VIDEO_TITLE_FONT, 0, "STOP VIDEO");
+            Display_End(s_pHalContext);
+            EVE_sleep(VIDEO_DELAY_MS);
+        } while (EVE_Hal_rd32(s_pHalContext, completionPtr) != 0);
+    }
+}
+
+/**
  * @brief AVI video playback directly from file
  *
  * @param None
@@ -311,7 +366,7 @@ static void SAMAPP_Video_fromSDPauseResume()
     helperSetVolume(s_pHalContext, VIDEO_VOL, VIDEO_VOL);
     eve_printf_debug("Video playback starts.\n");
     EVE_CoCmd_playVideo(s_pHalContext, OPT_FS | OPT_SOUND | OPT_YCBCR | OPT_OVERLAY | OPT_NODL);
-    while (EVE_Cmd_wp(s_pHalContext) != EVE_Cmd_rp(s_pHalContext))
+    while (EVE_Cmd_space(s_pHalContext) != EVE_CMD_FIFO_SPACE)
     {
         uint32_t touch = EVE_Hal_rd32(s_pHalContext, REG_TOUCH_SCREEN_XY);
         uint32_t touch_x = touch >> 16;
@@ -333,6 +388,7 @@ static void SAMAPP_Video_fromSDPauseResume()
     }
 
     EVE_Cmd_waitFlush(s_pHalContext);
+    EVE_Hal_wr32(s_pHalContext, REG_PLAY_CONTROL, 1); // restore default value
 }
 
 /**
@@ -401,7 +457,7 @@ static void SAMAPP_Video_frameByFrameSDPauseResume()
     uint8_t txtPause[2][20] = { "PAUSE", "RESUME" };
     uint32_t tag = 0;
 
-    Draw_Text(s_pHalContext, "Example for: Video playback frame by frame with pause/resume button");
+    Draw_Text(s_pHalContext, "Example for: Video playback from SD card, frame by frame with pause/resume button");
 
     uint32_t result = 0;
     result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
@@ -454,6 +510,62 @@ static void SAMAPP_Video_frameByFrameSDPauseResume()
         /*** Done button ***/
         Display_End(s_pHalContext);
         EVE_sleep(VIDEO_DELAY_MS);
+    } while (EVE_Hal_rd32(s_pHalContext, completionPtr) != 0);
+}
+
+/**
+ * @brief Video playback from an SD card, frame by frame, with double-buffer swapping
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Video_frameByFrameSDBufferSwap()
+{
+    const uint32_t completionPtr = RAM_G;
+    const uint32_t videoSource1 = DDR_BITMAPS_STARTADDR1;
+    const uint32_t videoSource2 = DDR_BITMAPS_STARTADDR2;
+    uint32_t frame = 0;
+
+    Draw_Text(s_pHalContext, "Example for: Video playback from SD card, frame by frame, with double-buffer swapping");
+
+    uint32_t result = 0;
+    result = EVE_CoCmd_sdattach(s_pHalContext, OPT_4BIT | OPT_IS_SD, result);
+    eve_printf_debug("SD attach status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD attach failed\n");
+        return;
+    }
+    result = EVE_CoCmd_fssource(s_pHalContext, VIDEO_AVI, 0);
+    eve_printf_debug("file read status 0x%x \n", result);
+    if (result != 0)
+    {
+        eve_printf_debug("SD read failed\n");
+        return;
+    }
+
+    EVE_CoCmd_videoStart(s_pHalContext, OPT_FS);
+    do
+    {
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+        if (frame % 2 == 0)
+        {
+            EVE_CoCmd_videoFrame(s_pHalContext, videoSource1, completionPtr);
+            EVE_CoDl_bitmapHandle(s_pHalContext, 1);
+            EVE_CoCmd_setBitmap(s_pHalContext, videoSource1, RGB565, VIDEO_FLOWERS_1024_W, VIDEO_FLOWERS_1024_H);
+        }
+        else
+        {
+            EVE_CoCmd_videoFrame(s_pHalContext, videoSource2, completionPtr);
+            EVE_CoDl_bitmapHandle(s_pHalContext, 2);
+            EVE_CoCmd_setBitmap(s_pHalContext, videoSource2, RGB565, VIDEO_FLOWERS_1024_W, VIDEO_FLOWERS_1024_H);
+        }
+        EVE_CoDl_begin(s_pHalContext, BITMAPS);
+        EVE_CoDl_vertex2f_4(s_pHalContext, 0, 0);
+        EVE_CoDl_end(s_pHalContext);
+        Display_End(s_pHalContext);
+        EVE_sleep(VIDEO_DELAY_MS);
+        frame++;
     } while (EVE_Hal_rd32(s_pHalContext, completionPtr) != 0);
 }
 
@@ -622,6 +734,52 @@ static void SAMAPP_Video_frameByFrameMediafifo()
 }
 
 /**
+ * @brief API demonstrating looping video playback from Mediafifo with stop button.
+ *
+ * @param None
+ * @return None
+ */
+static void SAMAPP_Video_fromMediafifoLoop()
+{
+    uint32_t btnW = VIDEO_BTN_W;
+    uint32_t btnH = VIDEO_BTN_H;
+    uint32_t btnX = VIDEO_FLOWERS_1024_W / 2 - btnW / 2;
+    uint32_t btnY = VIDEO_FLOWERS_1024_H + VIDEO_BTN_Y_INC;
+    bool stop = false;
+
+    Draw_Text(s_pHalContext, "Example for: Looping Mediafifo video playback with stop button");
+
+    helperSetVolume(s_pHalContext, VIDEO_VOL, VIDEO_VOL);
+    EVE_Util_loadRawFile(s_pHalContext, VIDEO_MEDIAFIFO_ADDR, TEST_DIR VIDEO_FLOWERS_1024);
+    EVE_CoCmd_mediaFifo(s_pHalContext, VIDEO_MEDIAFIFO_ADDR, 5000 * 1024); // set a mediafifo larger than data
+    while (!stop)
+    {
+        Display_Start(s_pHalContext, (uint8_t[]) { 0, 0, 0 }, (uint8_t[]) { 255, 255, 255 }, 0, 4);
+        EVE_CoCmd_button(s_pHalContext, btnX, btnY, btnW, btnH, VIDEO_TITLE_FONT, 0, "STOP VIDEO");
+
+        EVE_CoCmd_regWrite(s_pHalContext, REG_MEDIAFIFO_READ, 0);
+        EVE_CoCmd_regWrite(s_pHalContext, REG_MEDIAFIFO_WRITE, 5000 * 1024);
+        EVE_CoCmd_playVideo(s_pHalContext, OPT_MEDIAFIFO | OPT_SOUND | OPT_OVERLAY);
+
+        while (EVE_Cmd_space(s_pHalContext) != EVE_CMD_FIFO_SPACE)
+        {
+            uint32_t touch = EVE_Hal_rd32(s_pHalContext, REG_TOUCH_SCREEN_XY);
+            uint32_t touch_x = touch >> 16;
+            uint32_t touch_y = touch & 0xFFFF;
+            if ((touch_x > btnX) && (touch_x < (btnX + btnW)) && (touch_y > btnY) && (touch_y < (btnY + btnH)))
+            {
+                stop = true;
+                EVE_Hal_wr32(s_pHalContext, REG_PLAY_CONTROL, -1);
+                break;
+            }
+        }
+        EVE_Cmd_waitFlush(s_pHalContext);
+        if (stop == true)
+            EVE_Hal_wr32(s_pHalContext, REG_PLAY_CONTROL, 1); // restore default value
+    }
+}
+
+/**
  * @brief Main entry to run all video demos
  *
  * @param None
@@ -632,17 +790,18 @@ static void SAMAPP_Video()
     SAMAPP_Video_fromFlashFullScreen();
     SAMAPP_Video_frameByFrameFromFlash();
     SAMAPP_Video_frameByFrameFlashPauseResume();
+    SAMAPP_Video_frameByFrameFlashLoop();
     SAMAPP_Video_fromFileDirect();
     SAMAPP_Video_fromSD();
     SAMAPP_Video_fromSDPauseResume();
     SAMAPP_Video_fromSDbackground();
     SAMAPP_Video_frameByFrameSDPauseResume();
+    SAMAPP_Video_frameByFrameSDBufferSwap();
     SAMAPP_Video_fromCMDB();
     SAMAPP_Video_fromCMDBwithLogoBeside();
     SAMAPP_Video_fromMediafifoFullscreen();
     SAMAPP_Video_fromMediafifowithCompletereg();
     SAMAPP_Video_fromMediafifowithCompleteregFailcase();
     SAMAPP_Video_frameByFrameMediafifo();
+    SAMAPP_Video_fromMediafifoLoop();
 }
-
-
