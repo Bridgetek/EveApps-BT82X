@@ -143,10 +143,21 @@ $ nmake
 | GND | GND | | |
 
 ## Version
-This version is v1.2.0_RC1
+This version is v1.3.0_RC1
 
 ## Release log
 ```
+v1.3.0_RC1
+    - Added new sample applications:
+      - Single-channel and REG565 use cases for LVDSRX
+      - Z-order bitmap use case
+      - Double-buffered video usage
+      - Video playback in loop mode
+    - Added support for the new VM820B10A module
+    - Fixed audio issues caused by the patch and updated the patches
+    - Added limitation notes for the flash write function
+    - Updated coprocessor completion check to use REG_CMDB_SPACE
+
 v1.2.0_RC1
     - Refactored sample application code
     - Added default patch loading support
