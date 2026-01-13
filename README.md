@@ -75,8 +75,8 @@ cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_FT4222 -DEVE_APPS_GR
 nmake SampleApp_[Project Name]
 
 # EVE_APPS_PLATFORM can be one of : EVE_PLATFORM_FT4222 or EVE_PLATFORM_MPSSE
-# [EVE graphics] must be : EVE_GRAPHICS_BT820
-# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD)
+# [EVE graphics] can be one of: EVE_GRAPHICS_BT820, VM820B15A, VM820B10A
+# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD), EVE_DISPLAY_WXGA (1280x800 LCD)
 # [EVE SPI] can be one of : EVE_SPI_QUAD, EVE_SPI_DUAL, EVE_SPI_SINGLE  (FT4222 can support Quad/Dual/Single, MPSSE supports single only)
 # [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
 # The output binary [Project Name].exe can be found in build\[Project Name]
@@ -114,8 +114,8 @@ cd build
 cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=EVE_PLATFORM_RP2040 -DEVE_APPS_GRAPHICS=[EVE graphics] -DEVE_APPS_DISPLAY=[EVE display] -DEVE_APPS_SPI=[EVE SPI] -DCMAKE_BUILD_TYPE=Debug ..
 nmake [Project name]
 
-# [EVE graphics] must be : EVE_GRAPHICS_BT820
-# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD)
+# [EVE graphics] can be one of: EVE_GRAPHICS_BT820, VM820B15A, VM820B10A
+# [EVE display] can be one of:  EVE_DISPLAY_WUXGA (1920x1200 LCD), EVE_DISPLAY_FHD (1920x1080 LCD), EVE_DISPLAY_WXGA (1280x800 LCD)
 # [EVE SPI] must : EVE_SPI_SINGLE (PR2040 supports single only)
 # [Project Name] is the folder name of a subfolder inside SampleApp , one example is SampleApp_Widget
 # The output binary [Project Name].uf2 can be found in build\SampleApp\[Project]
